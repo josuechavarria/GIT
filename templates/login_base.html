@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html lang="es">
+
+<head>
+    <title>{% block title %}{% endblock %}</title>    
+    <!-- chartist CSS -->
+    {% load static %}
+    <link href="{% static "evaluaciones/assets/plugins/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static 'evaluaciones/assets/plugins/chartist-js/dist/chartist-init.css' %}" rel="stylesheet">
+    <link href="{% static 'evaluaciones/assets/plugins/chartist-plugin-tooltip-master/dist/chartist-plugin-tooltip.css' %}" rel="stylesheet">
+    <!--This page css - Morris CSS -->
+    <link href="{% static 'evaluaciones/assets/css/c3-master/c3.min.css' %}" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="{% static 'css/colors/blue.css' %}" rel="stylesheet">
+</head>
+<body>
+    <h1>Login</h1>
+    {% block content %}{% endblock %} {% block footer %}
+    <hr>
+    <p>Gracias por Visitar el Sitio.</p>
+    {% endblock %}
+</body>
+
+</html>
