@@ -3,12 +3,14 @@ from django.contrib.auth.models import User, Group
 from django.utils.timezone import now
 # Create your models here.
 
+
 class empresas(models.Model):
 	"""docstring for empresas"""
 	nombre = models.CharField(max_length=60)
 	rtn = models.CharField(max_length=20)
 	direccion = models.TextField()
 	otros_datos = models.TextField()
+
 
 class puestos(models.Model):
 	"""docstring for puestos"""
@@ -17,10 +19,12 @@ class puestos(models.Model):
 	nombre = models.CharField(max_length=50)
 	orden_jerarquico = models.IntegerField()
 
+
 class departamentos(models.Model):
 	"""docstring for departamentos"""
 	empresa = models.ForeignKey(empresas)
 	nombre = models.CharField(max_length=60)
+
 
 class sucursales(models.Model):
 	"""docstring for sucursales"""
@@ -28,6 +32,7 @@ class sucursales(models.Model):
 	nombre = models.CharField(max_length=60)
 	direccion = models.TextField()
 	otros_datos = models.TextField()
+
 
 class colaboradores(models.Model):
 	"""docstring for colaborador"""
@@ -38,30 +43,35 @@ class colaboradores(models.Model):
 	segundo_nombre = models.CharField(max_length=30)
 	primer_apellido = models.CharField(max_length=30)
 	segundo_apellido = models.CharField(max_length=30)
-	password_caducado = models.BooleanField(default=False)	
+	password_caducado = models.BooleanField(default=False)
 	puesto = models.ForeignKey(puestos)
 	departamento = models.ForeignKey(departamentos)
 	sucursal = models.ForeignKey(sucursales, null=True, blank=True, default=None)
 	supevisor = models.ForeignKey('self')
-	usuario_creador = models.ForeignKey(User, related_name='colaborador_usuario_creador')
-	fecha_creacion = models.DateField(default=now())
-	usuario_modificador = models.ForeignKey(User, related_name='colaborador_usuario_modificador')
-	fecha_modificacion = models.DateField(default=now())
-	fecha_ult_mod_password = models.DateField(default=now())
+	usuario_creador = models.ForeignKey(
+		User, related_name='colaborador_usuario_creador')
+	fecha_creacion = models.DateField(default=now)
+	usuario_modificador = models.ForeignKey(
+		User, related_name='colaborador_usuario_modificador')
+	fecha_modificacion = models.DateField(default=now)
+	fecha_ult_mod_password = models.DateField(default=now)
 
 	def _get_full_name(self):
 		"Returns the person's full name."
 		return '%s %s %s %s' % (self.primer_nombre, self.segundo_nombre, self.primer_apellido, self.segundo_apellido)
 	nombre_completo = property(_get_full_name)
 
+
 class perfil(models.Model):
 	empresa = models.ForeignKey(empresas)
 	colaborador = models.ForeignKey(colaboradores)
 	usuario = models.ForeignKey(User)
-	foto = models.ImageField(upload_to='profile',null=True, blank=True, default=None)
-	sexo = models.CharField(max_length=15,null=True, blank=True, default=None)
+	foto = models.ImageField(
+		upload_to='profile', null=True, blank=True, default=None)
+	sexo = models.CharField(max_length=15, null=True, blank=True, default=None)
 	fecha_nacimiento = models.DateField(null=True, blank=True, default=None)
 	pasa_tiempos = models.TextField(null=True, blank=True, default=None)
+
 
 class periodos(models.Model):
 	"""periodo a evaluar, se llenara una vez, luego automatico
@@ -71,10 +81,12 @@ class periodos(models.Model):
 	fecha_fin = models.DateTimeField()
 	activo = models.BooleanField()
 
+
 class objetivos(models.Model):
 	"""objetivo estrategico del criterio"""
 	nombre = models.CharField(max_length=30, unique=True)
-		
+
+
 class criterios(models.Model):
 	"""Al crear no se debe mostrar el periodo ni la empresa, debe guardarse el activo por empresa"""
 	empresa = models.ForeignKey(empresas)
@@ -83,6 +95,7 @@ class criterios(models.Model):
 	descripcion = models.TextField()
 	objetivo = models.ForeignKey(objetivos)
 
+
 class evaluaciones(models.Model):
 	empresa = models.ForeignKey(empresas)
 	periodo = models.ForeignKey(periodos)
@@ -90,6 +103,7 @@ class evaluaciones(models.Model):
 	criterio = models.ForeignKey(criterios)
 	ponderacion = models.DecimalField(max_digits=3, decimal_places=2)
 	porcentaje_meta = models.DecimalField(max_digits=3, decimal_places=2)
+
 
 class evaluacion_colaborador(models.Model):
 	empresa = models.ForeignKey(empresas)
@@ -100,5 +114,3 @@ class evaluacion_colaborador(models.Model):
 	porcentaje = models.DecimalField(max_digits=3, decimal_places=2)
 	porcentaje_final = models.DecimalField(max_digits=3, decimal_places=2)
 	nota = models.DecimalField(max_digits=3, decimal_places=2)
-
-		

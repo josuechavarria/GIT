@@ -1,12 +1,9 @@
 {% extends 'login_base.html'%}
-{% block content %} {% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %} {% if next %} {% if user.is_authenticated %}
-<p>Your account doesn't have access to this page. To proceed, please login with an account that has access.</p>
-{% else %}
-<p>Please login to see this page.</p>
-{% endif %} {% endif %}
-
+{% block content %} 
+<body>
+    <div class="container">
+        <h1>Bienvenido</h1>
+        Bienvenido! usted puede hace login desde aca!
 <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
 
@@ -20,14 +17,17 @@
     </div>
 
     <div>
-        <input type="submit" value="login" />
+        <input class="btn btn-success" type="submit" value="login" />
         <input type="hidden" name="next" value="{{ next }}" />
     </div>
 </form>
-
+    </div>
+</body>
 {# Assumes you setup the password_reset view in your URLconf #}
+<h1>{{numbers}}</h1>
 <p>
     <a href="{% url 'password_reset' %}">Olvido su contraseña?</a>
 </p>
+
 
 {% endblock %}
