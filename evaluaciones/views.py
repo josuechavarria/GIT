@@ -8,9 +8,8 @@ def home(request):
     args = {'name' :name, 'numbers': numbers}
     return render(request, 'evaluaciones/landing.html',args)
 
-@login_required
 def principal(request):
     return render(request,'evaluaciones/principal.html')
 
 def login(request):
-    return render(request, 'evaluaciones/login.html')
+    return render(request, 'accounts/login.html')
