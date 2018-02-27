@@ -10,7 +10,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="theme-color" content="#333">
-        <title>Material Style</title>
+        <title>Iniciar Sesión</title>
         <meta name="description" content="Material Style Theme">
         <link rel="shortcut icon" href="{% static 'evaluaciones/assetsvicon.png?v=3' %}">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -36,26 +36,26 @@
             <div class="mw-500 absolute-center">
                 <div class="card color-dark shadow-6dp animated fadeIn animation-delay-7">
                     <div class="ms-hero-bg-primary ms-hero-img-mountain">
-                        <h2 class="text-center no-m pt-4 pb-4 color-white index-1">Login Form</h2>
+                        <h2 class="text-center no-m pt-4 pb-4 color-white index-1">Iniciar Sesión</h2>
                     </div>
                     <ul class="nav nav-tabs nav-tabs-full nav-tabs-3 nav-tabs-transparent indicator-primary" role="tablist">
                         <li class="nav-item" role="presentation">
                             <a href="#ms-login-tab" aria-controls="ms-login-tab" role="tab" data-toggle="tab" class="nav-link withoutripple active">
-                                <i class="zmdi zmdi-account"></i> Login</a>
+                                <i class="zmdi zmdi-account"></i> Entrar</a>
                         </li>
                         <li class="nav-item" role="presentation">
                             <a href="#ms-register-tab" aria-controls="ms-register-tab" role="tab" data-toggle="tab" class="nav-link withoutripple">
-                                <i class="zmdi zmdi-account-add"></i> Register</a>
+                                <i class="zmdi zmdi-key"></i> Registrar</a>
                         </li>
                         <li class="nav-item" role="presentation">
                             <a href="#ms-recovery-tab" aria-controls="ms-recovery-tab" role="tab" data-toggle="tab" class="nav-link withoutripple">
-                                <i class="zmdi zmdi-key"></i> Recovery</a>
+                                <i class="zmdi zmdi-key"></i> Recuperar</a>
                         </li>
                     </ul>
                     <div class="card-body">
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane fade active show" id="ms-login-tab">
-                                <form method="post" action="{% url 'login' %}">
+                                <form method="post" action="{% url 'evaluaciones:login' %}">
                                     {% csrf_token %}
                        
                                     <fieldset>

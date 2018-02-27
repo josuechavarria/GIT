@@ -41,11 +41,11 @@ class LoginView(View):
 		if user is not None:
 			if user.is_active:
 				login(request, user)
-				return HttpResponseRedirect(reverse('evaluaciones:index'))
+				return HttpResponseRedirect(reverse('evaluaciones:landy'))
 			else:
 				messages.error(request, 'Usuario Inactivo')
 				return HttpResponseRedirect(reverse('evaluaciones:login'))
 		else:
 			# Mensaje Incorrecto
 			messages.error(request, 'Correo o contraseña inválidos')
-			return HttpResponseRedirect(reverse('evaluaciones:landy'))
+			return HttpResponseRedirect(reverse('login'))
