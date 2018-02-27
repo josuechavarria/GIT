@@ -10,6 +10,3 @@ def home(request):
 
 def principal(request):
     return render(request,'evaluaciones/principal.html')
-
-def login(request):
-    return render(request, 'accounts/login.html')
