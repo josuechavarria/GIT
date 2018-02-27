@@ -1,0 +1,33 @@
+{% extends 'login_base.html'%}
+{% block content %} 
+<body>
+    <div class="container">
+        <h1>Bienvenido</h1>
+        Bienvenido! usted puede hace login desde aca!
+<form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+
+    <div>
+        <td>{{ form.username.label_tag }}</td>
+        <td>{{ form.username }}</td>
+    </div>
+    <div>
+        <td>{{ form.password.label_tag }}</td>
+        <td>{{ form.password }}</td>
+    </div>
+
+    <div>
+        <input class="btn btn-success" type="submit" value="login" />
+        <input type="hidden" name="next" value="{{ next }}" />
+    </div>
+</form>
+    </div>
+</body>
+{# Assumes you setup the password_reset view in your URLconf #}
+<h1>{{numbers}}</h1>
+<p>
+    <a href="{% url 'password_reset' %}">Olvido su contraseña?</a>
+</p>
+
+
+{% endblock %}
