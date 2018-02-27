@@ -43,8 +43,8 @@
                         </button>
                         <div class="modal-title text-center">
                             <span class="ms-logo ms-logo-white ms-logo-sm mr-1">M</span>
-                            <h3 class="no-m ms-site-title">Material
-                                <span>Style</span>
+                            <h3 class="no-m ms-site-title">Grupo Inversiones
+                                <span>Tecnológicas</span>
                             </h3>
                         </div>
                         <div class="modal-header-tabs">
@@ -182,9 +182,9 @@
                 <div class="ms-title">
                     <a href="index.html">
                         <!-- <img src="assets/img/demo/logo-header.png" alt=""> -->
-                        <span class="ms-logo animated zoomInDown animation-delay-5">M</span>
-                        <h1 class="animated fadeInRight animation-delay-6">Material
-                            <span>Style</span>
+                        <span class="ms-logo animated zoomInDown animation-delay-5">GIT</span>
+                        <h1 class="animated fadeInRight animation-delay-6">Grupo Inversiones 
+                            <span>Tecnológicas</span>
                         </h1>
                     </a>
                 </div>
@@ -765,84 +765,23 @@
             <div class="container">
                 <div class="text-left mb-6">
                     <h1 class="color-white">
-                        <span class="text-normal">13: 04 </span> </h1>
+                            <span><div class="clock"></div></span>
                 </div>
-                <br>                
                 <div class="text-left mb-6">
-                    <h1 class="color-white">
-                        <span class="text-normal">Buenos dias Manuel</span> </h1>
+                    <h2 class="color-white">
+                        <span class="text-normal">Buenos dias Marisol</span> </h2>
                 </div>
-
                 <div class="text-left mb-6">
-                    <p class="lead color-info">" Cuando Vas por algo, no regreses hasta que lo consigas "</p>
+                    <p class="lead color-info"><span> "En medio del caos también hay oportunidad.-Sun Tzu" </span></p>
                 </div>
-            </div>
-
-
-                <div class="panel-body">
-                    <!-- Tab panes -->
-                    <div class="tab-content mt-4">
-                        <div role="tabpanel" class="tab-pane fade" id="windows">
-                        </div>
-                        <div role="tabpanel" class="tab-pane active show fade" id="macos">
-                            <div class="row">
-                                <div class="col-lg-6 col-xl-5">
-                                    <ul class="list-unstyled hand-list color-light">
-                                        <li class="mb-3 wow fadeInLeft animation-delay-2">
-                                            <h2 class="handwriting no-mt color-primary no-mb">Ideas for your product</h2>
-                                            <p class="lead handwriting">Lorem ipsum dolor sit amet, consectetur adipisicing elit provident tempore porro
-                                                deserunt nostrum sapiente.</p>
-                                        </li>
-                                        <li class="mb-3 wow fadeInLeft animation-delay-4">
-                                            <h2 class="handwriting no-mt color-primary no-mb">Type here annotations</h2>
-                                            <p class="lead handwriting">Lorem ipsum dolor sit amet, consectetur adipisicing elit provident tempore porro
-                                                deserunt nostrum sapiente.</p>
-                                        </li>
-                                        <li class="mb-3 wow fadeInLeft animation-delay-6">
-                                            <h2 class="handwriting no-mt color-primary no-mb">An informal approach to design</h2>
-                                            <p class="lead handwriting">Lorem ipsum dolor sit amet, consectetur adipisicing elit provident tempore porro
-                                                deserunt nostrum.</p>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-lg-6 col-xl-7">
-                                    <img class="img-fluid animated zoomInDown animation-delay-3" src="assets/img/demo/new_mac.png"> </div>
-                            </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade" id="linux">
-                            <div class="row">
-                                <div class="col-lg-6 col-xl-5 order-lg-2">
-                                    <ul class="list-unstyled hand-list color-light">
-                                        <li class="mb-3 animated fadeInLeft animation-delay-2">
-                                            <h2 class="handwriting no-mt color-primary no-mb">Ideas for your product</h2>
-                                            <p class="lead handwriting">Lorem ipsum dolor sit amet, consectetur adipisicing elit provident tempore porro
-                                                deserunt nostrum sapiente.</p>
-                                        </li>
-                                        <li class="mb-3 animated fadeInLeft animation-delay-4">
-                                            <h2 class="handwriting no-mt color-primary no-mb">Type here annotations</h2>
-                                            <p class="lead handwriting">Lorem ipsum dolor sit amet, consectetur adipisicing elit provident tempore porro
-                                                deserunt nostrum sapiente.</p>
-                                        </li>
-                                        <li class="mb-3 animated fadeInLeft animation-delay-6">
-                                            <h2 class="handwriting no-mt color-primary no-mb">An informal approach to design</h2>
-                                            <p class="lead handwriting">Lorem ipsum dolor sit amet, consectetur adipisicing elit provident tempore porro
-                                                deserunt nostrum.</p>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div class="col-lg-6 col-xl-7 order-lg-1">
-                                    <img class="img-fluid animated zoomInDown animation-delay-3" src="assets/img/demo/ubuntu_tablet.png"> </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </div>               
+        </div>
     
         <!-- container -->
     
         <footer class="ms-footer">
             <div class="container">
-                <p>Copyright &copy; Grupo de Inversiones Tecnologicas (GIT) 2018</p>
+                <p>Copyright &copy; Grupo de Inversiones Tecnológicas (GIT) 2018</p>
             </div>
         </footer>
         <div class="btn-back-top">
@@ -906,3 +845,35 @@
 </body>
 
 </html>
+
+<script>
+    function clock() {// We create a new Date object and assign it to a variable called "time".
+var time = new Date(),
+    
+    // Access the "getHours" method on the Date object with the dot accessor.
+    hours = time.getHours(),
+    
+    // Access the "getMinutes" method with the dot accessor.
+    minutes = time.getMinutes(),
+    
+    
+    seconds = time.getSeconds();
+
+document.querySelectorAll('.clock')[0].innerHTML = harold(hours) + ":" + harold(minutes) ;
+// + ":" + harold(seconds);
+  
+  function harold(standIn) {
+    if (standIn < 10) {
+      standIn = '0' + standIn
+    }
+    return standIn;
+  }
+}
+setInterval(clock, 1000);
+</script>
+<style>
+    .clock {
+    font-size: 3em;
+    font-family: 'AvenirWindows, "Segoe UI", Arial, sans-serif;'
+    }
+</style>
