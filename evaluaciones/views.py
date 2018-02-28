@@ -16,6 +16,12 @@ def home(request):
 def principal(request):
     return render(request,'evaluaciones/principal.html')
 
+class CrearEmpresa(View):
+	def get(self, request):
+		template_name = "evaluaciones/crearEmpresa.html"
+		ctx={'s':'s'}
+		return render_to_response(template_name,ctx)
+
 class IndexView(View):
 	def get(self, request):
 		template_name = "evaluaciones/landing.html"
