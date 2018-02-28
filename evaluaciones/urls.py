@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.principal, name='principal'),
-    url(r'^$', views.LoginView, name='login'),
+    url(r'^empresas/crear', views.CrearEmpresa.as_view(), name='empresa.crear'),
 ]
