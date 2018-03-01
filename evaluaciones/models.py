@@ -10,7 +10,8 @@ class empresas(models.Model):
 	rtn = models.CharField(max_length=20)
 	direccion = models.TextField()
 	otros_datos = models.TextField()
-
+	def __str__(self):
+		return self.nombre
 
 class puestos(models.Model):
 	"""docstring for puestos"""

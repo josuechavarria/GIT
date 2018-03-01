@@ -3,9 +3,14 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.views.generic import View, TemplateView
+from django.views.generic import View, TemplateView,CreateView, ListView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.core.urlresolvers import reverse_lazy
+from django.utils import timezone
+
+from evaluaciones.models import empresas, puestos
+from evaluaciones.forms import empresasForm, puestosForm
 
 def home(request):
     numbers = [1,2,3,4,5]
@@ -16,11 +21,29 @@ def home(request):
 def principal(request):
     return render(request,'evaluaciones/principal.html')
 
-class CrearEmpresa(View):
-	def get(self, request):
-		template_name = "evaluaciones/crearEmpresa.html"
-		ctx={'s':'s'}
-		return render_to_response(template_name,ctx)
+## Vistas para la creación
+class CrearEmpresa(CreateView):
+	model = empresas
+	form_class = empresasForm
+	template_name = "evaluaciones/crearEmpresa.html"
+	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
+class CrearPuesto(CreateView):
+	model = puestos
+	form_class = puestosForm
+	template_name = "evaluaciones/crearpuesto.html"
+
+#Listas, tablas
+class ListarEmpresas(ListView):
+	
+	model = empresas
+	print(empresas.objects.all())
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['now'] = timezone.now()
+		print(context)
+		return context
+
+		
 
 class IndexView(View):
 	def get(self, request):
@@ -35,8 +58,7 @@ class LoginView(View):
 		form = LoginForm()
 		ctx = {'form':form}
 		return render_to_response('login.html', ctx, context_instance=RequestContext(request))
-
-
+   
 	def post(self, request):
 		print("hola post")
 		print(request.POST)

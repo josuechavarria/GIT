@@ -366,34 +366,35 @@
             <div class="col-lg-9 ms-paper-content-container">
               <div class="ms-paper-content">
                 <section class="ms-component-section">
-                  <h2 class="section-title">Crear Empresa</h2>
-                  <hr class="color">
-                  {% if errors %}
-                  <div class="alert alert-info">
-                    <p>
-                      {{messages}}</p>
-                  </div>
-                  {% endif %}
-                  <form class="form-horizontal" autocomplete="off"  method="post">
-                    <fieldset class="container">
-                        {% csrf_token %} 
-                        {% for field in form %}                       
-                        <div class="form-group roe label-floating">                            
-                            <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="zmdi zmdi-account"></i>
-                                </span>
-                                <label class="control-label" for="ms-form-user"> {{field.label_tag}} </label>
-                                <input type="hidden"  id="" class="form-control" required>{{ field }}
-                            </div>
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="zmdi zmdi-graduation-cap"></i> Listado de Empresas Registradas en el sistema</h3>
                         </div>
-                        {% endfor %}
-                    <div class="col-md-4">
-                        <button class="btn btn-raised btn-primary pull-left" type="submit"  value="Save" >Guardar</button>
+                        <table class="table table-no-border table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Rtn</th>
+                                    <th>Dirección</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for empresa in object_list %}
+                                <tr>
+                                    <td>1</td>
+                                    <td>{{ empresa.nombre }}</td>
+                                    <td>{{ empresas.rtn}}</td>
+                                    <td>{{ empresa.direccion}}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
-                    </fieldset>
-                    </form>                   
-                  </form>
+                </section>
+              </div>
+            </div>            
     <!-- ms-site-container -->
     <div class="ms-slidebar sb-slidebar sb-left sb-style-overlay" id="ms-slidebar">
         <div class="sb-slidebar-container">
