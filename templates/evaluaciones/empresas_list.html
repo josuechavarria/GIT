@@ -20,8 +20,11 @@
                                 <tr>
                                     <td>1</td>
                                     <td>{{ empresa.nombre }}</td>
-                                    <td>{{ empresas.rtn}}</td>
+                                    <td>{{ empresa.rtn}}</td>
                                     <td>{{ empresa.direccion}}</td>
+                                    <th>
+                                        <a href="{% url 'evaluaciones:actualiza_empresa' empresa.id %}" class="btn btn-raised btn-success"><i class="glyphicon glyphicon-asterisk"></i>  Actualizar</a>                                        </form>
+                                    </th>
                                 </tr>
                             {% endfor %}
                             </tbody>

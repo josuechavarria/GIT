@@ -263,7 +263,7 @@
                                         <div class="tab-pane active" id="tab-general" role="tabpanel">
                                             <ul class="ms-tab-menu-right-container">
                                                 <li>
-                                                    <a href="">
+                                                    <a href="{% url 'evaluaciones:crear_empresa' %}">
                                                         <i class="fa fa-plus"></i>&nbsp;Crear Empresas</a>
                                                 </li>
                                                 <li>
@@ -325,22 +325,17 @@
                                                     <i class="fa fa-building-o"></i> Empresa</a>
                                                 <ul id="c1" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="e1" data-parent="#components-nav">
                                                     <li>
-                                                        <a class="withripple" href="empresas/crear">
+                                                        <a class="withripple" href="{% url 'evaluaciones:crear_empresa' %}">
                                                             <i class="fa fa-plus"></i> Agregar empresa</a>
                                                     </li>
                                                 </ul>
                                                 <ul id="c1" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="e1" data-parent="#components-nav">
                                                     <li>
-                                                        <a class="withripple" href="empresas/listar">
+                                                        <a class="withripple" href="{% url 'evaluaciones:listar_empresa' %}">
                                                             <i class="fa fa-plus"></i> Listar Empresas</a>
                                                     </li>
                                                 </ul>
-                                                <ul id="c1" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="e1" data-parent="#components-nav">
-                                                    <li>
-                                                        <a class="withripple" href="component-typography.html">
-                                                            <i class="fa fa-plus"></i> Modificar Empresas</a>
-                                                    </li>
-                                                </ul>
+                        
                                             </li>
                                         </ul>
                                         <ul class="panel-group ms-collapse-nav" id="components-nav" role="tablist" aria-multiselectable="true">
@@ -349,7 +344,7 @@
                                                     <i class="fa fa-cog"></i> Administrar</a>
                                                 <ul id="c1" class="panel-collapse collapse show" role="tabpanel" aria-labelledby="e1" data-parent="#components-nav">
                                                     <li>
-                                                        <a class="withripple" href="">
+                                                        <a class="withripple" href="{% url 'evaluaciones:puesto_create' %}">
                                                             <i class="fa fa-plus"></i> Agregar Puestos</a>
                                                     </li>
                                                     <li>

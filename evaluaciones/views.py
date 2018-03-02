@@ -3,7 +3,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.views.generic import View, TemplateView,CreateView, ListView
+from django.views.generic import View, TemplateView,CreateView, ListView, UpdateView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.core.urlresolvers import reverse_lazy
@@ -26,15 +26,24 @@ class CrearEmpresa(CreateView):
 	model = empresas
 	form_class = empresasForm
 	template_name = "evaluaciones/crearEmpresa.html"
+	#Succes_Url
+	def get_succes_url(self):
+		return reverse('evaluaciones:listar_empresa')
 	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
 class CrearPuesto(CreateView):
 	model = puestos
 	form_class = puestosForm
 	template_name = "evaluaciones/crearpuesto.html"
-
+# Vistas para la actualización
+class ActualizarEmpresa(UpdateView):
+	model = empresas
+	form_class = empresasForm
+	template_name = "evaluaciones/ActualizaEmpresa.html"
+	def get_succes_url(self):
+		return reverse('evaluaciones:listar_empresa')
+	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
 #Listas, tablas
-class ListarEmpresas(ListView):
-	
+class ListarEmpresas(ListView):	
 	model = empresas
 	print(empresas.objects.all())
 	def get_context_data(self, **kwargs):
@@ -42,8 +51,6 @@ class ListarEmpresas(ListView):
 		context['now'] = timezone.now()
 		print(context)
 		return context
-
-		
 
 class IndexView(View):
 	def get(self, request):
