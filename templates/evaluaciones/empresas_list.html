@@ -1,0 +1,34 @@
+{% extends 'evaluaciones/base.html'%}
+{% block content %}
+    <section class="ms-component-section">
+                    <div class="card card-primary">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="zmdi zmdi-graduation-cap"></i> Listado de Empresas Registradas en el sistema</h3>
+                        </div>
+                        <table class="table table-no-border table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nombre</th>
+                                    <th>Rtn</th>
+                                    <th>Dirección</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for empresa in object_list %}
+                                <tr>
+                                    <td>1</td>
+                                    <td>{{ empresa.nombre }}</td>
+                                    <td>{{ empresa.rtn}}</td>
+                                    <td>{{ empresa.direccion}}</td>
+                                    <th>
+                                        <a href="{% url 'evaluaciones:actualiza_empresa' empresa.id %}" class="btn btn-raised btn-success"><i class="glyphicon glyphicon-asterisk"></i>  Actualizar</a>                                        </form>
+                                    </th>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+{% endblock %}
