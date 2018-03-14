@@ -7,8 +7,11 @@ class empresas(models.Model):
 	"""docstring for empresas"""
 	nombre = models.CharField(max_length=60)
 	rtn = models.CharField(max_length=20)
+	licencias = models.IntegerField(default=0)
 	direccion = models.TextField()
 	otros_datos = models.TextField()
+	logo = models.ImageField(
+		upload_to='evaluaciones/logos', null=True, blank=True, default=None)
 	def __str__(self):
 		return self.nombre
 

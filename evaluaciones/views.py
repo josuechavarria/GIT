@@ -1,16 +1,16 @@
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.views.generic import View, TemplateView,CreateView, ListView, UpdateView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from django.core.urlresolvers import reverse_lazy
 from django.utils import timezone
 
-from evaluaciones.models import empresas, puestos
-from evaluaciones.forms import empresasForm, puestosForm
+from evaluaciones.models import *
+from evaluaciones.forms import *
 
 def home(request):
     numbers = [1,2,3,4,5]
@@ -21,35 +21,190 @@ def home(request):
 def principal(request):
     return render(request,'evaluaciones/principal.html')
 
+class IndexEmpresaView(View):
+	def get(self, request, pk=None):
+		template_name = "evaluaciones/index_empresa.html"
+		ctx={'empresa': empresas.objects.get(pk=pk)}
+		return render(request,template_name,ctx)
+
 ## Vistas para la creación
-class CrearEmpresa(CreateView):
+class CrearEmpresa(SuccessMessageMixin,CreateView):
 	model = empresas
 	form_class = empresasForm
 	template_name = "evaluaciones/crearEmpresa.html"
-	#Succes_Url
-	def get_succes_url(self):
-		return reverse('evaluaciones:listar_empresa')
-	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
-class CrearPuesto(CreateView):
-	model = puestos
-	form_class = puestosForm
-	template_name = "evaluaciones/crearpuesto.html"
+	#success_url = reverse_lazy('evaluaciones:crear_empresa')
+	success_message = "Empresa creada satisfactoriamente."
+	error_message = "La empresa no se pudo crear, inténtelo nuevamente."
+
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_empresa')
+		else:
+			url = reverse_lazy('evaluaciones:listar_empresa')
+		return url
+
 # Vistas para la actualización
-class ActualizarEmpresa(UpdateView):
+class ActualizarEmpresa(SuccessMessageMixin,UpdateView):
 	model = empresas
-	form_class = empresasForm
+	form_class = empresasFormEdit
 	template_name = "evaluaciones/ActualizaEmpresa.html"
-	def get_succes_url(self):
-		return reverse('evaluaciones:listar_empresa')
+	success_message = "Empresa actualizada satisfactoriamente."
+	error_message = "La empresa no se pudo actualizar, inténtelo nuevamente."
+	
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_empresa')
+		else:
+			url = reverse_lazy('evaluaciones:listar_empresa')
+		return url
 	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
 #Listas, tablas
 class ListarEmpresas(ListView):	
 	model = empresas
-	print(empresas.objects.all())
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['now'] = timezone.now()
 		print(context)
+		return context
+
+class CrearPuesto(SuccessMessageMixin,CreateView):
+	model = puestos
+	form_class = puestosForm
+	template_name = "evaluaciones/crearpuesto.html"
+	success_message = "Puesto creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_puesto', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_puesto', args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+# Vistas para la actualización
+class ActualizarPuesto(SuccessMessageMixin,UpdateView):
+	model = puestos
+	form_class = puestosForm
+	template_name = "evaluaciones/ActualizaPuesto.html"
+	success_message = "Puesto actualizado satisfactoriamente."
+	error_message = "El puesto no se pudo actualizar, inténtelo nuevamente."
+	
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_puesto', args=[self.kwargs['id']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_puesto', args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+
+class ListarPuestos(ListView):	
+	model = puestos
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+class CrearDepartamento(SuccessMessageMixin,CreateView):
+	model = departamentos
+	form_class = DepartamentosForm
+	template_name = "evaluaciones/crearDepartamento.html"
+	success_message = "Departamento creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_departamento', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_departamento', args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+# Vistas para la actualización
+class ActualizarDepartamento(SuccessMessageMixin,UpdateView):
+	model = departamentos
+	form_class = DepartamentosForm
+	template_name = "evaluaciones/ActualizaDepartamento.html"
+	success_message = "Departamento actualizado satisfactoriamente."
+	error_message = "El Departamento no se pudo actualizar, inténtelo nuevamente."
+	
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_departamento', args=[self.kwargs['id']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_departamento', args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+
+class ListarDepartamentos(ListView):	
+	model = departamentos
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+class CrearSucursal(SuccessMessageMixin,CreateView):
+	model = sucursales
+	form_class = SucursalesForm
+	template_name = "evaluaciones/crearSucursal.html"
+	success_message = "Sucursal creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_sucursal', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_sucursal', args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+# Vistas para la actualización
+class ActualizarSucursal(SuccessMessageMixin,UpdateView):
+	model = sucursales
+	form_class = SucursalesForm
+	template_name = "evaluaciones/ActualizaSucursal.html"
+	success_message = "Sucursal actualizado satisfactoriamente."
+	error_message = "La Sucursal no se pudo actualizar, inténtelo nuevamente."
+	
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_sucursal', args=[self.kwargs['id']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_sucursal', args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+
+class ListarSucursales(ListView):	
+	model = sucursales
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
 class IndexView(View):
@@ -61,7 +216,7 @@ class IndexView(View):
 class LoginView(View):	
 	def get(self, request):
 		if request.user.is_authenticated():
-			return HttpResponseRedirect(reverse('evaluaciones:landy'))
+			return HttpResponseRedirect(reverse('evaluaciones:principal'))
 		form = LoginForm()
 		ctx = {'form':form}
 		return render_to_response('login.html', ctx, context_instance=RequestContext(request))
@@ -72,14 +227,22 @@ class LoginView(View):
 		username = request.POST['username']
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
+		print (username)
+		print (password)
 		if user is not None:
 			if user.is_active:
 				login(request, user)
-				return HttpResponseRedirect(reverse('evaluaciones:landy'))
+				return HttpResponseRedirect(reverse('evaluaciones:principal'))
 			else:
 				messages.error(request, 'Usuario Inactivo')
 				return HttpResponseRedirect(reverse('evaluaciones:login'))
 		else:
 			# Mensaje Incorrecto
+			print("hola invalidaos")
 			messages.error(request, 'Correo o contraseña inválidos')
 			return HttpResponseRedirect(reverse('login'))
+
+class LogoutView(View):
+	def get(self, request):
+		logout(request)
+		return HttpResponseRedirect('/accounts/login/')
