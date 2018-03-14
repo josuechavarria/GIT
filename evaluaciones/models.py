@@ -3,14 +3,17 @@ from django.contrib.auth.models import User, Group
 from django.utils.timezone import now
 # Create your models here.
 
-
 class empresas(models.Model):
 	"""docstring for empresas"""
 	nombre = models.CharField(max_length=60)
 	rtn = models.CharField(max_length=20)
+	licencias = models.IntegerField(default=0)
 	direccion = models.TextField()
 	otros_datos = models.TextField()
-
+	logo = models.ImageField(
+		upload_to='evaluaciones/logos', null=True, blank=True, default=None)
+	def __str__(self):
+		return self.nombre
 
 class puestos(models.Model):
 	"""docstring for puestos"""
@@ -18,12 +21,16 @@ class puestos(models.Model):
 	perfil = models.ForeignKey(Group)
 	nombre = models.CharField(max_length=50)
 	orden_jerarquico = models.IntegerField()
+	def __str__(self):
+		return self.empresa
 
 
 class departamentos(models.Model):
 	"""docstring for departamentos"""
 	empresa = models.ForeignKey(empresas)
 	nombre = models.CharField(max_length=60)
+	def __str__(self):
+		return self.nombre
 
 
 class sucursales(models.Model):
@@ -32,6 +39,8 @@ class sucursales(models.Model):
 	nombre = models.CharField(max_length=60)
 	direccion = models.TextField()
 	otros_datos = models.TextField()
+	def __str__(self):
+		return self.nombre
 
 
 class colaboradores(models.Model):
@@ -72,7 +81,6 @@ class perfil(models.Model):
 	fecha_nacimiento = models.DateField(null=True, blank=True, default=None)
 	pasa_tiempos = models.TextField(null=True, blank=True, default=None)
 
-
 class periodos(models.Model):
 	"""periodo a evaluar, se llenara una vez, luego automatico
 	   hasta que se cambie, se tomara como base el activo"""
@@ -80,6 +88,8 @@ class periodos(models.Model):
 	fecha_inico = models.DateTimeField()
 	fecha_fin = models.DateTimeField()
 	activo = models.BooleanField()
+	def get_year(self):
+		return self.fecha_inico.year
 
 
 class objetivos(models.Model):
