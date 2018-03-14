@@ -328,34 +328,51 @@
             </li>
             <li class="treeview">
               <a href="#">
-                <i class="fa fa-folder"></i> <span>Puestos</span> <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-folder"></i> <span>Listas de selección</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:crear_puesto' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
-                <li><a href="{% url 'evaluaciones:listar_puesto' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
+                <li>
+                    <a href="#"><i class="fa fa-circle-o"></i> Puestos <i class="fa fa-angle-left pull-right"></i></a>
+                    <ul class="treeview-menu">
+                      <li class="active"><a href="{% url 'evaluaciones:crear_puesto' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
+                      <li><a href="{% url 'evaluaciones:listar_puesto' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-circle-o"></i> Departamentos <i class="fa fa-angle-left pull-right"></i></a>
+                    <ul class="treeview-menu">
+                      <li class="active"><a href="{% url 'evaluaciones:crear_departamento' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
+                      <li><a href="{% url 'evaluaciones:listar_departamento' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-circle-o"></i> Sucursales <i class="fa fa-angle-left pull-right"></i></a>
+                    <ul class="treeview-menu">
+                      <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
+                      <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="fa fa-bullseye"></i> Objetivos <i class="fa fa-angle-left pull-right"></i></a>
+                    <ul class="treeview-menu">
+                      <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
+                      <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
+                    </ul>
+                </li>
               </ul>
             </li>
             <li class="treeview">
               <a href="#">
-                <i class="fa fa-folder"></i> <span>Departamentos</span> <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-folder"></i> <span>Roles y permisos</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:crear_departamento' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
-                <li><a href="{% url 'evaluaciones:listar_departamento' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
+                <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear rol</a></li>
+                <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Detalles </a></li>
               </ul>
             </li>
             <li class="treeview">
               <a href="#">
-                <i class="fa fa-folder"></i> <span>Sucursales</span> <i class="fa fa-angle-left pull-right"></i>
-              </a>
-              <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
-                <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
-              </ul>
-            </li>
-            <li class="treeview">
-              <a href="#">
-                <i class="fa fa-bullseye"></i> <span>Objetivos</span> <i class="fa fa-angle-left pull-right"></i>
+                <i class="fa fa-user"></i> <span>Usuarios</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
                 <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
@@ -374,15 +391,6 @@
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-list"></i> <span>Criterios</span> <i class="fa fa-angle-left pull-right"></i>
-              </a>
-              <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
-                <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
-              </ul>
-            </li>
-            <li class="treeview">
-              <a href="#">
-                <i class="fa fa-user"></i> <span>Usuarios</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
                 <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
