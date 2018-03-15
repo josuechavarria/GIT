@@ -21,6 +21,18 @@ def home(request):
 def principal(request):
     return render(request,'evaluaciones/principal.html')
 
+class RolesView(View):	
+	def get(self, request, pk=None):
+		template_name = "evaluaciones/roles_list.html"
+		ctx = {'grupos': Group.objects.filter(name__endswith=u'_%s' % (pk)),
+		'empresa' : empresas.objects.get(pk=pk)
+		}
+		return render_to_response(template_name, ctx)
+   
+	def post(self, request):
+		print("hola post")
+
+
 class IndexEmpresaView(View):
 	def get(self, request, pk=None):
 		template_name = "evaluaciones/index_empresa.html"

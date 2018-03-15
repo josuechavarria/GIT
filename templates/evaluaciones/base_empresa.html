@@ -321,10 +321,26 @@
           <!-- sidebar menu: : style can be found in sidebar.less -->
           <ul class="sidebar-menu">
             <li class="header">MENÚ PRINCIPAL</li>
+            {% if request.user.is_superuser %}
+            <li>
+              <a href="{% url 'evaluaciones:principal' %}">
+                <i class="fa fa-arrow-left"></i> <span>Admin Empresas</span>
+              </a>
+            </li>
+            {% endif %}
             <li>
               <a href="{% url 'evaluaciones:principal_empresa' empresa.pk%}">
                 <i class="fa fa-home"></i> <span>Inicio</span>
               </a>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-folder"></i> <span>Roles y permisos</span> <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear rol</a></li>
+                <li><a href="{% url 'evaluaciones:listar_roles' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Detalles </a></li>
+              </ul>
             </li>
             <li class="treeview">
               <a href="#">
@@ -359,15 +375,6 @@
                       <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
                     </ul>
                 </li>
-              </ul>
-            </li>
-            <li class="treeview">
-              <a href="#">
-                <i class="fa fa-folder"></i> <span>Roles y permisos</span> <i class="fa fa-angle-left pull-right"></i>
-              </a>
-              <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear rol</a></li>
-                <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Detalles </a></li>
               </ul>
             </li>
             <li class="treeview">

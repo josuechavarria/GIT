@@ -114,6 +114,16 @@ class evaluaciones(models.Model):
 	ponderacion = models.DecimalField(max_digits=3, decimal_places=2)
 	porcentaje_meta = models.DecimalField(max_digits=3, decimal_places=2)
 
+	class Meta:
+		permissions = (
+			("evaluaciones_colaboradores", "Evaluaciones colaboradores"), 
+			("evaluaciones_administracion", "Administración evaluaciones"),
+			("evaluaciones_dashboard", "Dashboard evaluaciones"),
+			("evaluaciones_ficha", "Ficha evaluaciones"),
+			("evaluaciones_gestionar", "Gestionar evaluaciones"),
+			("evaluaciones_mis", "Mis evaluaciones")
+		)
+
 
 class evaluacion_colaborador(models.Model):
 	empresa = models.ForeignKey(empresas)

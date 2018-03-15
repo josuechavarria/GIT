@@ -20,5 +20,6 @@ urlpatterns = [
     url(r'^departamento/listar/(?P<pk>\d+)/$', views.ListarDepartamentos.as_view(model= departamentos), name='listar_departamento'),
     url(r'^sucursal/crear/(?P<pk>\d+)/$', views.CrearSucursal.as_view(model=sucursales), name='crear_sucursal'),
     url(r'^sucursal/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarSucursal.as_view(model= sucursales), name='actualiza_sucursal'),
-    url(r'^sucursal/listar/(?P<pk>\d+)/$', views.ListarSucursales.as_view(model= sucursales), name='listar_sucursal')
+    url(r'^sucursal/listar/(?P<pk>\d+)/$', views.ListarSucursales.as_view(model= sucursales), name='listar_sucursal'),
+    url(r'^roles/listar/(?P<pk>\d+)/$', views.RolesView.as_view(), name='listar_roles')
 ]
