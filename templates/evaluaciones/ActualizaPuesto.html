@@ -17,6 +17,17 @@
     <!-- left column -->
     <div class="col-md-8">
         <!-- general form elements -->
+         {% if messages %} {% for message in messages %}
+        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <i class="fa fa-close"></i>
+            </button>
+            <p></p>
+            <strong>
+                <i class="fa fa-check"></i>{{ message }}</strong>
+        </div>
+        
+        {% endfor %} {% endif %}
         <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Actualizar puesto</h3>

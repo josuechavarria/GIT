@@ -15,6 +15,8 @@ urlpatterns = [
     url(r'^puesto/crear/(?P<pk>\d+)/$', views.CrearPuesto.as_view(model=puestos), name='crear_puesto'),
     url(r'^puesto/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarPuesto.as_view(model= puestos), name='actualiza_puesto'),
     url(r'^puesto/listar/(?P<pk>\d+)/$', views.ListarPuestos.as_view(model= puestos), name='listar_puesto'),
+    url(r'^puesto/borrar/(?P<pk>\d+)',
+        views.BorrarPuesto.as_view(model=puestos), name='borrar_puesto'),
     url(r'^departamento/crear/(?P<pk>\d+)/$', views.CrearDepartamento.as_view(model=departamentos), name='crear_departamento'),
     url(r'^departamento/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarDepartamento.as_view(model= departamentos), name='actualiza_departamento'),
     url(r'^departamento/listar/(?P<pk>\d+)/$', views.ListarDepartamentos.as_view(model= departamentos), name='listar_departamento'),
