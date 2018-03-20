@@ -89,8 +89,8 @@ class periodos(models.Model):
 	fecha_fin = models.DateTimeField()
 	activo = models.BooleanField()
 	def get_year(self):
+		print(self.fecha_inicio.year)
 		return self.fecha_inico.year
-
 
 class objetivos(models.Model):
 	"""objetivo estrategico del criterio"""

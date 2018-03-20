@@ -126,9 +126,9 @@ class ListarPuestos(ListView):
 	model = puestos	
 	print(model)
 	def get_context_data(self, **kwargs):
-			context = super().get_context_data(**kwargs)
-			context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])			
-			return context
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
 
 class BorrarPuesto(DeleteView):
 	model = puestos
@@ -270,3 +270,43 @@ class LogoutView(View):
 	def get(self, request):
 		logout(request)
 		return HttpResponseRedirect('/accounts/login/')
+
+# Criterios
+class CrearCriterio(SuccessMessageMixin,CreateView):
+	model = criterios
+	form_class = CriteriosForm
+	template_name = "evaluaciones/CrearCriterio.html"
+	success_message = "Criterio creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_criterio', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_criterio', args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+
+# Periodos
+class CrearPeriodos(SuccessMessageMixin,CreateView):
+	model = periodos
+	form_class = PeriodosForm
+	template_name = "evaluaciones/CrearPeriodo.html"
+	success_message = "Periodo creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_periodo', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_periodo', args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+

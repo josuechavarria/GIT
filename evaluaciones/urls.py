@@ -22,5 +22,7 @@ urlpatterns = [
     url(r'^sucursal/crear/(?P<pk>\d+)/$', views.CrearSucursal.as_view(model=sucursales), name='crear_sucursal'),
     url(r'^sucursal/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarSucursal.as_view(model= sucursales), name='actualiza_sucursal'),
     url(r'^sucursal/listar/(?P<pk>\d+)/$', views.ListarSucursales.as_view(model= sucursales), name='listar_sucursal'),
-    url(r'^roles/listar/(?P<pk>\d+)/$', views.RolesView.as_view(), name='listar_roles')
+    url(r'^roles/listar/(?P<pk>\d+)/$', views.RolesView.as_view(), name='listar_roles'),
+    url(r'^criterio/crear/(?P<pk>\d+)/$', views.CrearCriterio.as_view(model=criterios), name='crear_criterio'),
+    url(r'^periodo/crear/(?P<pk>\d+)/$', views.CrearPeriodos.as_view(model=periodos), name='crear_periodo'),
 ]
