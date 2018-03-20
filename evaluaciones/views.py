@@ -120,19 +120,23 @@ class ActualizarPuesto(SuccessMessageMixin,FormInvalidMessageMixin,UpdateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
-		print(context)
 		return context
 
 class ListarPuestos(ListView):	
 	model = puestos	
+	print(model)
 	def get_context_data(self, **kwargs):
 			context = super().get_context_data(**kwargs)
-			context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])			
+			context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])			
 			return context
 
 class BorrarPuesto(DeleteView):
 	model = puestos
 	success_url = reverse_lazy('listar_puesto')
+	def get_context_data(self, **kwargs):
+			context = super().get_context_data(**kwargs)
+			context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+			return context
 
 
 class CrearDepartamento(SuccessMessageMixin,CreateView):
