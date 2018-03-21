@@ -1,0 +1,65 @@
+{% extends 'evaluaciones/base_empresa.html' %} 
+ {% block pantalla %}
+<section class="content-header">
+    <h1>
+        Configuración
+        <small>{{empresa.nombre}}</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li>
+            <a href="#">
+                <i class="fa fa-home"></i> Inicio</a>
+        </li>
+        <li class="active">Crear puesto</li>
+    </ol>
+</section>
+{% endblock %} {% block content %}
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-8">
+        <!-- general form elements -->
+        {% if messages %} {% for message in messages %}
+        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <i class="fa fa-close"></i>
+            </button>
+            <p></p>
+            <strong>
+                <i class="fa fa-check"></i>{{ message }}</strong>
+        </div>
+
+        {% endfor %} {% endif %}
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Registrar puestos</h3>
+            </div>
+            <!-- /.box-header -->
+            <!-- form start -->
+            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
+                <div class="box-body">
+                    {% csrf_token %}
+                    <p>Are you sure you want to delete "{{ object }}"?</p>
+                    <input type="submit" value="Confirm" />
+                </div>
+                <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
+                <div class="box-footer">
+                    <div class="col-md-3 col-md-offset-6">
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').removeAttr('disabled');"
+                            value="SaveNew">
+                            <i class="fa fa-save"></i>&nbsp;Guardar y nuevo</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').attr('disabled','disabled')"
+                            value="SaveList">
+                            <i class="fa fa-send"></i>&nbsp;Guardar y listar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock%} {% block script %}
+<script type="text/javascript">
+    $("#id_empresa").val("{{empresa.pk}}");
+    $("#id_empresa").attr('disabled', 'disabled');
+</script> {% endblock %}

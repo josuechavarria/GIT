@@ -1,0 +1,93 @@
+{% extends 'evaluaciones/base_empresa.html'%}
+{% load static %}
+{% block style %}
+<!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock %}
+{% block pantalla %}
+<section class="content-header">
+  <h1>
+    Configuración
+    <small>{{empresa.nombre}}</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
+    <li class="active">Listar Criterios</li>
+  </ol>
+</section>      
+{% endblock %}
+{% block content %}
+    <section class="ms-component-section">
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-10">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <i class="fa fa-close"></i>
+                    </button>
+                    <p></p>
+                    <strong><i class="fa fa-check"></i> Éxito! {{ message }}</strong> 
+                </div>
+
+            {% endfor %}
+        {% endif %}
+        <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">Listado de puestos | {{empresa.nombre}}</h3>
+            </div><!-- /.box-header -->
+            <div class="box-body">
+                <table id="empresas" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Empresa</th>
+                            <th>Objetivo</th>
+                            <th>Periodo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for criterio in object_list %}
+                        <tr>
+                            <td>{{criterio.id}}</td>
+                            <td>{{ criterio.nombre }}</td>
+                            <td>{{ criterio.descripcion }}</td>
+                            <td>{{ criterio.empresa }}</td>
+                            <td>{{ criterio.objetivo }}</td>
+                            <td>{{ criterio.periodos.year }}</td>
+                            <td>
+                                <a href="{% url 'evaluaciones:crear_criterio' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar criterio"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;                                
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>#</th>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Empresa</th>
+                            <th>Objetivo</th>
+                            <th>Periodo</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+    </div>
+</div>
+</section>
+{% endblock %}
+{% block script %}
+<script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
+<script>
+      $(function () {
+        $("#empresas").DataTable();
+      });
+    </script>
+{% endblock %}
