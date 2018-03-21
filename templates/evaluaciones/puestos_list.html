@@ -43,7 +43,6 @@
                         <tr>
                             <th>#</th>
                             <th>Nombre</th>
-                            <th>Perfil</th>
                             <th>Orden Jerárquico</th>
                             <th>Acciones</th>
                         </tr>
@@ -53,7 +52,6 @@
                         <tr>
                             <td>{{puesto.id}}</td>
                             <td>{{ puesto.nombre }}</td>
-                            <td>{{ puesto.perfil.name}}</td>
                             <td>{{ puesto.orden_jerarquico}}</td>
                             <td>
                                 <a href="{% url 'evaluaciones:crear_puesto' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar puesto"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;

@@ -8,6 +8,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.utils import timezone
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 from evaluaciones.models import *
 from evaluaciones.forms import *
@@ -23,15 +25,37 @@ def principal(request):
 
 class RolesView(View):	
 	def get(self, request, pk=None):
+		content_type = ContentType.objects.get_for_model(evaluaciones)
+		permissions = Permission.objects.filter(content_type=content_type)
+		permission = Permission.objects.filter(content_type=content_type, codename__startswith='evaluaciones_')
 		template_name = "evaluaciones/roles_list.html"
-		ctx = {'grupos': Group.objects.filter(name__endswith=u'_%s' % (pk)),
+		ctx = {'grupos': group_empresas.objects.filter(empresa__pk = pk),
+		'permisos' : permission,
 		'empresa' : empresas.objects.get(pk=pk)
 		}
-		return render_to_response(template_name, ctx)
+		return render(request, template_name, ctx)
    
-	def post(self, request):
-		print("hola post")
+	def post(self, request, pk=None):
+		print(request.POST)
+		group = Group.objects.get(pk=request.POST['group'])
+		permission = Permission.objects.get(pk=request.POST['permission'])
+		if request.POST['accion'] == 'agregar':
+			group.permissions.add(permission)
+		else:
+			group.permissions.remove(permission)
+		return HttpResponse(0)
 
+class RolesNuevoView(View):	   
+	def get(self, request, pk=None):
+		return HttpResponse(0)
+
+	def post(self, request, pk=None):
+		print(request.POST)
+		objGroup = Group(name = request.POST['perfil']+'|'+str(pk))
+		objGroup.save()
+		objGroupEmpresas = group_empresas(empresa=empresas.objects.get(pk=pk), perfil=objGroup)
+		objGroupEmpresas.save()
+		return HttpResponseRedirect(reverse('evaluaciones:listar_roles', args=(pk,)))
 
 class IndexEmpresaView(View):
 	def get(self, request, pk=None):
