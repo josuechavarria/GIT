@@ -18,12 +18,14 @@ class empresas(models.Model):
 class puestos(models.Model):
 	"""docstring for puestos"""
 	empresa = models.ForeignKey(empresas)
-	perfil = models.ForeignKey(Group)
 	nombre = models.CharField(max_length=50)
 	orden_jerarquico = models.IntegerField()
 	def __str__(self):
 		return self.nombre
 
+class group_empresas(models.Model):
+	empresa = models.ForeignKey(empresas)
+	perfil = models.ForeignKey(Group)
 
 class departamentos(models.Model):
 	"""docstring for departamentos"""

@@ -1,5 +1,6 @@
 {% extends 'evaluaciones/base_empresa.html'%}
 {% load static %}
+{% load evaluaciones_tags %}
 {% block style %}
 <!-- DataTables -->
     <link rel="stylesheet" href="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.css' %}">
@@ -41,25 +42,85 @@
                 <table id="empresas" class="table table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Nombre</th>
+                            <th width="5%">#</th>
+                            <th width="20%">Nombre</th>
+                            <th width="25%">Permisos</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for object in grupos %}
                         <tr>
-                            <td>{{object.id}}</td>
-                            <td>{{ object.name }}</td>
+                            <td>{{object.perfil.id}}</td>
+                            <td>{{ object.perfil.name|getgroupName:"|" }}</td>
+                            <td>
+                                <div class="btn-group">
+                                  <button type="button" class="btn btn-default">Permisos</button>
+                                  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                  </button>
+                                  <div class="dropdown-menu col-sm-12" role="menu" style="min-width: 400px; padding: 5px;">
+                                    <ul class="col-sm-6 list-unstyled">
+                                    <li><a>Por pantalla</a></li>
+                                    <li class="divider"></li>
+                                    {% for permiso in permisos %}
+                                      <li>
+                                        <a href="#" class="small" data-value="{{object.perfil.pk}}_{{permiso.pk}}" tabIndex="-1"><input type="checkbox" id="id_{{object.perfil.pk}}_{{permiso.pk}}" name="{{object.perfil.pk}}_{{permiso.pk}}" {% for p in object.perfil.permissions.all %} 
+                                          {% if p.pk == permiso.pk %} checked {% endif %}
+                                          {% endfor %} />&nbsp;{{permiso.name}}</a>
+                                      </li>
+                                    {% endfor %}
+                                     </ul>
+                                     <ul class="col-sm-6 list-unstyled">
+                                    <!--<li><a>Específicos</a></li>
+                                    <li class="divider"></li>
+                                    {% for permiso in permisos %}
+                                      <li>
+                                        <a href="#" class="small" data-value="{{permiso.pk}}" tabIndex="-1"><input type="checkbox"/>&nbsp;{{permiso.name}}</a>
+                                      </li>
+                                    {% endfor %}-->
+                                    </ul>
+                                  </div>
+                                </div>
+                                <a data-toggle="tooltip" data-placement="top" title="Guardado automático: Al marcar el permiso éste se guardará automáticamente en el perfil.">&nbsp;&nbsp;<i class="fa fa-question-circle"></i></a>
+                            </td>
+                            <td>
+                                <a href="#" onclick="$('#myModal').modal();" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar perfil"><i class="fa fa-plus"></i>&nbsp;&nbsp;  Agregar</a>
+                                &nbsp;|&nbsp;
+                                <a href="#" onclick="$('#myModal').modal();" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Eliminar perfil"><i class="fa fa-trash text-red"></i>&nbsp;&nbsp;  Eliminar</a>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
-                    <tfoot>
-                        <tr>
-                            <th>#</th>
-                            <th>Nombre</th>
-                        </tr>
-                    </tfoot>
                 </table>
+                <form>
+                </form>
+                <div class="example-modal">
+                  <div class="modal fade" id="myModal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title">Agregar perfil</h4>
+                        </div>
+                        <form action="{% url 'evaluaciones:crear_roles' empresa.pk %}" method="post">
+                          {% csrf_token %}
+                          <div class="modal-body">
+                            <div class="form-group">
+                              <label for="recipient-name" class="control-label">Nombre de perfil:</label>
+                              <input type="text" class="form-control" id="id_perfil" name="perfil" required />
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                          </div>
+                        </form>
+                      </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                  </div><!-- /.modal -->
+          </div><!-- /.example-modal -->
             </div><!-- /.box-body -->
         </div><!-- /.box -->
     </div>
@@ -70,8 +131,63 @@
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script>
-      $(function () {
-        $("#empresas").DataTable();
-      });
-    </script>
+    $(function () {
+    $("#empresas").DataTable();
+    });
+    var options = [];
+function guardarRol(group_id, permission_id){
+  var accion;
+  var flag="";
+  //alert($("#id_"+group_id+"_"+permission_id).is(":checked"))
+  if (!$("#id_"+group_id+"_"+permission_id).is(":checked")){
+    //accion="agregar"
+    flag="quitar"
+  }else{
+    //accion="quitar"
+    flag="agregar"
+  }
+$.ajax({
+  method: "POST",
+  url: "{% url 'evaluaciones:listar_roles' pk=empresa.pk %}",
+  data: { group: group_id, permission: permission_id, accion: flag, csrfmiddlewaretoken: '{{ csrf_token }}'}
+})
+  .done(function( msg ) {
+    //alert( "Data Saved: " + msg );
+  });
+}
+
+$( '.dropdown-menu a' ).on( 'click', function( event ) {
+
+   var $target = $( event.currentTarget ),
+       val = $target.attr( 'data-value' ),
+       $inp = $target.find( 'input' ),
+       idx;
+  /* alert(options)
+   if ( ( idx = options.indexOf( val ) ) > -1 ) {
+      options.splice( idx, 1 );
+      setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
+      $inp.removeAttr('checked')
+   } else {
+      options.push( val );
+      setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
+      $inp.attr('checked','true')
+   }*/
+   //alert(val)
+   //alert($inp.is(":checked"))
+  if ($inp.is(":checked")){
+    //$("#id_"+val.split("_")[0]+"_"+val.split("_")[1]).removeAttr('checked')
+    $inp.prop( 'checked', false );
+  }else{
+    //$("#id_"+val.split("_")[0]+"_"+val.split("_")[1]).attr('checked','true')
+    $inp.prop( 'checked', true );
+  }
+
+  guardarRol(val.split("_")[0], val.split("_")[1])
+   $( event.target ).blur();
+      
+   console.log( options );
+   
+   return false;
+});
+</script>
 {% endblock %}

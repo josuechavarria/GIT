@@ -28,12 +28,12 @@ class empresasFormEdit(ModelForm):
 
 class puestosForm(ModelForm):
     empresa = forms.ModelChoiceField(queryset=empresas.objects.all(),  widget=forms.Select(attrs={'class': 'form-control'}))
-    perfil = forms.ModelChoiceField(queryset=Group.objects.all(),  widget=forms.Select(attrs={'class': 'form-control'}))
+    #perfil = forms.ModelChoiceField(queryset=Group.objects.all(),  widget=forms.Select(attrs={'class': 'form-control'}))
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     orden_jerarquico = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     class Meta:
         model = puestos
-        fields = ('empresa', 'perfil', 'nombre', 'orden_jerarquico',)
+        fields = ('empresa', 'nombre', 'orden_jerarquico',)
 
 class DepartamentosForm(ModelForm):
     class Meta:
