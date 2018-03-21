@@ -21,7 +21,7 @@ class puestos(models.Model):
 	nombre = models.CharField(max_length=50)
 	orden_jerarquico = models.IntegerField()
 	def __str__(self):
-		return self.empresa
+		return self.nombre
 
 class group_empresas(models.Model):
 	empresa = models.ForeignKey(empresas)
@@ -91,12 +91,16 @@ class periodos(models.Model):
 	fecha_fin = models.DateTimeField()
 	activo = models.BooleanField()
 	def get_year(self):
+		print(self.fecha_inicio.year)
 		return self.fecha_inico.year
-
 
 class objetivos(models.Model):
 	"""objetivo estrategico del criterio"""
 	nombre = models.CharField(max_length=30, unique=True)
+
+	def __str__(self):
+		return self.nombre
+
 
 
 class criterios(models.Model):

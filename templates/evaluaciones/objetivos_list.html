@@ -8,11 +8,12 @@
 <section class="content-header">
   <h1>
     Configuración
-    <small>{{empresa.nombre}}</small>
+    <small>Objetivos</small>
   </h1>
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
-    <li class="active">Listar puestos</li>
+    <li class="">Objetivos</li>
+    <li class="active">Listar Objetivos</li>
   </ol>
 </section>      
 {% endblock %}
@@ -35,7 +36,7 @@
         {% endif %}
         <div class="box">
             <div class="box-header">
-              <h3 class="box-title">Listado de puestos | {{empresa.nombre}}</h3>
+              <h3 class="box-title">Listado de Objetivos registrados</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
                 <table id="empresas" class="table table-bordered table-striped">
@@ -43,20 +44,17 @@
                         <tr>
                             <th>#</th>
                             <th>Nombre</th>
-                            <th>Orden Jerárquico</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for puesto in object_list %}
+                    {% for objetivo in object_list %}
                         <tr>
-                            <td>{{puesto.id}}</td>
-                            <td>{{ puesto.nombre }}</td>
-                            <td>{{ puesto.orden_jerarquico}}</td>
+                            <td>{{ objetivo.id }}</td>
+                            <td>{{ objetivo.nombre }}</td>
                             <td>
-                                <a href="{% url 'evaluaciones:crear_puesto' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar puesto"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:actualiza_puesto' pk=puesto.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar puesto"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:borrar_puesto' pk=puesto.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar puesto"><i class="fa fa-trash text-red"></i></a> 
+                                <a href="{% url 'evaluaciones:crear_objetivos' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar objetivo"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
+                                <a href="{% url 'evaluaciones:actualizar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar objetivo"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
+                                <a href="{% url 'evaluaciones:principal_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-success" data-toggle="tooltip" data-placement="top" title="Administrar"><i class="fa fa-cog text-orange"></i></a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -65,9 +63,6 @@
                         <tr>
                             <th>#</th>
                             <th>Nombre</th>
-                            <th>Perfil</th>
-                            <th>Orden Jerárquico</th>
-                            <th>Acciones</th>
                         </tr>
                     </tfoot>
                 </table>

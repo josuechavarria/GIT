@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm, CharField, ImageField, ModelChoiceField, Select, FileInput, TextInput, Textarea, IntegerField
+from django.forms import ModelForm, CharField, ImageField,DateField, ModelChoiceField, Select, FileInput, TextInput, Textarea, IntegerField,CheckboxInput
 from .models import *
 from django.contrib.auth.models import User, Group
 
@@ -54,3 +54,42 @@ class SucursalesForm(ModelForm):
             'direccion': Textarea(attrs={'class':'form-control','rows':'2'}),
             'otros_datos': Textarea(attrs={'class':'form-control','rows':'2'}),
         }
+
+class CriteriosForm(ModelForm):
+    class Meta:
+        model = criterios
+        fields = ('nombre', 'descripcion', 'empresa','objetivo','periodo')
+        widgets = {
+            'empresa': Select(attrs={'class': 'form-control'}),
+            'periodo': Select(attrs={'class': 'form-control'}),
+            'nombre': TextInput(attrs={'class': 'form-control'}),
+            'descripcion': TextInput(attrs={'class': 'form-control'}),            
+            'objetivo': Select(attrs={'class': 'form-control'}),            
+        }
+
+class PeriodosForm(ModelForm):
+    class Meta:
+        model = periodos
+        fields = ('fecha_inico', 'fecha_fin', 'activo','empresa')
+        widgets = {
+            'empresa': Select(attrs={'class': 'form-control'}), 
+            'fecha_inico': forms.DateInput(attrs={'class':'datepicker'}),
+            'fecha_fin': forms.DateInput(attrs={'class':'datepicker'}),
+            'activo': CheckboxInput(attrs={'class': 'checkbox'}),                      
+        }
+
+class objetivosForm(ModelForm):
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))    
+    class Meta:
+        model = objetivos
+        fields = ('nombre',)
+
+
+class objetivosFormEdit(ModelForm):
+    nombre = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = objetivos
+        fields = ('nombre',)
+

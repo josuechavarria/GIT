@@ -3,11 +3,12 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
-from django.views.generic import View, TemplateView,CreateView, ListView, UpdateView
+from django.views.generic import View, TemplateView,CreateView, ListView, UpdateView,DeleteView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.utils import timezone
+from braces.views import FormInvalidMessageMixin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
@@ -105,11 +106,12 @@ class ListarEmpresas(ListView):
 		print(context)
 		return context
 
-class CrearPuesto(SuccessMessageMixin,CreateView):
+class CrearPuesto(SuccessMessageMixin,FormInvalidMessageMixin,CreateView):
 	model = puestos
 	form_class = puestosForm
 	template_name = "evaluaciones/crearpuesto.html"
 	success_message = "Puesto creado satisfactoriamente."
+	form_invalid_message = 'Error al crear el puesto por favor revise los datos'
 	def get_success_url(self, **kwargs):
 		print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
@@ -124,12 +126,12 @@ class CrearPuesto(SuccessMessageMixin,CreateView):
 		return context
 
 # Vistas para la actualización
-class ActualizarPuesto(SuccessMessageMixin,UpdateView):
+class ActualizarPuesto(SuccessMessageMixin,FormInvalidMessageMixin,UpdateView):
 	model = puestos
 	form_class = puestosForm
 	template_name = "evaluaciones/ActualizaPuesto.html"
 	success_message = "Puesto actualizado satisfactoriamente."
-	error_message = "El puesto no se pudo actualizar, inténtelo nuevamente."
+	form_invalid_message = 'Error al Actualizar el puesto  por favor revise los datos'
 	
 	def get_success_url(self, **kwargs):
 		print(self.request.POST)
@@ -145,11 +147,21 @@ class ActualizarPuesto(SuccessMessageMixin,UpdateView):
 		return context
 
 class ListarPuestos(ListView):	
-	model = puestos
+	model = puestos	
+	print(model)
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
 		return context
+
+class BorrarPuesto(DeleteView):
+	model = puestos
+	success_url = reverse_lazy('listar_puesto')
+	def get_context_data(self, **kwargs):
+			context = super().get_context_data(**kwargs)
+			context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+			return context
+
 
 class CrearDepartamento(SuccessMessageMixin,CreateView):
 	model = departamentos
@@ -282,3 +294,97 @@ class LogoutView(View):
 	def get(self, request):
 		logout(request)
 		return HttpResponseRedirect('/accounts/login/')
+
+# Criterios
+class CrearCriterio(SuccessMessageMixin,CreateView):
+	model = criterios
+	form_class = CriteriosForm
+	template_name = "evaluaciones/CrearCriterio.html"
+	success_message = "Criterio creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_criterio', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_criterio', args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+class ListarCriterios(ListView):	
+	model = criterios	
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+# Periodos
+class CrearPeriodos(SuccessMessageMixin,CreateView):
+	model = periodos
+	form_class = PeriodosForm
+	template_name = "evaluaciones/CrearPeriodo.html"
+	success_message = "Periodo creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_periodo', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_periodo', args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+## OBJETIVOS
+## Creación de Objetivos	
+class CrearObjetivos(SuccessMessageMixin,CreateView):
+	model = objetivos
+	form_class = objetivosForm
+	template_name = "evaluaciones/crearObjetivo.html"
+	success_message = "Objetivo creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_objetivos', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_objetivos', args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+## Listar Objetivos
+class ListarObjetivos(ListView):	
+	model = objetivos
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+# Actualizar Objetivos
+class ActualizarObjetivos(SuccessMessageMixin,UpdateView):
+	model = objetivos
+	form_class = objetivosFormEdit
+	template_name = "evaluaciones/ActualizaObjetivo.html"
+	success_message = "Empresa actualizada satisfactoriamente."
+	error_message = "La empresa no se pudo actualizar, inténtelo nuevamente."
+	
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_objetivos',args=[self.kwargs['id']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_objetivos', args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
+#Listas, tablas
