@@ -151,7 +151,7 @@ class ListarPuestos(ListView):
 	print(model)
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
 class BorrarPuesto(DeleteView):
@@ -306,7 +306,7 @@ class CrearCriterio(SuccessMessageMixin,CreateView):
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_criterio', args=[self.kwargs['pk']])
 		else:
-			url = reverse_lazy('evaluaciones:listar_criterio', args=[self.kwargs['pk']])
+			url = reverse_lazy('evaluaciones:listar_criterios', args=[self.kwargs['pk']])
 		return url
 
 	def get_context_data(self, **kwargs):
@@ -339,6 +339,14 @@ class CrearPeriodos(SuccessMessageMixin,CreateView):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
+
+class ListarPeriodos(ListView):	
+	model = periodos	
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
 ## OBJETIVOS
 ## Creación de Objetivos	
 class CrearObjetivos(SuccessMessageMixin,CreateView):

@@ -8,11 +8,12 @@
 <section class="content-header">
   <h1>
     Configuración
-    <small>{{empresa.nombre}}</small>
+    <small>Empresas</small>
   </h1>
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
-    <li class="active">Listar puestos</li>
+    <li class="">Empresas</li>
+    <li class="active">Listar Periodos</li>
   </ol>
 </section>      
 {% endblock %}
@@ -35,28 +36,31 @@
         {% endif %}
         <div class="box">
             <div class="box-header">
-              <h3 class="box-title">Listado de puestos | {{empresa.nombre}}</h3>
+              <h3 class="box-title">Listado de periodos registradas</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
                 <table id="empresas" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nombre</th>
-                            <th>Orden Jerárquico</th>
-                            <th>Acciones</th>
+                            <th>fecha Inicio</th>
+                            <th>fecha Fin</th>
+                            <th>Activo </th>
+                            <th>Empresa</th>
+                            <th>Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for puesto in object_list %}
+                    {% for periodo in object_list %}
                         <tr>
-                            <td>{{puesto.id}}</td>
-                            <td>{{ puesto.nombre }}</td>
-                            <td>{{ puesto.orden_jerarquico}}</td>
+                            <td>{{periodo.id}}</td>
+                            <td>{{ periodo.fecha_inico }}</td>
+                            <td>{{ periodo.fecha_fin}}</td>
+                            <td>{{ periodo.activo}}</td>
+                            <td>{{ periodo.empresa}}</td>
                             <td>
-                                <a href="{% url 'evaluaciones:crear_puesto' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar puesto"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:actualiza_puesto' pk=puesto.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar puesto"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:borrar_puesto' pk=puesto.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar puesto"><i class="fa fa-trash text-red"></i></a> 
+                                <a href="{% url 'evaluaciones:crear_periodo' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar empresa"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
+                               
                             </td>
                         </tr>
                     {% endfor %}
@@ -64,9 +68,11 @@
                     <tfoot>
                         <tr>
                             <th>#</th>
-                            <th>Nombre</th>
-                            <th>Orden Jerárquico</th>
-                            <th>Acciones</th>
+                            <th>fecha Inicio</th>
+                            <th>fecha Fin</th>
+                            <th>Activo </th>
+                            <th>Empresa</th>
+                            <th>Opciones</th>
                         </tr>
                     </tfoot>
                 </table>

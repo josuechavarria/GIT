@@ -28,8 +28,9 @@ urlpatterns = [
     url(r'^criterio/listar/(?P<pk>\d+)/$',
         views.ListarCriterios.as_view(), name='listar_criterios'),
     url(r'^periodo/crear/(?P<pk>\d+)/$', views.CrearPeriodos.as_view(model=periodos), name='crear_periodo'),
+    url(r'^periodo/listar/(?P<pk>\d+)/$', views.ListarPeriodos.as_view(model=periodos), name='listar_periodos'),
     url(r'^objetivo/crear/(?P<pk>\d+)/$', views.CrearObjetivos.as_view(model=objetivos), name='crear_objetivos'),
     url(r'^objetivos/listar/(?P<pk>\d+)/$', views.ListarObjetivos.as_view(), name='listar_objetivos'),
     url(r'^objetivos/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$',
-        views.ActualizarObjetivos.as_view(model=sucursales), name='actualizar_objetivos')
+        views.ActualizarObjetivos.as_view(model=objetivos), name='actualizar_objetivos')
 ]
