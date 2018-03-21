@@ -18,12 +18,14 @@ class empresas(models.Model):
 class puestos(models.Model):
 	"""docstring for puestos"""
 	empresa = models.ForeignKey(empresas)
-	perfil = models.ForeignKey(Group)
 	nombre = models.CharField(max_length=50)
 	orden_jerarquico = models.IntegerField()
 	def __str__(self):
 		return self.empresa
 
+class group_empresas(models.Model):
+	empresa = models.ForeignKey(empresas)
+	perfil = models.ForeignKey(Group)
 
 class departamentos(models.Model):
 	"""docstring for departamentos"""
@@ -113,6 +115,16 @@ class evaluaciones(models.Model):
 	criterio = models.ForeignKey(criterios)
 	ponderacion = models.DecimalField(max_digits=3, decimal_places=2)
 	porcentaje_meta = models.DecimalField(max_digits=3, decimal_places=2)
+
+	class Meta:
+		permissions = (
+			("evaluaciones_colaboradores", "Evaluaciones colaboradores"), 
+			("evaluaciones_administracion", "Administración evaluaciones"),
+			("evaluaciones_dashboard", "Dashboard evaluaciones"),
+			("evaluaciones_ficha", "Ficha evaluaciones"),
+			("evaluaciones_gestionar", "Gestionar evaluaciones"),
+			("evaluaciones_mis", "Mis evaluaciones")
+		)
 
 
 class evaluacion_colaborador(models.Model):
