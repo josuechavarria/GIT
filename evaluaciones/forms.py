@@ -2,7 +2,6 @@ from django import forms
 from django.forms import ModelForm, CharField, ImageField,DateField, ModelChoiceField, Select, FileInput, TextInput, Textarea, IntegerField,CheckboxInput
 from .models import *
 from django.contrib.auth.models import User, Group
-from suit.widgets import SuitDateWidget, SuitTimeWidget, SuitSplitDateTimeWidget
 
 class empresasForm(ModelForm):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -78,3 +77,19 @@ class PeriodosForm(ModelForm):
             'fecha_fin': forms.DateInput(attrs={'class':'datepicker'}),
             'activo': CheckboxInput(attrs={'class': 'checkbox'}),                      
         }
+
+class objetivosForm(ModelForm):
+    nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))    
+    class Meta:
+        model = objetivos
+        fields = ('nombre',)
+
+
+class objetivosFormEdit(ModelForm):
+    nombre = forms.CharField(widget=forms.TextInput(
+        attrs={'class': 'form-control'}))
+
+    class Meta:
+        model = objetivos
+        fields = ('nombre',)
+

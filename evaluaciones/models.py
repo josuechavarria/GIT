@@ -22,7 +22,7 @@ class puestos(models.Model):
 	nombre = models.CharField(max_length=50)
 	orden_jerarquico = models.IntegerField()
 	def __str__(self):
-		return self.empresa
+		return self.nombre
 
 
 class departamentos(models.Model):
@@ -95,6 +95,10 @@ class periodos(models.Model):
 class objetivos(models.Model):
 	"""objetivo estrategico del criterio"""
 	nombre = models.CharField(max_length=30, unique=True)
+
+	def __str__(self):
+		return self.nombre
+
 
 
 class criterios(models.Model):

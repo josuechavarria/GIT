@@ -290,6 +290,12 @@ class CrearCriterio(SuccessMessageMixin,CreateView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
+class ListarCriterios(ListView):	
+	model = criterios	
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
 
 # Periodos
 class CrearPeriodos(SuccessMessageMixin,CreateView):
@@ -309,4 +315,52 @@ class CrearPeriodos(SuccessMessageMixin,CreateView):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
+## OBJETIVOS
+## Creación de Objetivos	
+class CrearObjetivos(SuccessMessageMixin,CreateView):
+	model = objetivos
+	form_class = objetivosForm
+	template_name = "evaluaciones/crearObjetivo.html"
+	success_message = "Objetivo creado satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_objetivos', args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_objetivos', args=[self.kwargs['pk']])
+		return url
 
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+## Listar Objetivos
+class ListarObjetivos(ListView):	
+	model = objetivos
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+# Actualizar Objetivos
+class ActualizarObjetivos(SuccessMessageMixin,UpdateView):
+	model = objetivos
+	form_class = objetivosFormEdit
+	template_name = "evaluaciones/ActualizaObjetivo.html"
+	success_message = "Empresa actualizada satisfactoriamente."
+	error_message = "La empresa no se pudo actualizar, inténtelo nuevamente."
+	
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_objetivos',args=[self.kwargs['id']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_objetivos', args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
+#Listas, tablas
