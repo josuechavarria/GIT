@@ -93,6 +93,7 @@ class periodos(models.Model):
 	def get_year(self):
 		print(self.fecha_inicio.year)
 		return self.fecha_inico.year
+	
 
 class objetivos(models.Model):
 	"""objetivo estrategico del criterio"""

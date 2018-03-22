@@ -12,6 +12,10 @@ from braces.views import FormInvalidMessageMixin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
+## Para la automatización de la creación de los periodos
+from celery.schedules import crontab
+from celery.task import periodic_task
+
 from evaluaciones.models import *
 from evaluaciones.forms import *
 
@@ -337,7 +341,7 @@ class CrearPeriodos(SuccessMessageMixin,CreateView):
 		return url
 
 class ListarPeriodos(ListView):	
-	model = periodos	
+	model = periodos
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
