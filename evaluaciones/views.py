@@ -396,3 +396,15 @@ class ActualizarObjetivos(SuccessMessageMixin,UpdateView):
 		return context
 	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
 #Listas, tablas
+
+## Definimos para cada empresa cual sera el tiempo de generación de indicadores
+class CreartipoPeriodicidad(SuccessMessageMixin,CreateView):
+	model = tipoperiodicidad
+	form_class = tipoperiodicidadForm
+	template_name = "evaluaciones/creartipoPeriodicidad.html"
+	success_message = "periodicidad creada satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_tipoperiodicidad')
+		return url

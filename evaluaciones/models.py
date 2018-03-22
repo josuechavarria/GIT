@@ -23,6 +23,20 @@ class puestos(models.Model):
 	def __str__(self):
 		return self.nombre
 
+class tipoperiodicidad(models.Model):
+	"""docstring for tipoperiodicidad"""
+	nombre = models.CharField(max_length=50)
+	meses = models.IntegerField()
+	def __str__(self):
+		return self.nombre
+
+class periodicidad(models.Model):
+	"""docstring for puestos"""
+	empresa = models.ForeignKey(empresas)
+	Periodicidad = models.ForeignKey(tipoperiodicidad)
+	def __str__(self):
+		return self.nombre
+
 class group_empresas(models.Model):
 	empresa = models.ForeignKey(empresas)
 	perfil = models.ForeignKey(Group)
