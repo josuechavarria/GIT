@@ -45,8 +45,9 @@
                             <th>#</th>
                             <th>fecha Inicio</th>
                             <th>fecha Fin</th>
-                            <th>Activo </th>
+                            <th>Estado </th>
                             <th>Empresa</th>
+                            <th>Duración</th>
                             <th>Opciones</th>
                         </tr>
                     </thead>
@@ -56,8 +57,13 @@
                             <td>{{periodo.id}}</td>
                             <td>{{ periodo.fecha_inicio }}</td>
                             <td>{{ periodo.fecha_fin}}</td>
-                            <td>{{ periodo.activo}}</td>
-                            <td>{{ periodo.empresa}}</td>
+                            {% if periodo.activo %}
+                            <td><i class="fa fa-arrow-circle-up fa-2x text-green" ></i> </td>
+                            {% else %}
+                            <td><i class="fa fa-arrow-circle-down fa-2x text-red"></i></td>
+                             {% endif %}
+                            <td>{{ periodo.empresa}}</td>´
+                            <td>{{ periodo.tiempo}} Meses</td>
                             <td>
                                 <a href="{% url 'evaluaciones:crear_periodo' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar empresa"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
                                
@@ -70,8 +76,9 @@
                             <th>#</th>
                             <th>fecha Inicio</th>
                             <th>fecha Fin</th>
-                            <th>Activo </th>
+                            <th>Estado </th>
                             <th>Empresa</th>
+                            <th>Duracion</th>
                             <th>Opciones</th>
                         </tr>
                     </tfoot>

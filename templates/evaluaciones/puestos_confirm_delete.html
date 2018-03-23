@@ -31,27 +31,26 @@
         {% endfor %} {% endif %}
         <div class="box box-primary">
             <div class="box-header with-border">
-                <h3 class="box-title">Registrar puestos</h3>
+                <h3 class="box-title">Borrar puestos</h3>
             </div>
             <!-- /.box-header -->
             <!-- form start -->
             <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
                 <div class="box-body">
                     {% csrf_token %}
-                    <p>Are you sure you want to delete "{{ object }}"?</p>
-                    <input type="submit" value="Confirm" />
+                    <p>Esta seguro que quiere borrar  "{{ object }}"?</p>
                 </div>
                 <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
                 <div class="box-footer">
                     <div class="col-md-3 col-md-offset-6">
-                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').removeAttr('disabled');"
-                            value="SaveNew">
-                            <i class="fa fa-save"></i>&nbsp;Guardar y nuevo</button>
+                        <button class="btn btn-raised btn-danger pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').removeAttr('disabled');"
+                            value="Confirm">
+                            <i class="fa fa-eraser"></i>&nbsp;Borrar</button>
                     </div>
                     <div class="col-md-3">
                         <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').attr('disabled','disabled')"
                             value="SaveList">
-                            <i class="fa fa-send"></i>&nbsp;Guardar y listar</button>
+                            <i class="fa fa-send"></i>&nbsp;Cancelar</button>
                     </div>
                 </div>
             </form>

@@ -158,9 +158,15 @@ class ListarPuestos(ListView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
-class BorrarPuesto(DeleteView):
-	model = puestos
-	success_url = reverse_lazy('listar_puesto')
+class BorrarPuesto(SuccessMessageMixin,DeleteView):
+	model = puestos	
+	success_message = "Puesto borrado con exito"
+	def get_success_url(self):		
+		empresa_id = self.kwargs['id']
+		return reverse(
+			'evaluaciones:listar_puesto',
+			kwargs={'pk' : empresa_id}
+		)
 	def get_context_data(self, **kwargs):
 			context = super().get_context_data(**kwargs)
 			context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
