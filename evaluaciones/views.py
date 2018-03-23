@@ -161,16 +161,21 @@ class ListarPuestos(ListView):
 class BorrarPuesto(SuccessMessageMixin,DeleteView):
 	model = puestos	
 	success_message = "Puesto borrado con exito"
-	def get_success_url(self):		
+	
+	def get_success_url(self):
 		empresa_id = self.kwargs['id']
-		return reverse(
-			'evaluaciones:listar_puesto',
-			kwargs={'pk' : empresa_id}
-		)
+		print(self.request.POST)
+		if "Confirm" in self.request.POST:
+			url = reverse('evaluaciones:listar_puesto',kwargs={'pk' : empresa_id})
+		else:
+			url = reverse('evaluaciones:listar_puesto',kwargs={'pk': empresa_id})
+		return url
+	
 	def get_context_data(self, **kwargs):
 			context = super().get_context_data(**kwargs)
 			context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
 			return context
+		
 
 
 class CrearDepartamento(SuccessMessageMixin,CreateView):
