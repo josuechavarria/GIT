@@ -19,9 +19,11 @@ urlpatterns = [
     url(r'^departamento/crear/(?P<pk>\d+)/$', views.CrearDepartamento.as_view(model=departamentos), name='crear_departamento'),
     url(r'^departamento/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarDepartamento.as_view(model= departamentos), name='actualiza_departamento'),
     url(r'^departamento/listar/(?P<pk>\d+)/$', views.ListarDepartamentos.as_view(model= departamentos), name='listar_departamento'),
+    url(r'^departamento/borrar/(?P<pk>\d+)/(?P<id>\d+)/$',views.BorrarDepartamento.as_view(model=departamentos), name='borrar_departamento'),
     url(r'^sucursal/crear/(?P<pk>\d+)/$', views.CrearSucursal.as_view(model=sucursales), name='crear_sucursal'),
     url(r'^sucursal/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarSucursal.as_view(model= sucursales), name='actualiza_sucursal'),
     url(r'^sucursal/listar/(?P<pk>\d+)/$', views.ListarSucursales.as_view(model= sucursales), name='listar_sucursal'),
+    url(r'^sucursal/borrar/(?P<pk>\d+)/(?P<id>\d+)/$',views.BorrarSucursal.as_view(model=sucursales), name='borrar_sucursal'),
     url(r'^roles/listar/(?P<pk>\d+)/$', views.RolesView.as_view(), name='listar_roles'),
     url(r'^roles/nuevo/(?P<pk>\d+)/$', views.RolesNuevoView.as_view(), name='crear_roles'),
     url(r'^criterio/crear/(?P<pk>\d+)/$', views.CrearCriterio.as_view(model=criterios), name='crear_criterio'),
@@ -33,4 +35,5 @@ urlpatterns = [
     url(r'^objetivos/listar/(?P<pk>\d+)/$', views.ListarObjetivos.as_view(), name='listar_objetivos'),
     url(r'^objetivos/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$',
         views.ActualizarObjetivos.as_view(model=objetivos), name='actualizar_objetivos'),
+    url(r'^objetivos/borrar/(?P<pk>\d+)/(?P<id>\d+)/$',views.BorrarObejtivos.as_view(model=objetivos), name='borrar_objetivos'),
 ]

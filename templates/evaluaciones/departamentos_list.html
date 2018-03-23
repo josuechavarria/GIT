@@ -56,7 +56,7 @@
                             <td>
                                 <a href="{% url 'evaluaciones:crear_departamento' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar departamento"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:actualiza_departamento' pk=object.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar departamento"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:actualiza_departamento' pk=object.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar departamento"><i class="fa fa-trash text-red"></i></a> 
+                                <a href="{% url 'evaluaciones:borrar_departamento' pk=object.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar departamento"><i class="fa fa-trash text-red"></i></a> 
                             </td>
                         </tr>
                     {% endfor %}

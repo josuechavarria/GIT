@@ -55,7 +55,7 @@
                             <td>
                                 <a href="{% url 'evaluaciones:crear_objetivos' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar objetivo"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:actualizar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar objetivo"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
-                                
+                                <a href="{% url 'evaluaciones:borrar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar departamento"><i class="fa fa-trash text-red"></i></a> 
                             </td>
                         </tr>
                     {% endfor %}
