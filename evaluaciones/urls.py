@@ -33,5 +33,4 @@ urlpatterns = [
     url(r'^objetivos/listar/(?P<pk>\d+)/$', views.ListarObjetivos.as_view(), name='listar_objetivos'),
     url(r'^objetivos/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$',
         views.ActualizarObjetivos.as_view(model=objetivos), name='actualizar_objetivos'),
-    url(r'^tipoPeriodicidad/crear/', views.CreartipoPeriodicidad.as_view(model=tipoperiodicidad), name='crear_tipoperiodicidad'),
 ]
