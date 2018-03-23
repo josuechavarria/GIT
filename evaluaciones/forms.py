@@ -66,7 +66,6 @@ class CriteriosForm(ModelForm):
             'descripcion': TextInput(attrs={'class': 'form-control'}),            
             'objetivo': Select(attrs={'class': 'form-control'}),            
         }
-
 class PeriodosForm(ModelForm):
     class Meta:
         model = periodos
@@ -92,4 +91,13 @@ class objetivosFormEdit(ModelForm):
     class Meta:
         model = objetivos
         fields = ('nombre',)
+
+class tipoperiodicidadForm(ModelForm):
+    class Meta:
+        model = tipoperiodicidad
+        fields = ('nombre', 'meses')
+        widgets = {
+            'nombre': TextInput(attrs={'class': 'form-control'}),
+            'meses': TextInput(attrs={'class': 'form-control'}),
+        }
 

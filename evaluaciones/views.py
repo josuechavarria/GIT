@@ -12,6 +12,10 @@ from braces.views import FormInvalidMessageMixin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
+## Para la automatización de la creación de los periodos
+from celery.schedules import crontab
+from celery.task import periodic_task
+
 from evaluaciones.models import *
 from evaluaciones.forms import *
 
@@ -151,7 +155,7 @@ class ListarPuestos(ListView):
 	print(model)
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
 class BorrarPuesto(DeleteView):
@@ -306,7 +310,7 @@ class CrearCriterio(SuccessMessageMixin,CreateView):
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_criterio', args=[self.kwargs['pk']])
 		else:
-			url = reverse_lazy('evaluaciones:listar_criterio', args=[self.kwargs['pk']])
+			url = reverse_lazy('evaluaciones:listar_criterios', args=[self.kwargs['pk']])
 		return url
 
 	def get_context_data(self, **kwargs):
@@ -327,6 +331,7 @@ class CrearPeriodos(SuccessMessageMixin,CreateView):
 	form_class = PeriodosForm
 	template_name = "evaluaciones/CrearPeriodo.html"
 	success_message = "Periodo creado satisfactoriamente."
+
 	def get_success_url(self, **kwargs):
 		print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
@@ -335,10 +340,13 @@ class CrearPeriodos(SuccessMessageMixin,CreateView):
 			url = reverse_lazy('evaluaciones:listar_periodo', args=[self.kwargs['pk']])
 		return url
 
+class ListarPeriodos(ListView):	
+	model = periodos
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
+
 ## OBJETIVOS
 ## Creación de Objetivos	
 class CrearObjetivos(SuccessMessageMixin,CreateView):
@@ -388,3 +396,15 @@ class ActualizarObjetivos(SuccessMessageMixin,UpdateView):
 		return context
 	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
 #Listas, tablas
+
+## Definimos para cada empresa cual sera el tiempo de generación de indicadores
+class CreartipoPeriodicidad(SuccessMessageMixin,CreateView):
+	model = tipoperiodicidad
+	form_class = tipoperiodicidadForm
+	template_name = "evaluaciones/creartipoPeriodicidad.html"
+	success_message = "periodicidad creada satisfactoriamente."
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_tipoperiodicidad')
+		return url

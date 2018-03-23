@@ -1,4 +1,4 @@
-{% extends 'evaluaciones/base.html'%}
+{% extends 'evaluaciones/base_empresa.html'%}
 {% load static %}
 {% block style %}
 <!-- DataTables -->
@@ -13,7 +13,7 @@
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
     <li class="">Empresas</li>
-    <li class="active">Listar empresa</li>
+    <li class="active">Listar Periodos</li>
   </ol>
 </section>      
 {% endblock %}
@@ -36,29 +36,31 @@
         {% endif %}
         <div class="box">
             <div class="box-header">
-              <h3 class="box-title">Listado de empresas registradas</h3>
+              <h3 class="box-title">Listado de periodos registradas</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
                 <table id="empresas" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Nombre</th>
-                            <th>RTN</th>
-                            <th>Licencias</th>
-                            <th>Acciones</th>
+                            <th>fecha Inicio</th>
+                            <th>fecha Fin</th>
+                            <th>Activo </th>
+                            <th>Empresa</th>
+                            <th>Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                    {% for empresa in object_list %}
+                    {% for periodo in object_list %}
                         <tr>
-                            <td>{{empresa.id}}</td>
-                            <td>{{ empresa.nombre }}</td>
-                            <td>{{ empresa.rtn}}</td>
-                            <td>{{ empresa.licencias}}/{{ empresa.licencias}}</td>
-                            <td>                                <a href="{% url 'evaluaciones:crear_empresa'%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar empresa"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:actualiza_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar empresa"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:principal_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-success" data-toggle="tooltip" data-placement="top" title="Administrar"><i class="fa fa-cog text-orange"></i></a>
+                            <td>{{periodo.id}}</td>
+                            <td>{{ periodo.fecha_inicio }}</td>
+                            <td>{{ periodo.fecha_fin}}</td>
+                            <td>{{ periodo.activo}}</td>
+                            <td>{{ periodo.empresa}}</td>
+                            <td>
+                                <a href="{% url 'evaluaciones:crear_periodo' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar empresa"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
+                               
                             </td>
                         </tr>
                     {% endfor %}
@@ -66,10 +68,11 @@
                     <tfoot>
                         <tr>
                             <th>#</th>
-                            <th>Nombre</th>
-                            <th>RTN</th>
-                            <th>Licencias</th>
-                            <th>Acciones</th>
+                            <th>fecha Inicio</th>
+                            <th>fecha Fin</th>
+                            <th>Activo </th>
+                            <th>Empresa</th>
+                            <th>Opciones</th>
                         </tr>
                     </tfoot>
                 </table>
