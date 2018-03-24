@@ -35,5 +35,5 @@ urlpatterns = [
     url(r'^objetivos/listar/(?P<pk>\d+)/$', views.ListarObjetivos.as_view(), name='listar_objetivos'),
     url(r'^objetivos/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$',
         views.ActualizarObjetivos.as_view(model=objetivos), name='actualizar_objetivos'),
-    url(r'^objetivos/borrar/(?P<pk>\d+)/(?P<id>\d+)/$',views.BorrarObejtivos.as_view(model=objetivos), name='borrar_objetivos'),
+    url(r'^objetivos/borrar/(?P<pk>\d+)/(?P<id>\d+)/$',views.BorrarObjetivos.as_view(model=objetivos), name='borrar_objetivos'),
 ]

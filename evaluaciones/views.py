@@ -224,6 +224,29 @@ class ListarDepartamentos(ListView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
+class BorrarDepartamento(SuccessMessageMixin,DeleteView):
+	model = departamentos	
+	success_message = "Departamento borrado con exito"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+	
+	def get_success_url(self):
+		empresa_id = self.kwargs['id']
+		print(self.request.POST)
+		if "Confirm" in self.request.POST:
+			url = reverse('evaluaciones:listar_departamento',kwargs={'pk' : empresa_id})
+		else:
+			url = reverse('evaluaciones:listar_departamento',kwargs={'pk': empresa_id})
+		return url
+
+	def delete(self, request, *args, **kwargs):
+        	messages.success(self.request, self.success_message)
+        	return super(BorrarDepartamento, self).delete(request, *args, **kwargs)
+
+
 class CrearSucursal(SuccessMessageMixin,CreateView):
 	model = sucursales
 	form_class = SucursalesForm
@@ -269,6 +292,28 @@ class ListarSucursales(ListView):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
+
+class BorrarSucursal(SuccessMessageMixin,DeleteView):
+	model = sucursales	
+	success_message = "Sucursal borrada con exito"
+	
+	def get_success_url(self):
+		empresa_id = self.kwargs['id']
+		print(self.request.POST)
+		if "Confirm" in self.request.POST:
+			url = reverse('evaluaciones:listar_sucursal',kwargs={'pk' : empresa_id})
+		else:
+			url = reverse('evaluaciones:listar_sucursal',kwargs={'pk': empresa_id})
+		return url
+		
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+
+	def delete(self, request, *args, **kwargs):
+        	messages.success(self.request, self.success_message)
+        	return super(BorrarSucursal, self).delete(request, *args, **kwargs)
 
 class IndexView(View):
 	def get(self, request):
@@ -405,5 +450,16 @@ class ActualizarObjetivos(SuccessMessageMixin,UpdateView):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
 		return context
-	#fields = ['nombre', 'rtn', 'direccion', 'otros_datos']
-#Listas, tablas
+
+class BorrarObjetivos(SuccessMessageMixin,DeleteView):
+	model = objetivos	
+	success_message = "Objetivo borrado con exito"
+	
+	def get_success_url(self):
+		empresa_id = self.kwargs['id']
+		print(self.request.POST)
+		if "Confirm" in self.request.POST:
+			url = reverse('evaluaciones:listar_objetivos',kwargs={'pk' : empresa_id})
+		else:
+			url = reverse('evaluaciones:listar_objetivos',kwargs={'pk': empresa_id})
+		return url

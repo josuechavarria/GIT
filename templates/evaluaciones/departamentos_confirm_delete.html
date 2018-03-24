@@ -38,7 +38,7 @@
             <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
                 <div class="box-body">
                     {% csrf_token %}
-                    <p>Esta seguro que quiere borrar  "{{ object }}"?</p>
+                    <p>Esta seguro que quiere borrar el Departamento "{{ object }}"?</p>
                 </div>
                 <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
                 <div class="box-footer">

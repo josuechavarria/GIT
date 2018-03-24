@@ -142,3 +142,5 @@ class evaluacion_colaborador(models.Model):
 	porcentaje = models.DecimalField(max_digits=3, decimal_places=2)
 	porcentaje_final = models.DecimalField(max_digits=3, decimal_places=2)
 	nota = models.DecimalField(max_digits=3, decimal_places=2)
+
+## Para la carga de archivos
