@@ -61,6 +61,10 @@
                             <td>{{ criterio.periodos.year }}</td>
                             <td>
                                 <a href="{% url 'evaluaciones:crear_criterio' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar criterio"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;                                
+                                <a href="{% url 'evaluaciones:borrar_criterios' pk=criterio.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error"
+                                    data-toggle="tooltip" data-placement="top" title="Listar Criterios">
+                                    <i class="fa fa-trash text-red"></i>
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

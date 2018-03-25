@@ -27,8 +27,9 @@ urlpatterns = [
     url(r'^roles/listar/(?P<pk>\d+)/$', views.RolesView.as_view(), name='listar_roles'),
     url(r'^roles/nuevo/(?P<pk>\d+)/$', views.RolesNuevoView.as_view(), name='crear_roles'),
     url(r'^criterio/crear/(?P<pk>\d+)/$', views.CrearCriterio.as_view(model=criterios), name='crear_criterio'),
-    url(r'^criterio/listar/(?P<pk>\d+)/$',
+    url(r'^criterios/listar/(?P<pk>\d+)/$',
         views.ListarCriterios.as_view(), name='listar_criterios'),
+    url(r'^criterios/borrar/(?P<pk>\d+)/(?P<id>\d+)/$',views.BorrarCriterios.as_view(model=criterios), name='borrar_criterios'),
     url(r'^periodo/crear/(?P<pk>\d+)/$', views.CrearPeriodos.as_view(model=periodos), name='crear_periodo'),
     url(r'^periodo/listar/(?P<pk>\d+)/$', views.ListarPeriodos.as_view(model=periodos), name='listar_periodos'),
     url(r'^objetivo/crear/(?P<pk>\d+)/$', views.CrearObjetivos.as_view(model=objetivos), name='crear_objetivos'),
@@ -36,4 +37,5 @@ urlpatterns = [
     url(r'^objetivos/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$',
         views.ActualizarObjetivos.as_view(model=objetivos), name='actualizar_objetivos'),
     url(r'^objetivos/borrar/(?P<pk>\d+)/(?P<id>\d+)/$',views.BorrarObjetivos.as_view(model=objetivos), name='borrar_objetivos'),
+    url(r'^departamentos/importar/',views.simple_upload, name='borrar_objetivos'),
 ]
