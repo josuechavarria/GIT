@@ -59,6 +59,10 @@
                                 <a href="{% url 'evaluaciones:crear_objetivos' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar objetivo"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:actualizar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar objetivo"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:borrar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar departamento"><i class="fa fa-trash text-red"></i></a> 
+                                <a  class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" onclick="$('#myModal').modal();"
+                                    data-toggle="tooltip" data-placement="top" title="Eliminar__ departamento">
+                                    <i class="fa fa-trash text-red"></i>
+                                </a>
                             </td>
                         </tr>
                     {% else %}
@@ -90,12 +94,55 @@
     </div>
 </div>
 </section>
+<div class="example-modal">
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Borrar Objetivo</h4>
+                </div>
+                <form action="" role="form" form class="form-horizontal" enctype="multipart/form-data" method="post">
+                    <div class="box-body">
+                        {% csrf_token %}
+                        <p>Esta seguro que quiere borrar "{{ object }}"?</p>
+                    </div>
+                    <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
+                    <div class="box-footer">
+                        <div class="col-md-3 col-md-offset-6">
+                            <button class="btn btn-raised btn-danger pull-left" type="submit" onclick=""
+                                value="Confirm">
+                                <i class="fa fa-eraser"></i>&nbsp;Borrar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
+<!-- /.example-modal -->
 {% endblock %}
 {% block script %}
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
-<script>
+<script>      
       $(function () {
+          $(".pull-left").click(function () {
+              alert('')
+              $.ajax({
+                  method: "POST",
+                  url: "",
+                  data: { pk=objetivo.id, csrfmiddlewaretoken: '{{ csrf_token }}' }
+              })
+                  .done(function (msg) {
+                      //alert( "Data Saved: " + msg );
+                  });  
+          });     
         $("#empresas").DataTable({
             "fnRowCallback":function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if( aData[3] == "inactivo" )

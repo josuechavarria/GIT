@@ -482,8 +482,6 @@ class BorrarCriterios(SuccessMessageMixin, DeleteView):
                 self.object.save()
                 return HttpResponseRedirect(error_url)
 # Periodos
-
-
 class CrearPeriodos(SuccessMessageMixin, CreateView):
     model = periodos
     form_class = PeriodosForm
@@ -608,7 +606,8 @@ class BorrarObjetivos(SuccessMessageMixin, DeleteView):
                 self.object.delete()
                 messages.add_message(request,messages.SUCCESS,'Exito, Objetivo borrado exitosamente')                
                 return HttpResponseRedirect(success_url)
-           except models.ProtectedError:
+           except models.ProtectedError:  
+                print(models.ProtectedError)                                           
                 messages.add_message(request,messages.WARNING,'info, Existen Criterios que dependen de este Objetivo, el estado paso a inactivo.')
                 self.object.estado = False
                 self.object.save()

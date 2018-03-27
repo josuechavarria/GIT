@@ -109,6 +109,9 @@ class periodos(models.Model):
 		print(self.fecha_inicio.year)
 		return self.fecha_inico.year
 	
+	def __str__(self):
+		return str(self.pk)
+	
 
 class objetivos(models.Model):
 	"""objetivo estrategico del criterio"""
