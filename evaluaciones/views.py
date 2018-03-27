@@ -11,9 +11,10 @@ from django.utils import timezone
 from braces.views import FormInvalidMessageMixin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-
+from django.core.mail import send_mail
 from evaluaciones.models import *
 from evaluaciones.forms import *
+from django.conf import settings
 
 def home(request):
     numbers = [1,2,3,4,5]
@@ -23,6 +24,56 @@ def home(request):
 
 def principal(request):
     return render(request,'evaluaciones/principal.html')
+
+class CrearUsuarioView(View):	
+	def get(self, request, pk=None):
+		form = usuariosForm()
+		template_name = "evaluaciones/crearUsuario.html"
+		ctx = {'form':form,
+		'empresa' : empresas.objects.get(pk=pk),
+		'grupos': group_empresas.objects.filter(empresa__pk = pk)
+		}
+		return render(request, template_name, ctx)
+   
+	def post(self, request, pk=None):
+		print(request.POST)
+		ctx={}
+		template_name = "evaluaciones/crearUsuario.html"
+		formulario = usuariosForm(request.POST)
+		password = User.objects.make_random_password(length=8, allowed_chars='0123456789qwertyuiopasdfghjklzxcvbnm%$')
+		objUser = User(username=request.POST['email'], email=request.POST['email']
+			, first_name=request.POST['primer_nombre'], last_name=request.POST['primer_apellido'])
+		objUser.set_password(password)
+		
+		if formulario.is_valid():
+			form = formulario.save(commit = False)
+			form.usuario_creador = request.user
+			form.usuario_modificador = request.user
+			objUser.save()
+			objUser.groups.add(Group.objects.get(pk=request.POST['grupo']))
+			form.usuario = objUser
+			#form.save()
+			subject = 'Bienvenido al sistema de evaluación y desempeño'
+			messagemail = 'Sus datos de acceso son: usuario-> ' + objUser.username + ' password-> ' + password
+			if not send_mail(subject, messagemail, settings.EMAIL_HOST_USER, [objUser.email], fail_silently=False):
+				message = 'Usuario Creado Exitosamente. Pero no se pudo enviar el correo al colaborador.'
+			else:
+				message = 'Usuario Modificado satisfactoriamente. Se envio un correo con sus datos de acceso'
+		else:
+			ctx = {'form': formulario}
+			print (formulario.errors)
+			#ctx['message'] = message
+		ctx['empresa'] = empresas.objects.get(pk=pk)
+		ctx['message'] = message
+		ctx['grupos'] = group_empresas.objects.filter(empresa__pk = pk)
+		ctx['form'] = usuariosForm()
+		if "GuardarNuevo" in request.POST:
+			return render(request, template_name, ctx)
+		else:
+			messages.add_messages(request,messages.success,"Exito")
+			url = reverse_lazy('evaluaciones:listar_usuario')
+		return url
+		return HttpResponse(0)
 
 class RolesView(View):	
 	def get(self, request, pk=None):
@@ -151,7 +202,7 @@ class ListarPuestos(ListView):
 	print(model)
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
 class BorrarPuesto(DeleteView):

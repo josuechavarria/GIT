@@ -3,6 +3,12 @@ from django.forms import ModelForm, CharField, ImageField,DateField, ModelChoice
 from .models import *
 from django.contrib.auth.models import User, Group
 
+class usuariosForm(ModelForm):
+    class Meta:
+        model = colaboradores
+        exclude = ('usuario','usuario_creador', 'fecha_creacion', 'usuario_modificador', 'fecha_modificacion', 'fecha_ult_mod_password')
+
+
 class empresasForm(ModelForm):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     rtn = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))

@@ -19,7 +19,7 @@
          folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="{% static 'evaluaciones/dist/css/skins/_all-skins.min.css' %}">
     <!-- iCheck -->
-    <link rel="stylesheet" href="{% static 'evaluaciones/plugins/iCheck/flat/blue.css' %}">
+    <link rel="stylesheet" href="{% static 'evaluaciones/plugins/iCheck/square/blue.css' %}">
     <!-- Morris chart -->
     <link rel="stylesheet" href="{% static 'evaluaciones/plugins/morris/morris.css' %}">
     <!-- jvectormap -->
@@ -382,7 +382,7 @@
                 <i class="fa fa-user"></i> <span>Usuarios</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
+                <li class="active"><a href="{% url 'evaluaciones:crear_usuario' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
                 <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
               </ul>
             </li>

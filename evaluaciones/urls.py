@@ -31,5 +31,6 @@ urlpatterns = [
     url(r'^objetivo/crear/(?P<pk>\d+)/$', views.CrearObjetivos.as_view(model=objetivos), name='crear_objetivos'),
     url(r'^objetivos/listar/(?P<pk>\d+)/$', views.ListarObjetivos.as_view(), name='listar_objetivos'),
     url(r'^objetivos/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$',
-        views.ActualizarObjetivos.as_view(model=sucursales), name='actualizar_objetivos')
+        views.ActualizarObjetivos.as_view(model=sucursales), name='actualizar_objetivos'),
+    url(r'^usuario/crear/(?P<pk>\d+)/$', views.CrearUsuarioView.as_view(), name='crear_usuario'),
 ]
