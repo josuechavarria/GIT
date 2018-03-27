@@ -54,27 +54,24 @@
                         <tr>
                             <td>{{ objetivo.id }}</td>
                             <td>{{ objetivo.nombre }}</td>
-                            <td> activo </td>
+                            <td> 
+                            <small class="label pull-center bg-green">Activo</small>
+                            </td>
                             <td>
                                 <a href="{% url 'evaluaciones:crear_objetivos' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar objetivo"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:actualizar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar objetivo"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:borrar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar departamento"><i class="fa fa-trash text-red"></i></a> 
-                                <a  class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" onclick="$('#myModal').modal();"
-                                    data-toggle="tooltip" data-placement="top" title="Eliminar__ departamento">
-                                    <i class="fa fa-trash text-red"></i>
-                                </a>
+                                <a href="{% url 'evaluaciones:borrar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar departamento"><i class="fa fa-trash text-red"></i></a>                                 
                             </td>
                         </tr>
                     {% else %}
                         <tr class="background: red">
                             <td>{{ objetivo.id }}</td>
                             <td>{{ objetivo.nombre }}</td>
-                            <td> inactivo </td>
-                            <td>                                
-                                <a href="{% url 'evaluaciones:actualizar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
-                                    data-toggle="tooltip" data-placement="top" title="Editar objetivo">
-                                    <i class="fa fa-edit"></i>
-                                </a> &nbsp;&nbsp;
+                            <td>                            
+                            <small class="label pull-center bg-red">Inactivo</small>
+                            </td>
+                            <td>
+                                <input type="checkbox" name="activar" onclick="activar" class="label-success" value="activar"> Activar
                             </td>
                         </tr>
                     {% endif %}
@@ -131,18 +128,6 @@
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script>      
-      $(function () {
-          $(".pull-left").click(function () {
-              alert('')
-              $.ajax({
-                  method: "POST",
-                  url: "",
-                  data: { pk=objetivo.id, csrfmiddlewaretoken: '{{ csrf_token }}' }
-              })
-                  .done(function (msg) {
-                      //alert( "Data Saved: " + msg );
-                  });  
-          });     
         $("#empresas").DataTable({
             "fnRowCallback":function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
             if( aData[3] == "inactivo" )
@@ -151,6 +136,6 @@
             }
             }
         });
-      });
+    
     </script>
 {% endblock %}
