@@ -120,11 +120,9 @@ class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 
 class ListarEmpresas(ListView):
     model = empresas
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['now'] = timezone.now()
-        print(context)
+        context['now'] = timezone.now()        
         return context
 
 
@@ -607,7 +605,8 @@ class BorrarObjetivos(SuccessMessageMixin, DeleteView):
                 messages.add_message(request,messages.SUCCESS,'Exito, Objetivo borrado exitosamente')                
                 return HttpResponseRedirect(success_url)
            except models.ProtectedError:  
-                print(models.ProtectedError)                                           
+                cri = criterios.objects.get(objetivo_id = self.object.pk)
+                print(cri)                
                 messages.add_message(request,messages.WARNING,'info, Existen Criterios que dependen de este Objetivo, el estado paso a inactivo.')
                 self.object.estado = False
                 self.object.save()
@@ -618,7 +617,6 @@ def simple_upload(request):
         departamento_import = ImportarDepartamentos()
         dataset = Dataset()
         new_persons = request.FILES['myfile']
-
         imported_data = dataset.load(new_persons.read())
         result = departamento_import.import_data(
             dataset, dry_run=True)  # Test the data import
@@ -627,3 +625,43 @@ def simple_upload(request):
                 dataset, dry_run=False)  # Actually import now
 
     return render(request, 'evaluaciones/simple_upload.html')
+
+class activar_objetivo(View):
+    def post(self,request,pk=None):
+        print(request.POST['empresa_id'])
+        empresa_id = request.POST['empresa_id']
+        messages.add_message(request,messages.SUCCESS,'info,Objetivo activado')
+        success_url = reverse('evaluaciones:listar_objetivos',
+                          kwargs={'pk': empresa_id})
+        objetivo_ = request.POST['pk']
+        obj = objetivos.objects.get(pk = objetivo_)
+        if obj:
+            print(obj.estado)
+            obj.estado = True
+            obj.save()
+            print(obj.estado)         
+        return HttpResponse(success_url)
+
+class activar_empresa(View):
+    def post(self, request, pk=None):
+        empresa_id = request.POST['pk']        
+        obj = empresas.objects.get(pk=empresa_id)       
+        if request.POST['bandera'] == '1':
+            mensaje = 'Desactivada'            
+            obj.estado = False           
+        else:
+            mensaje = 'Activada'
+            obj.estado = True
+        obj.save()            
+        mensaje_ = 'info,Empresa' + mensaje + 'con exito'
+        messages.add_message(request, messages.SUCCESS,mensaje_)
+        success_url = reverse('evaluaciones:listar_empresa')    
+        return HttpResponse(success_url)
+
+
+
+
+
+
+
+
