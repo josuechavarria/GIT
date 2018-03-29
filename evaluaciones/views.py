@@ -45,32 +45,38 @@ class CrearUsuarioView(View):
 			, first_name=request.POST['primer_nombre'], last_name=request.POST['primer_apellido'])
 		objUser.set_password(password)
 		
-		if formulario.is_valid():
+		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 0:
 			form = formulario.save(commit = False)
 			form.usuario_creador = request.user
 			form.usuario_modificador = request.user
 			objUser.save()
 			objUser.groups.add(Group.objects.get(pk=request.POST['grupo']))
 			form.usuario = objUser
-			#form.save()
+			form.save()
 			subject = 'Bienvenido al sistema de evaluación y desempeño'
 			messagemail = 'Sus datos de acceso son: usuario-> ' + objUser.username + ' password-> ' + password
 			if not send_mail(subject, messagemail, settings.EMAIL_HOST_USER, [objUser.email], fail_silently=False):
-				message = 'Usuario Creado Exitosamente. Pero no se pudo enviar el correo al colaborador.'
+				messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Pero no se pudo enviar el correo al colaborador.')
 			else:
-				message = 'Usuario Modificado satisfactoriamente. Se envio un correo con sus datos de acceso'
+				messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Se envio un correo con sus datos de acceso a %s'%(objUser.email))
+			ctx['form'] = usuariosForm()
 		else:
+			if len(User.objects.filter(username=request.POST['email'])) == 0:
+				messages.add_message(request,messages.ERROR,"Formulario contiene errores!!")
+			else:
+				messages.add_message(request,messages.ERROR,"Error, ya existe un usuario con el correo <%s>"%(request.POST['email']))
 			ctx = {'form': formulario}
 			print (formulario.errors)
 			#ctx['message'] = message
 		ctx['empresa'] = empresas.objects.get(pk=pk)
-		ctx['message'] = message
+		#ctx['message'] = message
 		ctx['grupos'] = group_empresas.objects.filter(empresa__pk = pk)
-		ctx['form'] = usuariosForm()
+		ctx['perfil'] = int(request.POST['grupo'])
+		ctx['email'] = request.POST['email']
 		if "GuardarNuevo" in request.POST:
 			return render(request, template_name, ctx)
 		else:
-			messages.add_messages(request,messages.success,"Exito")
+			messages.add_message(request,messages.SUCCESS,"Exito")
 			url = reverse_lazy('evaluaciones:listar_usuario')
 		return url
 		return HttpResponse(0)

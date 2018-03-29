@@ -48,7 +48,7 @@ class sucursales(models.Model):
 class colaboradores(models.Model):
 	"""docstring for colaborador"""
 	empresa = models.ForeignKey(empresas)
-	usuario = models.ForeignKey(User)
+	usuario = models.ForeignKey(User, unique=True)
 	codigo = models.CharField(max_length=50, unique=True, verbose_name = "Código colaborador")
 	primer_nombre = models.CharField(max_length=30)
 	segundo_nombre = models.CharField(max_length=30, null=True, blank=True, default=None)

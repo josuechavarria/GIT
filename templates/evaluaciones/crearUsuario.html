@@ -25,7 +25,7 @@
                       <i class="fa fa-close"></i>
                     </button>
                     <p></p>
-                    <strong><i class="fa fa-check"></i>{{ message }}</strong> 
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%else%}close{%endif%}">&nbsp;</i>{{ message }}</strong> 
                 </div>
 
             {% endfor %}
@@ -48,61 +48,91 @@
                         <label class="col-sm-2 control-label" for="id_{{form.codigo.name}}"> {{form.codigo.label}} </label>
                         <div class="col-sm-10">
                             {{ form.codigo|addcss:"class:form-control,maxlength:50" }}
+                            {% if form.codigo.errors %}
+                                <div class="text-red">{{form.codigo.errors}}</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="id_{{form.primer_nombre.name}}"> {{form.primer_nombre.label}} </label>
                         <div class="col-sm-4">
                             {{ form.primer_nombre|addcss:"class:form-control" }}
+                            {% if form.primer_nombre.errors %}
+                                <div class="text-red">{{form.primer_nombre.errors}}</div>
+                            {% endif %}
                         </div>
                         <label class="col-sm-2 control-label" for="id_{{form.segundo_nombre.name}}"> {{form.segundo_nombre.label}} </label>
                         <div class="col-sm-4">
                             {{ form.segundo_nombre|addcss:"class:form-control" }}
+                            {% if form.segundo_nombre.errors %}
+                                <div class="text-red">{{form.segundo_nombre.errors}}</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="id_{{form.primer_apellido.name}}"> {{form.primer_apellido.label}} </label>
                         <div class="col-sm-4">
                             {{ form.primer_apellido|addcss:"class:form-control" }}
+                            {% if form.primer_apellido.errors %}
+                                <div class="text-red">{{form.primer_apellido.errors}}</div>
+                            {% endif %}
                         </div>
                         <label class="col-sm-2 control-label" for="id_{{form.segundo_apellido.name}}"> {{form.segundo_apellido.label}} </label>
                         <div class="col-sm-4">
                             {{ form.segundo_apellido|addcss:"class:form-control" }}
+                            {% if form.segundo_apellido.errors %}
+                                <div class="text-red">{{form.segundo_apellido.errors}}</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="id_{{form.puesto.name}}"> {{form.puesto.label}} </label>
                         <div class="col-sm-4">
                             {{ form.puesto|addcss:"class:form-control" }}
+                            {% if form.puesto.errors %}
+                                <div class="text-red">{{form.puesto.errors}}</div>
+                            {% endif %}
                         </div>
                         <label class="col-sm-2 control-label" for="id_{{form.departamento.name}}"> {{form.departamento.label}} </label>
                         <div class="col-sm-4">
                             {{ form.departamento|addcss:"class:form-control" }}
+                            {% if form.departamento.errors %}
+                                <div class="text-red">{{form.departamento.errors}}</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="id_{{form.sucursal.name}}"> {{form.sucursal.label}} </label>
                         <div class="col-sm-4">
                             {{ form.sucursal|addcss:"class:form-control" }}
+                            {% if form.sucursal.errors %}
+                                <div class="text-red">{{form.sucursal.errors}}</div>
+                            {% endif %}
                         </div>
                         <label class="col-sm-2 control-label" for="id_{{form.supervisor.name}}"> {{form.supervisor.label}} </label>
                         <div class="col-sm-4">
                             {{ form.supervisor|addcss:"class:form-control"}}
+                            {% if form.supervisor.errors %}
+                                <div class="text-red">{{form.supervisor.errors}}</div>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="id_email">Correo </label>
                         <div class="col-sm-4">
-                            <input type="email" id="id_email" name="email" class="form-control" placeholder="example@example.com" required/>
+                            <input type="email" id="id_email" name="email" class="form-control" placeholder="example@example.com" value="{{email}}" required/>
                         </div>
                         <label class="col-sm-2 control-label" for="id_{{form.grupo.name}}"> {{form.grupo.label}} </label>
                         <div class="col-sm-4">
                             <select id="id_grupo" name="grupo" class="form-control" required>
                                 <option value="">---------</option>
                                 {% for object in grupos %}
-                                    <option value="{{object.perfil.id}}">{{object.perfil.name|getgroupName:"|"}}</option>
+                                    <option value="{{object.perfil.id}}" {% if object.perfil.id == perfil %} 
+                                        selected 
+                                    {% endif %}>{{object.perfil.name|getgroupName:"|"}}</option>
                                 {% endfor %}
                             </select>
+                            {% if object.perfil.id == perfil %} selected {% endif %}
                         </div>
                     </div>
                     <div class="form-group">
