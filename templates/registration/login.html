@@ -32,7 +32,19 @@
       </div><!-- /.login-logo -->
       <div class="login-box-body">
         <p class="login-box-msg">Iniciar Sesión</p>
-        <form action="{% url 'evaluaciones:login' %}" method="post">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <i class="fa fa-close"></i>
+                    </button>
+                    <p></p>
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%else%}close{%endif%}">&nbsp;</i>{{ message }}</strong> 
+                </div>
+
+            {% endfor %}
+        {% endif %}
+        <form action="{% url 'login' %}" method="post">
           {% csrf_token %}
           <div class="form-group has-feedback">
             <input type="text" name="username" class="form-control" placeholder="Usuario">
@@ -51,7 +63,7 @@
               </div>
             </div><!-- /.col -->
             <div class="col-xs-4">
-              <button type="submit" class="btn btn-primary btn-block btn-flat">Entrar</button>
+              <button type="submit" class="btn btn-primary btn-block btn-flat"><i class="fa fa-sign-in">&nbsp;</i>Entrar</button>
             </div><!-- /.col -->
           </div>
         </form>
