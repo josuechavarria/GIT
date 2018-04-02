@@ -263,7 +263,6 @@ class ListarDepartamentos(ListView):
 
 class BorrarDepartamento(SuccessMessageMixin, DeleteView):
     model = departamentos
-    success_message = "Departamento borrado con exito"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -280,10 +279,28 @@ class BorrarDepartamento(SuccessMessageMixin, DeleteView):
             url = reverse('evaluaciones:listar_departamento',
                           kwargs={'pk': empresa_id})
         return url
+    
+    def get_error_url(self):
+        error_url = reverse_lazy('evaluaciones:listar_departamento',args=[self.kwargs['id']])
+        if error_url:			
+            return error_url.format(**self.object.__dict__)
+        else:
+            raise ImproperlyConfigured(
+                "No error URL to redirect to. Provide a error_url.")
 
     def delete(self, request, *args, **kwargs):
-        messages.success(self.request, self.success_message)
-        return super(BorrarDepartamento, self).delete(request, *args, **kwargs)
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        error_url = self.get_error_url()
+        try:
+            self.object.delete()
+            messages.add_message(request,messages.SUCCESS,'Exito, Departamento borrado exitosamente')                
+            return HttpResponseRedirect(success_url)
+        except models.ProtectedError:               
+            messages.add_message(request,messages.WARNING,'info, Existen Elementos que dependen de este Departamento, el estado paso a inactivo.')
+            self.object.estado = False
+            self.object.save()
+            return HttpResponseRedirect(error_url)
 
 
 class CrearSucursal(SuccessMessageMixin, CreateView):
@@ -344,8 +361,6 @@ class ListarSucursales(ListView):
 
 class BorrarSucursal(SuccessMessageMixin, DeleteView):
     model = sucursales
-    success_message = "Sucursal borrada con exito"
-
     def get_success_url(self):
         empresa_id = self.kwargs['id']
         print(self.request.POST)
@@ -605,8 +620,8 @@ class BorrarObjetivos(SuccessMessageMixin, DeleteView):
                 messages.add_message(request,messages.SUCCESS,'Exito, Objetivo borrado exitosamente')                
                 return HttpResponseRedirect(success_url)
            except models.ProtectedError:  
-                cri = criterios.objects.get(objetivo_id = self.object.pk)
-                print(cri)                
+                cri = criterios.objects.get(objetivo_id = self.object.pk)                
+                print(cri.pk)
                 messages.add_message(request,messages.WARNING,'info, Existen Criterios que dependen de este Objetivo, el estado paso a inactivo.')
                 self.object.estado = False
                 self.object.save()
@@ -658,9 +673,22 @@ class activar_empresa(View):
         success_url = reverse('evaluaciones:listar_empresa')    
         return HttpResponse(success_url)
 
-
-
-
+class activar_departamento(View):
+    def post(self,request,pk=None):
+        print(request.POST['empresa_id'])
+        empresa_id = request.POST['empresa_id']
+        messages.add_message(request,messages.SUCCESS,'Departamento activado')
+        success_url = reverse('evaluaciones:listar_departamento',
+                          kwargs={'pk': empresa_id})
+        departamento_ = request.POST['pk']
+        print(departamento_)
+        depa = departamentos.objects.get(pk = departamento_)
+        if depa:
+            print(depa.estado)
+            depa.estado = True
+            depa.save()
+            print(depa.estado)         
+        return HttpResponse(success_url)
 
 
 
