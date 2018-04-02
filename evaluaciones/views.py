@@ -11,7 +11,9 @@ from django.utils import timezone
 from braces.views import FormInvalidMessageMixin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from hashlib import md5
 from django.core.mail import send_mail
+from django.template import loader
 from evaluaciones.models import *
 from evaluaciones.forms import *
 from django.conf import settings
@@ -25,6 +27,79 @@ def home(request):
 def principal(request):
     return render(request,'evaluaciones/principal.html')
 
+class ResetPasswordNotificacionView(View):	
+	def get(self, request, pk=None, id=None):
+		return HttpResponse(0)
+   
+	def post(self, request, pk=None, id=None):
+		template_name = "evaluaciones/email_resetPassword.html"
+		objColaborador = colaboradores.objects.get(pk=pk)
+		objUser = objColaborador.usuario
+		oldpass = md5(objColaborador.usuario.password.encode('utf-8')).hexdigest()
+		url = reverse_lazy('evaluaciones:actualiza_password', args=[pk,id,oldpass])
+		html_message = loader.render_to_string(
+		template_name,
+			{
+				'empresa': objColaborador.empresa.nombre,
+				'name':  objColaborador.primer_nombre,
+				'usuario' : objColaborador.usuario.username,
+				'fecha' : timezone.now(),
+				'action_url' : settings.SITE_URL + str(url)
+			}
+		)
+		subject = 'Reestablecer contraseña'
+		if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objColaborador.usuario.email], fail_silently=False, html_message=html_message):
+			msg = 'No se pudo enviar el correo con las instrucciones de reestablecimiento.'
+		else:
+			msg = 'Correo de reestablecimiento enviado.'
+		return HttpResponse(msg)
+
+class ResetPasswordView(View):	
+	def get(self, request, pk=None, id=None, oldpass=None):
+		template_name = "evaluaciones/ResetPassword.html"
+		objColaborador = colaboradores.objects.get(pk=pk)
+		ctx = {
+		'empresa' : empresas.objects.get(pk=id),
+		'username': objColaborador.usuario.username
+		}
+		return render(request, template_name, ctx)
+   
+	def post(self, request, pk=None, id=None, oldpass=None):
+		template_name = "evaluaciones/ResetPassword.html"
+		objColaborador = colaboradores.objects.get(pk=pk)
+		objUser = objColaborador.usuario
+		newPass = request.POST['password']
+		newRepeatPass = request.POST['password_repeat']
+		p1=oldpass
+		p2=md5(objColaborador.usuario.password.encode('utf-8')).hexdigest()
+		html_message = loader.render_to_string(
+		'evaluaciones/email_resetNotificacion.html',
+			{
+				'empresa': objColaborador.empresa.nombre,
+				'name':  objColaborador.primer_nombre,
+				'usuario' : objColaborador.usuario.username,
+				'fecha' : timezone.now(),
+				'action_url' : 'hola'
+			}
+		)
+		subject = 'Cambio de contraseña'
+		if p1==p2 and newPass==newRepeatPass:
+			objUser.set_password(request.POST['password'].strip())
+			objColaborador.fecha_ult_mod_password = timezone.now()
+			objUser.save()
+			objColaborador.save()
+			if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objColaborador.usuario.email], fail_silently=False, html_message=html_message):
+				messages.add_message(request,messages.SUCCESS, 'Contraseña actualizada exitosamente. Pero no se pudo enviar el correo de confirmación.')
+			else:
+				messages.add_message(request,messages.SUCCESS, 'Contraseña actualizada exitosamente.')
+		else:
+			messages.add_message(request,messages.ERROR, 'Error al actualizar la contraseña, url no válida o caducada.')
+		ctx = {
+		'empresa' : empresas.objects.get(pk=id),
+		'username': objColaborador.usuario.username
+		}
+		return render(request, template_name, ctx)
+
 class CrearUsuarioView(View):	
 	def get(self, request, pk=None):
 		form = usuariosForm()
@@ -36,7 +111,6 @@ class CrearUsuarioView(View):
 		return render(request, template_name, ctx)
    
 	def post(self, request, pk=None):
-		print(request.POST)
 		ctx={}
 		template_name = "evaluaciones/crearUsuario.html"
 		formulario = usuariosForm(request.POST)
@@ -54,8 +128,18 @@ class CrearUsuarioView(View):
 			form.usuario = objUser
 			form.save()
 			subject = 'Bienvenido al sistema de evaluación y desempeño'
+			html_message = loader.render_to_string(
+			'evaluaciones/email_Bienvenida.html',
+				{
+					'empresa': empresas.objects.get(pk=pk).nombre,
+					'name':  request.POST['primer_nombre'],
+					'usuario' : objUser.username,
+					'password' : password,
+					'action_url' : reverse_lazy('evaluaciones:login')
+				}
+			)
 			messagemail = 'Sus datos de acceso son: usuario-> ' + objUser.username + ' password-> ' + password
-			if not send_mail(subject, messagemail, settings.EMAIL_HOST_USER, [objUser.email], fail_silently=False):
+			if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objUser.email], fail_silently=False, html_message=html_message):
 				messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Pero no se pudo enviar el correo al colaborador.')
 			else:
 				messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Se envio un correo con sus datos de acceso a %s'%(objUser.email))
@@ -77,9 +161,82 @@ class CrearUsuarioView(View):
 			return render(request, template_name, ctx)
 		else:
 			messages.add_message(request,messages.SUCCESS,"Exito")
-			url = reverse_lazy('evaluaciones:listar_usuario')
-		return url
-		return HttpResponse(0)
+			url = reverse_lazy('evaluaciones:listar_usuario', args=[pk,])
+		return HttpResponseRedirect(url)
+
+class ListarUsuarioView(TemplateView):	
+	template_name = "evaluaciones/usuarios_list.html"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['form'] = usuariosForm()
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		context['object_list'] = colaboradores.objects.filter(empresa__pk = self.kwargs['pk'])
+		return context
+
+class ActualizarUsuarioView(View):	
+	def get(self, request, pk=None, id=None):
+		objColaborador = colaboradores.objects.get(pk=pk)
+		form = usuariosForm(instance=objColaborador)
+		template_name = "evaluaciones/ActualizaUsuario.html"
+		ctx = {'form':form,
+		'empresa' : empresas.objects.get(pk=id),
+		'grupos': group_empresas.objects.filter(empresa__pk = id)
+		}
+		ctx['perfil'] = int(objColaborador.usuario.groups.all()[0].pk)
+		ctx['email'] = objColaborador.usuario.email
+		ctx['colaborador_id'] = pk
+		return render(request, template_name, ctx)
+   
+	def post(self, request, pk=None, id=None):
+		ctx={}
+		template_name = "evaluaciones/ActualizaUsuario.html"
+		objColaborador = colaboradores.objects.get(pk=pk)
+		formulario = usuariosForm(request.POST, instance=objColaborador)
+		error = False
+		objUser = objColaborador.usuario
+		
+		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 1 and objUser.email ==request.POST['email']:
+			form = formulario.save(commit = False)
+			form.usuario_modificador = request.user
+			form.fecha_modificacion = timezone.now()
+			objUser.username = request.POST['email']
+			objUser.email = request.POST['email']
+			objUser.save()
+			objUser.groups.clear()
+			objUser.groups.add(Group.objects.get(pk=request.POST['grupo']))
+			form.usuario = objUser
+			form.save()
+			subject = 'Bienvenido al sistema de evaluación y desempeño'
+			ctx['form'] = usuariosForm()
+			messages.add_message(request,messages.SUCCESS,"Usuario actualizado exitosamente.")
+		else:
+			if len(User.objects.filter(username=request.POST['email'])) == 0:
+				messages.add_message(request,messages.ERROR,"Formulario contiene errores!!")
+			else:
+				messages.add_message(request,messages.ERROR,"Error, ya existe un usuario con el correo <%s>"%(request.POST['email']))
+			ctx = {'form': formulario}
+			error = True
+		ctx['empresa'] = empresas.objects.get(pk=id)
+		ctx['grupos'] = group_empresas.objects.filter(empresa__pk = id)
+		ctx['perfil'] = int(request.POST['grupo'])
+		ctx['email'] = request.POST['email']
+		if "GuardarNuevo" in request.POST or error == True:
+			url = reverse_lazy('evaluaciones:crear_usuario', args=[id,])
+			return HttpResponseRedirect(url)
+		else:
+			url = reverse_lazy('evaluaciones:listar_usuario', args=[id,])
+			return HttpResponseRedirect(url)
+
+class EstadoUsuarioView(View):	
+	def get(self, request, pk=None, id=None):
+		return HttpResponseRedirect(reverse_lazy('evaluaciones:principal_empresa', args=[id,]))
+   
+	def post(self, request, pk=None, id=None):
+		objUser = User.objects.get(pk=pk)
+		objUser.is_active = False if objUser.is_active else True
+		objUser.save()
+		return HttpResponse('Activo' if objUser.is_active else 'Inactivo')
 
 class RolesView(View):	
 	def get(self, request, pk=None):
@@ -322,29 +479,27 @@ class LoginView(View):
 	def get(self, request):
 		if request.user.is_authenticated():
 			return HttpResponseRedirect(reverse('evaluaciones:principal'))
-		form = LoginForm()
-		ctx = {'form':form}
-		return render_to_response('login.html', ctx, context_instance=RequestContext(request))
+		ctx = {}
+		return render(request, 'registration/login.html', ctx)
    
 	def post(self, request):
-		print("hola post")
-		print(request.POST)
 		username = request.POST['username']
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
-		print (username)
-		print (password)
 		if user is not None:
 			if user.is_active:
 				login(request, user)
-				return HttpResponseRedirect(reverse('evaluaciones:principal'))
+				if user.is_superuser:
+					return HttpResponseRedirect(reverse('evaluaciones:principal'))
+				else:
+					objColaborador = colaboradores.objects.get(usuario=user)
+					return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
 			else:
 				messages.error(request, 'Usuario Inactivo')
-				return HttpResponseRedirect(reverse('evaluaciones:login'))
+				return HttpResponseRedirect(reverse('login'))
 		else:
 			# Mensaje Incorrecto
-			print("hola invalidaos")
-			messages.error(request, 'Correo o contraseña inválidos')
+			messages.error(request, 'Usuario o contraseña inválidos')
 			return HttpResponseRedirect(reverse('login'))
 
 class LogoutView(View):
