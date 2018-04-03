@@ -1,0 +1,174 @@
+{% extends 'evaluaciones/base_empresa.html' %}
+{% load static %}
+{% load evaluaciones_tags %}
+{% block pantalla %}
+<section class="content-header">
+  <h1>
+    Configuración
+    <small>{{empresa.nombre}}</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
+    <li class="active">Actualizar usuario</li>
+  </ol>
+</section>      
+{% endblock %}
+{% block content %}
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-10">
+        <!-- general form elements -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <i class="fa fa-close"></i>
+                    </button>
+                    <p></p>
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%else%}close{%endif%}">&nbsp;</i>{{ message }}</strong> 
+                </div>
+
+            {% endfor %}
+        {% endif %}
+        <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">Registrar usuario</h3>
+              <a href="{% url 'evaluaciones:listar_usuario' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar usuarios</a>
+            </div><!-- /.box-header -->
+                <!-- form start -->
+            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post" onsubmit="$('#id_empresa').removeAttr('disabled');">
+                <div class="box-body">
+                    {% csrf_token %} 
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="id_{{form.empresa.name}}"> {{form.empresa.label}} </label>
+                        <div class="col-sm-10">
+                            {{ form.empresa|addcss:"class:form-control" }}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="id_{{form.codigo.name}}"> {{form.codigo.label}} </label>
+                        <div class="col-sm-10">
+                            {{ form.codigo|addcss:"class:form-control,maxlength:50" }}
+                            {% if form.codigo.errors %}
+                                <div class="text-red">{{form.codigo.errors}}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="id_{{form.primer_nombre.name}}"> {{form.primer_nombre.label}} </label>
+                        <div class="col-sm-4">
+                            {{ form.primer_nombre|addcss:"class:form-control" }}
+                            {% if form.primer_nombre.errors %}
+                                <div class="text-red">{{form.primer_nombre.errors}}</div>
+                            {% endif %}
+                        </div>
+                        <label class="col-sm-2 control-label" for="id_{{form.segundo_nombre.name}}"> {{form.segundo_nombre.label}} </label>
+                        <div class="col-sm-4">
+                            {{ form.segundo_nombre|addcss:"class:form-control" }}
+                            {% if form.segundo_nombre.errors %}
+                                <div class="text-red">{{form.segundo_nombre.errors}}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="id_{{form.primer_apellido.name}}"> {{form.primer_apellido.label}} </label>
+                        <div class="col-sm-4">
+                            {{ form.primer_apellido|addcss:"class:form-control" }}
+                            {% if form.primer_apellido.errors %}
+                                <div class="text-red">{{form.primer_apellido.errors}}</div>
+                            {% endif %}
+                        </div>
+                        <label class="col-sm-2 control-label" for="id_{{form.segundo_apellido.name}}"> {{form.segundo_apellido.label}} </label>
+                        <div class="col-sm-4">
+                            {{ form.segundo_apellido|addcss:"class:form-control" }}
+                            {% if form.segundo_apellido.errors %}
+                                <div class="text-red">{{form.segundo_apellido.errors}}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="id_{{form.puesto.name}}"> {{form.puesto.label}} </label>
+                        <div class="col-sm-4">
+                            {{ form.puesto|addcss:"class:form-control" }}
+                            {% if form.puesto.errors %}
+                                <div class="text-red">{{form.puesto.errors}}</div>
+                            {% endif %}
+                        </div>
+                        <label class="col-sm-2 control-label" for="id_{{form.departamento.name}}"> {{form.departamento.label}} </label>
+                        <div class="col-sm-4">
+                            {{ form.departamento|addcss:"class:form-control" }}
+                            {% if form.departamento.errors %}
+                                <div class="text-red">{{form.departamento.errors}}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="id_{{form.sucursal.name}}"> {{form.sucursal.label}} </label>
+                        <div class="col-sm-4">
+                            {{ form.sucursal|addcss:"class:form-control" }}
+                            {% if form.sucursal.errors %}
+                                <div class="text-red">{{form.sucursal.errors}}</div>
+                            {% endif %}
+                        </div>
+                        <label class="col-sm-2 control-label" for="id_{{form.supervisor.name}}"> {{form.supervisor.label}} </label>
+                        <div class="col-sm-4">
+                            {{ form.supervisor|addcss:"class:form-control"}}
+                            {% if form.supervisor.errors %}
+                                <div class="text-red">{{form.supervisor.errors}}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="id_email">Correo </label>
+                        <div class="col-sm-4">
+                            <input type="email" id="id_email" name="email" class="form-control" placeholder="example@example.com" value="{{email}}" required/>
+                        </div>
+                        <label class="col-sm-2 control-label" for="id_{{form.grupo.name}}"> {{form.grupo.label}} </label>
+                        <div class="col-sm-4">
+                            <select id="id_grupo" name="grupo" class="form-control" required>
+                                <option value="">---------</option>
+                                {% for object in grupos %}
+                                    <option value="{{object.perfil.id}}" {% if object.perfil.id == perfil %} 
+                                        selected 
+                                    {% endif %}>{{object.perfil.name|getgroupName:"|"}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="id_{{form.password_caducado.name}}">{{form.password_caducado.label}} </label>
+                        <div class="col-sm-4">
+                            <input type="checkbox" id="id_password_caducado" name="password_caducado" />
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
+                <div class="box-footer">
+                    <div class="col-md-3 col-md-offset-6 col-xs-12">
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').removeAttr('disabled');" value="SaveNew"><i class="fa fa-save"></i>&nbsp;Guardar y nuevo</button>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').attr('disabled','disabled')" value="SaveList"><i class="fa fa-send"></i>&nbsp;Guardar y listar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock%}
+
+{% block script %}
+<script src="{% static 'evaluaciones/plugins/iCheck/icheck.min.js' %}"></script>
+<script type="text/javascript">
+ $(function () {
+        $('input').iCheck({
+          checkboxClass: 'icheckbox_square-blue',
+          radioClass: 'iradio_square-blue',
+          increaseArea: '20%' // optional
+        });
+      });
+$("#id_empresa").val("{{empresa.pk}}");
+$("#id_empresa").attr('disabled','disabled');
+$("#id_supervisor option[value='{{colaborador_id}}']").remove();
+</script>
+{% endblock %}
