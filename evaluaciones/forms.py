@@ -73,16 +73,16 @@ class CriteriosForm(ModelForm):
             'descripcion': TextInput(attrs={'class': 'form-control'}),            
             'objetivo': Select(attrs={'class': 'form-control'}),            
         }
-
 class PeriodosForm(ModelForm):
     class Meta:
         model = periodos
-        fields = ('fecha_inico', 'fecha_fin', 'activo','empresa')
+        fields = ('fecha_inico', 'fecha_fin', 'activo','empresa','tiempo')
         widgets = {
             'empresa': Select(attrs={'class': 'form-control'}), 
             'fecha_inico': forms.DateInput(attrs={'class':'datepicker'}),
             'fecha_fin': forms.DateInput(attrs={'class':'datepicker'}),
             'activo': CheckboxInput(attrs={'class': 'checkbox'}),                      
+            'tiempo': TextInput(attrs={'class': 'form-control'}),
         }
 
 class objetivosForm(ModelForm):
@@ -99,4 +99,3 @@ class objetivosFormEdit(ModelForm):
     class Meta:
         model = objetivos
         fields = ('nombre',)
-

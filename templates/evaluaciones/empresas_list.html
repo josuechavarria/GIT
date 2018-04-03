@@ -46,22 +46,59 @@
                             <th>Nombre</th>
                             <th>RTN</th>
                             <th>Licencias</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for empresa in object_list %}
+                     {% if empresa.estado %}
                         <tr>
                             <td>{{empresa.id}}</td>
                             <td>{{ empresa.nombre }}</td>
                             <td>{{ empresa.rtn}}</td>
                             <td>{{ empresa.licencias}}/{{ empresa.licencias}}</td>
                             <td>
-                                <a href="{% url 'evaluaciones:crear_empresa'%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar empresa"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
+                                <small class="label pull-center bg-green">Activo</small>
+                            </td>
+                            <td>                                <a href="{% url 'evaluaciones:crear_empresa'%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar empresa"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:actualiza_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar empresa"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:principal_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-success" data-toggle="tooltip" data-placement="top" title="Administrar"><i class="fa fa-cog text-orange"></i></a>
+                                <a href="{% url 'evaluaciones:principal_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-success" data-toggle="tooltip" data-placement="top" title="Administrar"><i class="fa fa-cog text-orange"> </i></a>                               
+                                <a>&nbsp;
+                                <input type="checkbox" id="id_{{empresa.pk}}" name="activar" onclick="modal('{{ empresa.pk }}, {{ empresa.estado }}')" class="label-success"
+                                    value="activar"> Inactivar
+                                </a>                                
+                            </td>
+                        </tr>                        
+                         {% else %}
+                        <tr>
+                            <td>{{empresa.id}}</td>
+                            <td>{{ empresa.nombre }}</td>
+                            <td>{{ empresa.rtn}}</td>
+                            <td>{{ empresa.licencias}}/{{ empresa.licencias}}</td>
+                            <td>
+                                <small class="label pull-center bg-red">Inactiva</small>
+                            </td>
+                            <td>
+                                <a href="{% url 'evaluaciones:crear_empresa'%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip"
+                                    data-placement="top" title="Agregar empresa">
+                                    <i class="fa fa-plus text-green"></i>
+                                </a> &nbsp;&nbsp;
+                                <a href="{% url 'evaluaciones:actualiza_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
+                                    data-toggle="tooltip" data-placement="top" title="Editar empresa">
+                                    <i class="fa fa-edit"></i>
+                                </a> &nbsp;&nbsp;
+                                <a href="{% url 'evaluaciones:principal_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-success"
+                                    data-toggle="tooltip" data-placement="top" title="Administrar">
+                                    <i class="fa fa-cog text-orange"> </i>
+                                </a>
+                                <a>&nbsp;
+                                    <input type="checkbox" id="id_{{empresa.pk}}" name="activar" onclick="modal('{{ empresa.pk }},{{empresa.estado}}')" class="label-success"
+                                        value="activar"> Activar
+                                </a>
                             </td>
                         </tr>
+                    {% endif %}
                     {% endfor %}
                     </tbody>
                     <tfoot>
@@ -78,12 +115,59 @@
         </div><!-- /.box -->
     </div>
 </div>
+<div class="example-modal">
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="location.reload();">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Borrar Objetivo</h4>
+                </div>
+                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <p>Esta seguro que desea activar el objetivo seleccionado?
+                    </div>
+                    <div class="box-footer">
+                        <div class="col-md-3 col-md-offset-6">
+                            <button class="btn btn-raised btn-success pull-left" id="activar_" type="submit" onclick="" value="Confirm">
+                                <i class="fa fa-eraser"></i>&nbsp;Activar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
 </section>
 {% endblock %}
 {% block script %}
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script>
+function modal(datos) {                
+        arreglo = datos.split(",", 2)       
+        $('#myModal').modal();
+        if(arreglo[1] == 'True'){
+            arreglo[1] = 1
+        }else{
+            arreglo[1] = 0
+        }
+        console.log(arreglo)
+        $('#form_modal').on('submit', function (e) {            
+            $.ajax({
+                method: "POST",
+                url: "{% url 'evaluaciones:activar_empresa' %}",
+                data: { pk: arreglo[0], csrfmiddlewaretoken: '{{ csrf_token }}', bandera: arreglo[1] }
+            }).done(function (msg) {
+                location.reload();
+            });
+        })
+    };   
       $(function () {
         $("#empresas").DataTable();
       });
