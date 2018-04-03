@@ -24,7 +24,7 @@
                       <i class="fa fa-close"></i>
                     </button>
                     <p></p>
-                    <strong><i class="fa fa-check"></i>{{ message }}</strong> 
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%else%}close{%endif%}">&nbsp;</i>{{ message }}</strong>  
                 </div>
 
             {% endfor %}
@@ -32,6 +32,7 @@
         <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Registrar Objetivos</h3>
+              <a href="{% url 'evaluaciones:listar_objetivos' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar objetivos</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
             <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">

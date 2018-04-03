@@ -4,7 +4,7 @@ from .models import *
 from django.contrib.auth.models import User, Group
 
 class usuariosForm(ModelForm):
-    supervisor = forms.ModelChoiceField(queryset=colaboradores.objects.filter(puesto__nombre__upper='SUPERVISOR'),  widget=forms.Select(attrs={'class': 'form-control'}))
+    supervisor = forms.ModelChoiceField(queryset=colaboradores.objects.filter(puesto__nombre__upper='SUPERVISOR'),required=False, widget=forms.Select(attrs={'class': 'form-control'}))
     class Meta:
         model = colaboradores
         exclude = ('usuario','usuario_creador', 'fecha_creacion', 'usuario_modificador', 'fecha_modificacion', 'fecha_ult_mod_password')

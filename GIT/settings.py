@@ -79,7 +79,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'git',
         'USER': 'postgres',
-        'PASSWORD': '1234',
+        'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432'
     }
@@ -124,7 +124,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'media'))
 MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = '/accounts/login/'
-SITE_URL = 'http://10.10.0.100:8000'
+SITE_URL = 'http://localhost:8000'
 
 #configuracion de server de correo
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

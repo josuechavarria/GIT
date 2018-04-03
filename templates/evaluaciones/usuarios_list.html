@@ -54,12 +54,14 @@
                             <td>{{forloop.counter}}</td>
                             <td>{{ object.codigo }}</td>
                             <td>{{ object.nombre_completo}}</td>
-                            <td id="td_{{object.usuario.pk}}{{object.pk}}">{% if object.usuario.is_active %}<small class="label bg-green">Activo</small>{%else%}<small class="label bg-red">Inactivo</small>{%endif%}</td>
+                            <td id="td_{{object.usuario.pk}}{{object.pk}}">
+                            <a href="#" onclick = "AbrirModal('{% if object.usuario.is_active %}Activo{%else%}Inactivo{%endif%}','{% url 'evaluaciones:estado_usuario' pk=object.usuario.pk id=empresa.pk %}','{{object.nombre_completo}}','{{object.usuario.pk}}{{object.pk}}')" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="{% if object.usuario.is_active %}Inactivar{%else%}Activar{%endif%} usuario">{% if object.usuario.is_active %}<small class="label bg-green">Activo</small>{%else%}<small class="label bg-red">Inactivo</small>{%endif%}
+                            </a>
+                            </td>
                             <td>
                                 <a href="{% url 'evaluaciones:crear_usuario' empresa.pk%}" class="text-green" data-toggle="tooltip" data-placement="top" title="Agregar usuario"><i class="fa fa-plus">&nbsp;&nbsp;</i></a>
                                 <a {% if not object.usuario.is_active %}hidden{% endif %} id="edit_{{object.usuario.pk}}{{object.pk}}" href="{% url 'evaluaciones:actualiza_usuario' pk=object.pk id=empresa.pk %}" class="text-purple" data-toggle="tooltip" data-placement="top" title="Editar usuario"><i id="cicon_{{object.usuario.pk}}{{object.pk}}" class="fa fa-edit">&nbsp;&nbsp;</i></a>
                                 <a {% if not object.usuario.is_active %}hidden{% endif %} href="#" onclick = "AbrirModal2('{% url 'evaluaciones:notificacion_password' pk=object.pk id=empresa.pk %}','{{object.usuario.email}}')" class="text-blue" data-toggle="tooltip" data-placement="top" title="Reestablecer contraseña"><i class="fa fa-key">&nbsp;&nbsp;</i></a> 
-                                <a href="#" onclick = "AbrirModal('{% if object.usuario.is_active %}Activo{%else%}Inactivo{%endif%}','{% url 'evaluaciones:estado_usuario' pk=object.usuario.pk id=empresa.pk %}','{{object.nombre_completo}}','{{object.usuario.pk}}{{object.pk}}')" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="{% if object.usuario.is_active %}Inactivar{%else%}Activar{%endif%} usuario"><i id="eicon_{{object.usuario.pk}}{{object.pk}}" class="{% if object.usuario.is_active %}fa fa-user-times text-red{%else%}fa fa-user text-green{%endif%}"></i></a>
                             </td>
                         </tr>
                     {% endfor %}

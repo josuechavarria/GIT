@@ -21,6 +21,7 @@
         <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Actualizar objetivo</h3>
+              <a href="{% url 'evaluaciones:listar_objetivos' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar objetivos</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
             <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
@@ -47,25 +48,6 @@
             </form>
         </div>
     </div>
-    <div class="col-md-3">
-      <!-- USERS LIST -->
-      <div class="box box-info">
-        <div class="box-header with-border">
-          <h3 class="box-title">Vista previa logo</h3>
-          <div class="box-tools pull-right">
-            <span class="label label-danger"></span>
-            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-          </div>
-        </div><!-- /.box-header -->
-        <div class="box-footer text-center">
-            <img class="users-list clearfix" src="/media/{{form.logo.value}}" height="50%" width="50%" id="id_preview_logo" alt="User Image">
-        </div><!-- /.box-body -->
-        <div class="box-footer text-center">
-          <a href="javascript::" class="uppercase">Previa</a>
-        </div><!-- /.box-footer -->
-      </div><!--/.box -->
-    </div><!-- /.col -->
 </div>
 {% endblock%}
 
