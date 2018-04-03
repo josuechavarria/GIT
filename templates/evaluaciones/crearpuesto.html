@@ -32,6 +32,7 @@
         <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Registrar puestos</h3>
+              <a href="{% url 'evaluaciones:listar_puesto' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar puestos</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
             <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
@@ -39,7 +40,7 @@
                     {% csrf_token %} 
                     {% for field in form %}
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="{{field.name}}"> {{field.label}} </label>
+                        <label class="col-sm-2 control-label" for="id_{{field.name}}"> {{field.label}} </label>
                         <div class="col-sm-10">
                             {{ field }}
                         </div>

@@ -84,8 +84,6 @@ DATABASES = {
         'PORT': '5432'
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -108,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'es'
+LANGUAGE_CODE = 'es-HN'
 
 TIME_ZONE = 'UTC'
 
@@ -125,4 +123,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'media'))
 MEDIA_URL = '/media/'
-LOGIN_REDIRECT_UR = 'principal'
+LOGIN_REDIRECT_URL = '/accounts/login/'
+SITE_URL = 'http://localhost:8000'
+
+#configuracion de server de correo
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'josuechavarria89@gmail.com' #hancoir@gmail.com
+EMAIL_HOST_PASSWORD = '31829kmx' #******

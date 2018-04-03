@@ -19,7 +19,7 @@
          folder instead of downloading all of them to reduce the load. -->
     <link rel="stylesheet" href="{% static 'evaluaciones/dist/css/skins/_all-skins.min.css' %}">
     <!-- iCheck -->
-    <link rel="stylesheet" href="{% static 'evaluaciones/plugins/iCheck/flat/blue.css' %}">
+    <link rel="stylesheet" href="{% static 'evaluaciones/plugins/iCheck/square/blue.css' %}">
     <!-- Morris chart -->
     <link rel="stylesheet" href="{% static 'evaluaciones/plugins/morris/morris.css' %}">
     <!-- jvectormap -->
@@ -320,6 +320,7 @@
           <!-- /.search form -->
           <!-- sidebar menu: : style can be found in sidebar.less -->
           <ul class="sidebar-menu">
+            {% if user.is_authenticated %}
             <li class="header">MENÚ PRINCIPAL</li>
             {% if request.user.is_superuser %}
             <li>
@@ -333,15 +334,17 @@
                 <i class="fa fa-home"></i> <span>Inicio</span>
               </a>
             </li>
+            {% if 'evaluaciones.evaluaciones_roles' in perms %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-folder"></i> <span>Roles y permisos</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear rol</a></li>
-                <li><a href="{% url 'evaluaciones:listar_roles' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Detalles </a></li>
+                <li><a href="{% url 'evaluaciones:listar_roles' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar </a></li>
               </ul>
             </li>
+            {% endif %}
+            {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-folder"></i> <span>Listas de selección</span> <i class="fa fa-angle-left pull-right"></i>
@@ -377,24 +380,30 @@
                 </li>
               </ul>
             </li>
+            {% endif %}
+            {% if 'evaluaciones.evaluaciones_usuarios' in perms %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-user"></i> <span>Usuarios</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:crear_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
-                <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
+                <li class="active"><a href="{% url 'evaluaciones:crear_usuario' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
+                <li><a href="{% url 'evaluaciones:listar_usuario' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
               </ul>
             </li>
+            {% endif %}
+            {% if 'evaluaciones.evaluaciones_periodos' in perms %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-calendar"></i> <span>Períodos</span> <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
                 <li class="active"><a href="{% url 'evaluaciones:crear_periodo' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Crear</a></li>
-                <li><a href="{% url 'evaluaciones:listar_sucursal' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
+                <li><a href="{% url 'evaluaciones:listar_periodos' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
               </ul>
             </li>
+            {% endif %}
+            {% if 'evaluaciones.evaluaciones_criterios' in perms %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-list"></i> <span>Criterios</span> <i class="fa fa-angle-left pull-right"></i>
@@ -404,6 +413,8 @@
                 <li><a href="{% url 'evaluaciones:listar_criterios' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Listar</a></li>
               </ul>
             </li>
+            {% endif %}
+          {% endif %}
           </ul>
         </section>
         <!-- /.sidebar -->

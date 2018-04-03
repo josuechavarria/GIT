@@ -58,9 +58,14 @@
                             <td>{{ criterio.descripcion }}</td>
                             <td>{{ criterio.empresa }}</td>
                             <td>{{ criterio.objetivo }}</td>
+                            <td>{{ criterio.objetivo.estado }}</td>
                             <td>{{ criterio.periodos.year }}</td>
                             <td>
-                                <a href="{% url 'evaluaciones:crear_criterio' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar criterio"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;                                
+                                <a href="{% url 'evaluaciones:crear_criterio' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar criterio"><i class="fa fa-plus"> Crear |</i></a> &nbsp;&nbsp;                                
+                                <a href="{% url 'evaluaciones:borrar_criterios' pk=criterio.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error"
+                                    data-toggle="tooltip" data-placement="top" title="Borrar Criterios">
+                                    <i class="fa fa-trash text-red"> Borrar </i>
+                                </a>
                             </td>
                         </tr>
                     {% endfor %}

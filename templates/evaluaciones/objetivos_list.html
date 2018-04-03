@@ -29,7 +29,7 @@
                       <i class="fa fa-close"></i>
                     </button>
                     <p></p>
-                    <strong><i class="fa fa-check"></i> Éxito! {{ message }}</strong> 
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%else%}close{%endif%}">&nbsp;</i>{{ message }}</strong> 
                 </div>
 
             {% endfor %}
@@ -44,25 +44,45 @@
                         <tr>
                             <th>#</th>
                             <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for objetivo in object_list %}
+                    {% if objetivo.estado %}
                         <tr>
                             <td>{{ objetivo.id }}</td>
                             <td>{{ objetivo.nombre }}</td>
+                            <td> 
+                            <small class="label pull-center bg-green">Activo</small>
+                            </td>
                             <td>
                                 <a href="{% url 'evaluaciones:crear_objetivos' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar objetivo"><i class="fa fa-plus text-green"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:actualizar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar objetivo"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
-                                <a href="{% url 'evaluaciones:principal_empresa' empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-success" data-toggle="tooltip" data-placement="top" title="Administrar"><i class="fa fa-cog text-orange"></i></a>
+                                <a href="{% url 'evaluaciones:borrar_objetivos' pk=objetivo.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar objetivo"><i class="fa fa-trash text-red"></i></a>                                 
                             </td>
                         </tr>
+                    {% else %}
+                        <tr class="background: red">
+                            <td>{{ objetivo.id }}</td>
+                            <td>{{ objetivo.nombre }}</td>
+                            <td>                            
+                            <small class="label pull-center bg-red">Inactivo</small>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="id_{{objetivo.pk}}"  name="activar" onclick="modal('{{ objetivo.pk }}')" class="label-success" value="activar"> Activar
+                            </td>
+                        </tr>
+                    {% endif %}
                     {% endfor %}
                     </tbody>
                     <tfoot>
                         <tr>
                             <th>#</th>
                             <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Opciones</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -71,13 +91,66 @@
     </div>
 </div>
 </section>
+<div class="example-modal">
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="location.reload();">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Borrar Objetivo</h4>
+                </div>
+                <form action="" role="form" form  id="form_modal" class="form-horizontal" enctype="multipart/form-data"  >
+                    <div class="box-body">
+                        <p>Esta seguro que desea activar el objetivo seleccionado?                            
+                    </div>                   
+                    <div class="box-footer">
+                        <div class="col-md-3 col-md-offset-6">
+                            <button class="btn btn-raised btn-success pull-left" id="activar_" type="submit" onclick=""
+                                value="Confirm">
+                                <i class="fa fa-eraser"></i>&nbsp;Activar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
+<!-- /.example-modal -->
 {% endblock %}
 {% block script %}
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
-<script>
-      $(function () {
-        $("#empresas").DataTable();
-      });
+<script> 
+        function  modal(objetivo_id) {
+            console.log(objetivo_id)            
+            $('#myModal').modal();
+            $('#form_modal').on('submit', function (e) {
+                 activar(objetivo_id);
+            })
+        }; 
+        function activar(objetivo_id) {
+            console.log('intentaremos guardar');
+            $.ajax({
+                method: "POST",
+                url: "{% url 'evaluaciones:activar_objetivo' %}",
+                data: { pk: objetivo_id, csrfmiddlewaretoken: '{{ csrf_token }}', empresa_id: '{{ empresa.pk }}' }
+            }).done(function (msg) {
+                location.reload();
+            });            
+        }       
+        $("#empresas").DataTable({
+            "fnRowCallback":function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            if( aData[3] == "inactivo" )
+            {
+              $('tr', nRow).css('background-color', '#f2dede');  
+            }
+            }
+        });
+    
     </script>
 {% endblock %}
