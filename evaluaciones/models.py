@@ -80,9 +80,9 @@ class colaboradores(models.Model):
 	primer_apellido = models.CharField(max_length=30)
 	segundo_apellido = models.CharField(max_length=30, null=True, blank=True, default=None)
 	password_caducado = models.BooleanField(default=False)
-	puesto = models.ForeignKey(puestos)
-	departamento = models.ForeignKey(departamentos)
-	sucursal = models.ForeignKey(sucursales, null=True, blank=True, default=None)
+	puesto = models.ForeignKey(puestos,on_delete=models.PROTECT)
+	departamento = models.ForeignKey(departamentos, on_delete=models.PROTECT)
+	sucursal = models.ForeignKey(sucursales, null=True, blank=True, default=None, on_delete=models.PROTECT)
 	supervisor = models.ForeignKey('self',null=True, blank=True, default=None, on_delete=models.CASCADE)
 	grupo = models.ForeignKey(Group, default=None, verbose_name = "Perfil")
 	usuario_creador = models.ForeignKey(
