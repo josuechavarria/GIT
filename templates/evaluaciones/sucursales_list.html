@@ -80,6 +80,11 @@
                             </td>
                         </tr>
                     {% endif %}
+                    {% empty %}
+                        
+                            <div align="center">
+                                <a href="{% url 'evaluaciones:crear_sucursal' empresa.pk%}" class="btn btn-sm btn-raised btn-success" data-toggle="tooltip" data-placement="top" title="Agregar sucursal"><i class="fa fa-plus"></i>&nbsp;&nbsp;  Agregar</a>
+                            </div>
                     {% endfor %}
                     </tbody>
                     <tfoot>
