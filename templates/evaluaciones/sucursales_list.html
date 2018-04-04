@@ -30,7 +30,6 @@
                     <p></p>
                     <strong><i class="fa fa-check"></i> Éxito! {{ message }}</strong> 
                 </div>
-
             {% endfor %}
         {% endif %}
         <div class="box">
@@ -45,22 +44,42 @@
                             <th>Nombre</th>
                             <th>Empresa</th>
                             <th>Dirección</th>
-                            <th>Acciones</th>
+                            <th>Estado</th>
+                            <th>Opciones</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for object in object_list %}
+                    {% if object.estado %}
                         <tr>
                             <td>{{object.id}}</td>
                             <td>{{ object.nombre }}</td>
                             <td>{{ object.empresa.nombre}}</td>
                             <td>{{ object.direccion}}</td>
                             <td>
+                                <small class="label pull-center bg-green">Activo</small>
+                            </td>
+                            <td>
                                 <a href="{% url 'evaluaciones:crear_sucursal' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar sucursal"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:actualiza_sucursal' pk=object.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar sucursal"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:borrar_sucursal' pk=object.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar sucursal"><i class="fa fa-trash text-red"></i></a> 
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td>{{object.id}}</td>
+                            <td>{{ object.nombre }}</td>
+                            <td>{{ object.empresa.nombre}}</td>
+                            <td>{{ object.direccion}}</td>
+                            <td>
+                                <small class="label pull-center bg-red">Inactivo</small>
+                            </td>
+                            <td>
+                                <input type="checkbox" id="id_{{object.id}}" name="activar" onclick="modal('{{ object.id }}')" class="label-success"
+                                    value="activar"> Activar
+                            </td>
+                        </tr>
+                    {% endif %}
                     {% endfor %}
                     </tbody>
                     <tfoot>
@@ -69,7 +88,8 @@
                             <th>Nombre</th>
                             <th>Empresa</th>
                             <th>Dirección</th>
-                            <th>Acciones</th>
+                            <th>Estado</th>
+                            <th>Opciones</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -78,11 +98,56 @@
     </div>
 </div>
 </section>
+<div class="example-modal">
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="location.reload();">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Activar sucursarl</h4>
+                </div>
+                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <p>Esta seguro que desea activar la sucursal seleccionada?
+                    </div>
+                    <div class="box-footer">
+                        <div class="col-md-3 col-md-offset-6">
+                            <button class="btn btn-raised btn-success pull-left" id="activar_" type="submit" onclick="" value="Confirm">
+                                <i class="fa fa-eraser"></i>&nbsp;Activar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
 {% endblock %}
 {% block script %}
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script>
+       function modal(sucursal_id) {
+            console.log(sucursal_id)
+            $('#myModal').modal();
+            $('#form_modal').on('submit', function (e) {
+                activar(sucursal_id);
+            })
+        };
+        function activar(sucursal_id) {
+            console.log('intentaremos guardar');
+            $.ajax({
+                method: "POST",
+                url: "{% url 'evaluaciones:activar_sucursal' %}",
+                data: { pk: sucursal_id, csrfmiddlewaretoken: '{{ csrf_token }}', empresa_id: '{{ empresa.pk }}' }
+            }).done(function (msg) {
+                location.reload();
+            });
+        }       
       $(function () {
         $("#empresas").DataTable();
       });

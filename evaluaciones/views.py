@@ -410,12 +410,33 @@ class BorrarPuesto(SuccessMessageMixin, DeleteView):
 		else:
 			url = reverse('evaluaciones:listar_puesto',
 						  kwargs={'pk': empresa_id})
-		return url
-
+		return url	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
 		return context
+	def get_error_url(self):
+		error_url = reverse_lazy('evaluaciones:listar_puesto',args=[self.kwargs['id']])
+		if error_url:			
+			return error_url.format(**self.object.__dict__)
+		else:
+			raise ImproperlyConfigured(
+				"No error URL to redirect to. Provide a error_url.")
+	def delete(self, request, *args, **kwargs):		   
+		self.object = self.get_object()
+		success_url = self.get_success_url()
+		error_url = self.get_error_url()
+		try:
+			self.object.delete()
+			messages.add_message(request,messages.SUCCESS,'Exito, Objetivo borrado exitosamente')				
+			return HttpResponseRedirect(success_url)
+		except models.ProtectedError:  
+			puesto = puestos.objects.get(id = self.object.pk)				
+			print(puesto.pk)
+			messages.add_message(request,messages.WARNING,'info, Existen Colaboradores que dependen de este Puesto, el estado paso a inactivo.')
+			self.object.estado = False
+			self.object.save()
+			return HttpResponseRedirect(error_url)
 
 class CrearDepartamento(SuccessMessageMixin,CreateView):
 	model = departamentos
@@ -580,6 +601,13 @@ class BorrarSucursal(SuccessMessageMixin, DeleteView):
 			url = reverse('evaluaciones:listar_sucursal',
 						  kwargs={'pk': empresa_id})
 		return url
+	def get_error_url(self):
+		error_url = reverse_lazy('evaluaciones:listar_sucursal',args=[self.kwargs['id']])
+		if error_url:			
+			return error_url.format(**self.object.__dict__)
+		else:
+			raise ImproperlyConfigured(
+				"No error URL to redirect to. Provide a error_url.")
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -587,8 +615,25 @@ class BorrarSucursal(SuccessMessageMixin, DeleteView):
 		return context
 
 	def delete(self, request, *args, **kwargs):
-		messages.success(self.request, self.success_message)
-		return super(BorrarSucursal, self).delete(request, *args, **kwargs)
+		self.object = self.get_object()
+		success_url = self.get_success_url()
+		error_url = self.get_error_url()
+		try:
+			self.object.delete()
+			messages.add_message(
+				request,
+				messages.SUCCESS,'Exito, Sucursal borrada exitosamente'
+				)				
+			return HttpResponseRedirect(success_url)
+		except models.ProtectedError:  			
+			sucursal = sucursales.objects.get(id = self.object.pk)				
+			print(sucursal.pk)
+			messages.add_message(request,
+			messages.WARNING,'info, Existen Colaboradores que dependen de esta Sucursal, el estado paso a inactivo.')
+			# messages.add_message(request, messages.INFO,'info, Tendra que ser por acá')
+			self.object.estado = False
+			self.object.save()
+			return HttpResponseRedirect(error_url)
 
 
 class IndexView(View):
@@ -896,3 +941,39 @@ class activar_departamento(View):
 			print(depa.estado)		 
 		return HttpResponse(success_url)
 
+class activar_puesto(View):
+	print('activando_Puesto')
+	def post(self,request,pk=None):
+		print(request.POST['empresa_id'])
+		empresa_id = request.POST['empresa_id']
+		messages.add_message(request,messages.SUCCESS,'Puesto activado')
+		success_url = reverse('evaluaciones:listar_puesto',
+						  kwargs={'pk': empresa_id})
+		puest = request.POST['pk']
+		print(puest)
+		puesto = puestos.objects.get(pk = puest)
+		if puesto:
+			print(puesto.estado)
+			puesto.estado = True
+			puesto.save()
+			print(puesto.estado)		 
+		return HttpResponse(success_url)
+
+
+class activar_sucursal(View):
+	print('activando sucursal')
+	def post(self,request,pk=None):
+		print(request.POST['empresa_id'])
+		empresa_id = request.POST['empresa_id']
+		messages.add_message(request,messages.SUCCESS,'Sucursal activada')
+		success_url = reverse('evaluaciones:listar_sucursal',
+						  kwargs={'pk': empresa_id})
+		sucu = request.POST['pk']
+		print(sucu)
+		sucursal = sucursales.objects.get(pk = sucu)
+		if sucursal:
+			print(sucursal.estado)
+			sucursal.estado = True
+			sucursal.save()
+			print(sucursal.estado)		 
+		return HttpResponse(success_url)
