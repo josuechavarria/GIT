@@ -38,12 +38,13 @@
               <h3 class="box-title">Listado de departamentos | {{empresa.nombre}}</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
-                <table id="empresas" class="table table-bordered table-striped">
+                <table id="departamentos" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>#</th>
                             <th>Nombre</th>
                             <th>Empresa</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -77,6 +78,11 @@
                         </td>
                     </tr>
                     {% endif %}
+                    {% empty %}
+                        
+                            <div align="center">
+                                <a href="{% url 'evaluaciones:crear_departamento' empresa.pk%}" class="btn btn-sm btn-raised btn-success" data-toggle="tooltip" data-placement="top" title="Agregar departamento"><i class="fa fa-plus"></i>&nbsp;&nbsp;  Agregar</a>
+                            </div>
                     {% endfor %}
                     </tbody>
                     <tfoot>
@@ -84,6 +90,7 @@
                             <th>#</th>
                             <th>Nombre</th>
                             <th>Empresa</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </tfoot>

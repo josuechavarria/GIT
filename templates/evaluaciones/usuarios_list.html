@@ -64,6 +64,11 @@
                                 <a {% if not object.usuario.is_active %}hidden{% endif %} href="#" onclick = "AbrirModal2('{% url 'evaluaciones:notificacion_password' pk=object.pk id=empresa.pk %}','{{object.usuario.email}}')" class="text-blue" data-toggle="tooltip" data-placement="top" title="Reestablecer contraseña"><i class="fa fa-key">&nbsp;&nbsp;</i></a> 
                             </td>
                         </tr>
+                    {% empty %}
+                        
+                            <div align="center">
+                                <a href="{% url 'evaluaciones:crear_usuario' empresa.pk%}" class="btn btn-sm btn-raised btn-success" data-toggle="tooltip" data-placement="top" title="Agregar Usuario"><i class="fa fa-plus"></i>&nbsp;&nbsp;  Agregar</a>
+                            </div>
                     {% endfor %}
                     </tbody>
                     <tfoot>

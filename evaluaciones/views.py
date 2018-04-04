@@ -151,6 +151,10 @@ class ResetPasswordView(View):
 class CrearUsuarioView(View):	
 	def get(self, request, pk=None):
 		form = usuariosForm()
+		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=pk)
+		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=pk)
+		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=pk)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, puesto__nombre__upper='SUPERVISOR')
 		template_name = "evaluaciones/crearUsuario.html"
 		ctx = {'form':form,
 		'empresa' : empresas.objects.get(pk=pk),
@@ -388,8 +392,9 @@ class ActualizarPuesto(SuccessMessageMixin, FormInvalidMessageMixin, UpdateView)
 
 
 class ListarPuestos(ListView):
-	model = puestos
-	print(model)
+
+	def get_queryset(self):
+		return puestos.objects.filter(empresa__pk=self.kwargs['pk'])
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -483,7 +488,8 @@ class ActualizarDepartamento(SuccessMessageMixin, UpdateView):
 
 
 class ListarDepartamentos(ListView):
-	model = departamentos
+	def get_queryset(self):
+		return departamentos.objects.filter(empresa__pk=self.kwargs['pk'])
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -581,7 +587,8 @@ class ActualizarSucursal(SuccessMessageMixin, UpdateView):
 
 
 class ListarSucursales(ListView):
-	model = sucursales
+	def get_queryset(self):
+		return sucursales.objects.filter(empresa__pk=self.kwargs['pk'])
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -700,7 +707,8 @@ class CrearCriterio(SuccessMessageMixin, CreateView):
 
 
 class ListarCriterios(ListView):
-	model = criterios
+	def get_queryset(self):
+		return criterios.objects.filter(empresa__pk=self.kwargs['pk'])
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
@@ -768,7 +776,8 @@ class CrearPeriodos(SuccessMessageMixin, CreateView):
 
 
 class ListarPeriodos(ListView):
-	model = periodos
+	def get_queryset(self):
+		return periodos.objects.filter(empresa__pk=self.kwargs['pk'])
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)

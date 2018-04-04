@@ -51,7 +51,7 @@
                     <tbody>
                     {% for object in grupos %}
                         <tr>
-                            <td>{{object.perfil.id}}</td>
+                            <td>{{forloop.counter}}</td>
                             <td>{{ object.perfil.name|getgroupName:"|" }}</td>
                             <td>
                                 <div class="btn-group">
@@ -91,6 +91,11 @@
                                 <a href="#" onclick="$('#myModal').modal();" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Eliminar perfil"><i class="fa fa-trash text-red"></i>&nbsp;&nbsp;  Eliminar</a>
                             </td>
                         </tr>
+                    {% empty %}
+                        
+                            <div align="center">
+                                <a href="#" onclick="$('#myModal').modal();" class="btn btn-sm btn-raised btn-success" data-toggle="tooltip" data-placement="top" title="Agregar perfil"><i class="fa fa-plus"></i>&nbsp;&nbsp;  Agregar</a>
+                            </div>
                     {% endfor %}
                     </tbody>
                 </table>
