@@ -44,29 +44,48 @@
                             <th>#</th>
                             <th>Nombre</th>
                             <th>Orden Jerárquico</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                     {% for puesto in object_list %}
+                    {% if puesto.estado %}
                         <tr>
                             <td>{{puesto.id}}</td>
                             <td>{{ puesto.nombre }}</td>
                             <td>{{ puesto.orden_jerarquico}}</td>
+                            <td>
+                                <small class="label pull-center bg-green">Activo</small>
+                            </td>
                             <td>
                                 <a href="{% url 'evaluaciones:crear_puesto' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar puesto"><i class="fa fa-plus"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:actualiza_puesto' pk=puesto.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar puesto"><i class="fa fa-edit"></i></a> &nbsp;&nbsp;
                                 <a href="{% url 'evaluaciones:borrar_puesto' pk=puesto.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="Eliminar puesto"><i class="fa fa-trash text-red"></i></a> 
                             </td>
                         </tr>
+                    {% else %}
+                        <tr>
+                            <td>{{puesto.id}}</td>
+                            <td>{{ puesto.nombre }}</td>
+                            <td>{{ puesto.orden_jerarquico}}</td>
+                            <td>
+                                <small class="label pull-center bg-red">Inactivo</small>
+                            </td>
+                            <td>                           
+                                <input type="checkbox" id="id_{{puesto.id}}" name="activar" onclick="modal('{{ puesto.id }}')" class="label-success"
+                                value="activar"> Activar
+                            </td>
+                        </tr>
+                    {% endif %}
                     {% endfor %}
                     </tbody>
                     <tfoot>
                         <tr>
                             <th>#</th>
                             <th>Nombre</th>
-                            <th>Perfil</th>
                             <th>Orden Jerárquico</th>
+                            <th>Estado</th>
                             <th>Acciones</th>
                         </tr>
                     </tfoot>
@@ -76,11 +95,56 @@
     </div>
 </div>
 </section>
+<div class="example-modal">
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="location.reload();">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Activar Sucursal</h4>
+                </div>
+                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <p>Esta seguro que desea activar la sucursal seleccionada?
+                    </div>
+                    <div class="box-footer">
+                        <div class="col-md-3 col-md-offset-6">
+                            <button class="btn btn-raised btn-success pull-left" id="activar_" type="submit" onclick="" value="Confirm">
+                                <i class="fa fa-eraser"></i>&nbsp;Activar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
 {% endblock %}
 {% block script %}
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script>
+    function modal(puesto_id) {
+            console.log(puesto_id)
+            $('#myModal').modal();
+            $('#form_modal').on('submit', function (e) {
+                activar(puesto_id);
+            })
+        };
+    function activar(puesto_id) {
+            console.log('intentaremos guardar');
+            $.ajax({
+                method: "POST",
+                url: "{% url 'evaluaciones:activar_puesto' %}",
+                data: { pk: puesto_id, csrfmiddlewaretoken: '{{ csrf_token }}', empresa_id: '{{ empresa.pk }}' }
+            }).done(function (msg) {
+                location.reload();
+            });
+        }        
       $(function () {
         $("#empresas").DataTable();
       });

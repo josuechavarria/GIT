@@ -84,8 +84,6 @@ DATABASES = {
         'PORT': '5432'
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 
@@ -126,7 +124,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'media'))
 MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = '/accounts/login/'
-SITE_URL = 'http://10.10.0.100:8000'
+SITE_URL = 'http://localhost:8000'
 
 #configuracion de server de correo
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

@@ -9,7 +9,7 @@
             <a href="#">
                 <i class="fa fa-home"></i> Inicio</a>
         </li>
-        <li class="active">Borrar Puestos</li>
+        <li class="active">Borrar Departamentos</li>
     </ol>
 </section>
 {% endblock %} {% block content %}
@@ -37,12 +37,12 @@
                                 value="Cancel">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                            <h4 class="modal-title">Borrar Puesto</h4>
+                            <h4 class="modal-title">Borrar Sucursales</h4>
                         </div>
                         <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
                             <div class="box-body">
                                 {% csrf_token %}
-                                <p>Esta seguro que quiere borrar el Puesto "{{ object }}"?</p>
+                                <p>Esta seguro que quiere borrar la Sucursal "{{ object }}"?</p>
                             </div>
                             <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
                             <div class="box-footer">
