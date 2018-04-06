@@ -25,7 +25,7 @@
                       <i class="fa fa-close"></i>
                     </button>
                     <p></p>
-                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%else%}close{%endif%}">&nbsp;</i>{{ message }}</strong> 
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%endif%}{% if message.tags == "error" %}close{%endif%}{% if message.tags == "warning" %}warning{%endif%}">&nbsp;</i>{{ message }}</strong> 
                 </div>
 
             {% endfor %}
@@ -121,7 +121,7 @@
                     <div class="form-group">
                         <label class="col-sm-2 control-label" for="id_email">Correo </label>
                         <div class="col-sm-4">
-                            <input type="email" id="id_email" name="email" class="form-control" placeholder="example@example.com" value="{{email}}" required/>
+                            <input type="email" {% if permitir == True %}id="id_email" name="email" class="form-control" placeholder="example@example.com" value="{{email}}"{% endif %} required/>
                         </div>
                         <label class="col-sm-2 control-label" for="id_{{form.grupo.name}}"> {{form.grupo.label}} </label>
                         <div class="col-sm-4">
@@ -169,5 +169,10 @@
       });
 $("#id_empresa").val("{{empresa.pk}}");
 $("#id_empresa").attr('disabled','disabled');
+{% if permitir == False %}
+    $("input").attr('disabled','disabled');
+    $("select").attr('disabled','disabled');
+    $("button").attr('disabled','disabled');
+{% endif %}
 </script>
 {% endblock %}

@@ -156,9 +156,20 @@ class CrearUsuarioView(View):
 		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=pk)
 		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, puesto__nombre__upper='SUPERVISOR')
 		template_name = "evaluaciones/crearUsuario.html"
+		objEmpresa = empresas.objects.get(pk=pk)
+
+		#validar licencias
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		licencias = objEmpresa.licencias
+		permitir = True
+		if usuarios_activos >= licencias:
+			messages.add_message(request,messages.WARNING,"Lo sentimos, no tiene licencias disponibles.")
+			permitir = False
+		#fin validar licencias
 		ctx = {'form':form,
-		'empresa' : empresas.objects.get(pk=pk),
-		'grupos': group_empresas.objects.filter(empresa__pk = pk)
+		'empresa' : objEmpresa,
+		'grupos': group_empresas.objects.filter(empresa__pk = pk),
+		'permitir': permitir
 		}
 		return render(request, template_name, ctx)
    
@@ -166,12 +177,21 @@ class CrearUsuarioView(View):
 		ctx={}
 		template_name = "evaluaciones/crearUsuario.html"
 		formulario = usuariosForm(request.POST)
+		objEmpresa = empresas.objects.get(pk=pk)
 		password = User.objects.make_random_password(length=8, allowed_chars='0123456789qwertyuiopasdfghjklzxcvbnm%$')
 		objUser = User(username=request.POST['email'], email=request.POST['email']
 			, first_name=request.POST['primer_nombre'], last_name=request.POST['primer_apellido'])
 		objUser.set_password(password)
+
+		#validar licencias
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		licencias = objEmpresa.licencias
+		permitir = True
+		if usuarios_activos >= licencias:
+			permitir = False
+		#fin validar licencias
 		
-		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 0:
+		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 0 and permitir is True:
 			form = formulario.save(commit = False)
 			form.usuario_creador = request.user
 			form.usuario_modificador = request.user
@@ -205,11 +225,17 @@ class CrearUsuarioView(View):
 			ctx = {'form': formulario}
 			print (formulario.errors)
 			#ctx['message'] = message
+
+		storage = messages.get_messages(request)
+		storage.used=False
+		if usuarios_activos >= licencias:
+			messages.add_message(request,messages.WARNING,"Lo sentimos, no tiene licencias disponibles.")
 		ctx['empresa'] = empresas.objects.get(pk=pk)
 		#ctx['message'] = message
 		ctx['grupos'] = group_empresas.objects.filter(empresa__pk = pk)
 		ctx['perfil'] = int(request.POST['grupo'])
 		ctx['email'] = request.POST['email']
+		ctx['permitir'] = permitir
 		if "GuardarNuevo" in request.POST:
 			return render(request, template_name, ctx)
 		else:
@@ -661,19 +687,26 @@ class LoginView(View):
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
 		if user is not None:
+			objEmpresa = colaboradores.objects.get(usuario=user).empresa
 			if user.is_active:
-				login(request, user)
-				if user.is_superuser:
-					return HttpResponseRedirect(reverse('evaluaciones:principal'))
+				if objEmpresa.estado is True:
+					login(request, user)
+					if user.is_superuser:
+						return HttpResponseRedirect(reverse('evaluaciones:principal'))
+					else:
+						objColaborador = colaboradores.objects.get(usuario=user)
+						return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
 				else:
-					objColaborador = colaboradores.objects.get(usuario=user)
-					return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
+					messages.error(request, 'Empresa inactiva, comuníquese con el administrador.')
 			else:
 				messages.error(request, 'Usuario Inactivo')
-				return HttpResponseRedirect(reverse('login'))
+			return HttpResponseRedirect(reverse('login'))
 		else:
 			# Mensaje Incorrecto
-			messages.error(request, 'Usuario o contraseña inválidos')
+			if User.objects.filter(username=request.POST['username'], is_active=False).count() > 0:
+				messages.error(request, 'Usuario Inactivo, comuníquese con el administrador.')
+			else:
+				messages.error(request, 'Usuario o contraseña inválidos')
 			return HttpResponseRedirect(reverse('login'))
 
 class LogoutView(View):
