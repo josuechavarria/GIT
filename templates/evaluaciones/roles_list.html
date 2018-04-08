@@ -62,7 +62,7 @@
                                   </button>
                                   <div class="dropdown-menu col-sm-12" role="menu" style="min-width: 400px; padding: 5px;">
                                     <ul class="col-sm-6 list-unstyled">
-                                    <li><a>Por pantalla</a></li>
+                                    <li><a>Pantallas</a></li>
                                     <li class="divider"></li>
                                     {% for permiso in permisos %}
                                       <li>
@@ -73,13 +73,15 @@
                                     {% endfor %}
                                      </ul>
                                      <ul class="col-sm-6 list-unstyled">
-                                    <!--<li><a>Específicos</a></li>
+                                    <li><a>Eliminación</a></li>
                                     <li class="divider"></li>
-                                    {% for permiso in permisos %}
+                                    {% for permiso in permisos_eliminar %}
                                       <li>
-                                        <a href="#" class="small" data-value="{{permiso.pk}}" tabIndex="-1"><input type="checkbox"/>&nbsp;{{permiso.name}}</a>
+                                        <a href="#" class="small" data-value="{{object.perfil.pk}}_{{permiso.pk}}" tabIndex="-1"><input type="checkbox" id="id_{{object.perfil.pk}}_{{permiso.pk}}" name="{{object.perfil.pk}}_{{permiso.pk}}" {% for p in object.perfil.permissions.all %} 
+                                          {% if p.pk == permiso.pk %} checked {% endif %}
+                                          {% endfor %} />&nbsp;{{permiso.name}}</a>
                                       </li>
-                                    {% endfor %}-->
+                                    {% endfor %}
                                     </ul>
                                   </div>
                                 </div>

@@ -44,9 +44,12 @@ class RolesView(View):
 		permissions = Permission.objects.filter(content_type=content_type)
 		permission = Permission.objects.filter(
 			content_type=content_type, codename__startswith='evaluaciones_')
+		permission_delete = Permission.objects.filter(
+			content_type=content_type, codename__startswith='eliminar_')
 		template_name = "evaluaciones/roles_list.html"
 		ctx = {'grupos': group_empresas.objects.filter(empresa__pk=pk),
 			   'permisos': permission,
+			   'permisos_eliminar': permission_delete,
 			   'empresa': empresas.objects.get(pk=pk)
 			   }
 		return render(request, template_name, ctx)
@@ -241,10 +244,10 @@ class ExpiredPasswordView(View):
 class CrearUsuarioView(View):	
 	def get(self, request, pk=None):
 		form = usuariosForm()
-		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=pk)
-		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=pk)
-		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=pk)
-		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, puesto__nombre__upper='SUPERVISOR')
+		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=pk, estado=True)
+		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=pk, estado=True)
+		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=pk, estado=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, puesto__nombre__upper='SUPERVISOR', usuario__is_active=True)
 		template_name = "evaluaciones/crearUsuario.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 
@@ -347,10 +350,10 @@ class ActualizarUsuarioView(View):
 	def get(self, request, pk=None, id=None):
 		objColaborador = colaboradores.objects.get(pk=pk)
 		form = usuariosForm(instance=objColaborador)
-		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=id)
-		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=id)
-		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=id)
-		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=id, puesto__nombre__upper='SUPERVISOR')
+		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=id, estado=True)
+		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=id, estado=True)
+		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=id, estado=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=id, puesto__nombre__upper='SUPERVISOR', usuario__is_active=True)
 
 		template_name = "evaluaciones/ActualizaUsuario.html"
 		ctx = {'form':form,
@@ -407,10 +410,23 @@ class EstadoUsuarioView(View):
 		return HttpResponseRedirect(reverse_lazy('evaluaciones:principal_empresa', args=[id,]))
 
 	def post(self, request, pk=None, id=None):
+		objEmpresa = empresas.objects.get(pk=id)
 		objUser = User.objects.get(pk=pk)
-		objUser.is_active = False if objUser.is_active else True
-		objUser.save()
-		return HttpResponse('Activo' if objUser.is_active else 'Inactivo')
+		#validar licencias
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		licencias = objEmpresa.licencias
+		permitir = True
+		if usuarios_activos >= licencias and objUser.is_active == False:
+			permitir = False
+		#fin validar licencias
+		if permitir:
+			objUser.is_active = False if objUser.is_active else True
+			objUser.save()
+		else:
+			messages.add_message(request,messages.WARNING,"Lo sentimos, no tiene licencias disponibles.")
+		#return HttpResponse('Activo' if objUser.is_active else 'Inactivo')
+		url = reverse_lazy('evaluaciones:listar_usuario', args=[id,])
+		return HttpResponseRedirect(url)
 
 class IndexEmpresaView(View):
 	def get(self, request, pk=None):

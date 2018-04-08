@@ -166,18 +166,16 @@ class evaluaciones(models.Model):
 
 	class Meta:
 		permissions = (
-			# ("evaluaciones_colaboradores", "Evaluaciones colaboradores"), 
-			# ("evaluaciones_administracion", "Administración evaluaciones"),
-			# ("evaluaciones_dashboard", "Dashboard evaluaciones"),
-			# ("evaluaciones_ficha", "Ficha evaluaciones"),
-			# ("evaluaciones_gestionar", "Gestionar evaluaciones"),
-			# ("evaluaciones_mis", "Mis evaluaciones"),
 			("evaluaciones_roles", "Configurar Roles y permisos"),
 			("evaluaciones_listasdesplegables", "Configurar listas de selección"),
 			("evaluaciones_usuarios", "Administrar usuarios"),
 			("evaluaciones_periodos", "Configurar Períodos"),
 			("evaluaciones_criterios", "Configurar Criterios"),
-
+			("eliminar_roles", "Eliminar roles"),
+			("eliminar_listasdesplegables", "Eliminar listas de selección"),
+			("eliminar_usuarios", "Eliminar usuarios"),
+			("eliminar_períodos", "Eliminar períodos"),
+			("eliminar_criterios", "Eliminar criterios"),
 		)
 
 
