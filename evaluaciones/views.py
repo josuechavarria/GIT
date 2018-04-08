@@ -44,9 +44,12 @@ class RolesView(View):
 		permissions = Permission.objects.filter(content_type=content_type)
 		permission = Permission.objects.filter(
 			content_type=content_type, codename__startswith='evaluaciones_')
+		permission_delete = Permission.objects.filter(
+			content_type=content_type, codename__startswith='eliminar_')
 		template_name = "evaluaciones/roles_list.html"
 		ctx = {'grupos': group_empresas.objects.filter(empresa__pk=pk),
 			   'permisos': permission,
+			   'permisos_eliminar': permission_delete,
 			   'empresa': empresas.objects.get(pk=pk)
 			   }
 		return render(request, template_name, ctx)
@@ -67,14 +70,53 @@ class RolesNuevoView(View):
 		return HttpResponse(0)
 
 	def post(self, request, pk=None):
-		print(request.POST)
-		objGroup = Group(name=request.POST['perfil']+'|'+str(pk))
-		objGroup.save()
-		objGroupEmpresas = group_empresas(
-			empresa=empresas.objects.get(pk=pk), perfil=objGroup)
-		objGroupEmpresas.save()
+		if not Group.objects.filter(name__upper=request.POST['perfil'].strip().upper()+'|'+str(pk)).exists():
+			objGroup = Group(name=request.POST['perfil']+'|'+str(pk))
+			objGroup.save()
+			objGroupEmpresas = group_empresas(
+				empresa=empresas.objects.get(pk=pk), perfil=objGroup)
+			objGroupEmpresas.save()
+		else:
+			messages.add_message(request,messages.ERROR, 'Error. Ya existe un perfil con el nombre de %s.'%(request.POST['perfil']))
+
 		return HttpResponseRedirect(reverse('evaluaciones:listar_roles', args=(pk,)))
 
+class RolesActualizarView(View):
+	def get(self, request, pk=None, id=None):
+		return HttpResponse(0)
+
+	def post(self, request, pk=None, id=None):
+		print(request.POST)
+		objGroup = Group.objects.get(pk=pk)
+
+		if not Group.objects.filter(name__upper=request.POST['perfil'].strip().upper()+'|'+str(id)).exists() or objGroup.name.upper() == request.POST['perfil'].strip().upper()+'|'+str(id):
+			objGroup.name = request.POST['perfil'].strip()+'|'+str(id)
+			objGroup.save()
+			messages.add_message(request,messages.SUCCESS, "Éxito. Perfil actulizado exitosamente.")
+		else:
+			messages.add_message(request,messages.ERROR, 'Error. Ya existe un perfil con el nombre de %s.'%(request.POST['perfil']))
+
+		return HttpResponseRedirect(reverse('evaluaciones:listar_roles', args=(id,)))
+
+class RolesEliminarView(View):
+	def get(self, request, pk=None, id=None):
+		return HttpResponse(0)
+
+	def post(self, request, pk=None, id=None):
+		print(request.POST)
+		objGroup = Group.objects.get(pk=pk)
+
+		try:
+			objGroup.delete()
+			messages.add_message(request,messages.SUCCESS,'Exito, Perfil borrado exitosamente')				
+		except models.ProtectedError: 
+			objGroupEmpresas = group_empresas.objects.get(
+				empresa=empresas.objects.get(pk=id), perfil=objGroup)
+			objGroupEmpresas.estado = False
+			objGroupEmpresas.save() 
+			messages.add_message(request,messages.WARNING,'info, Existen Colaboradores que dependen de este Perfil, no se puede eliminar.')
+
+		return HttpResponseRedirect(reverse('evaluaciones:listar_roles', args=(id,)))
 class ResetPasswordNotificacionView(View):	
 	def get(self, request, pk=None, id=None):
 		return HttpResponse(0)
@@ -148,13 +190,79 @@ class ResetPasswordView(View):
 		}
 		return render(request, template_name, ctx)
 
+class ExpiredPasswordView(View):	
+	def get(self, request, pk=None, id=None):
+		template_name = "evaluaciones/ExpiredPassword.html"
+		objColaborador = colaboradores.objects.get(pk=pk)
+		ctx = {
+		'empresa' : empresas.objects.get(pk=id),
+		'username': objColaborador.usuario.username
+		}
+		return render(request, template_name, ctx)
+   
+	def post(self, request, pk=None, id=None):
+		template_name = "evaluaciones/ExpiredPassword.html"
+		objColaborador = colaboradores.objects.get(pk=pk)
+		objUser = objColaborador.usuario
+		oldPass = request.POST['old_password']
+		newPass = request.POST['password']
+		newRepeatPass = request.POST['password_repeat']
+
+		html_message = loader.render_to_string(
+		'evaluaciones/email_resetNotificacion.html',
+			{
+				'empresa': objColaborador.empresa.nombre,
+				'name':  objColaborador.primer_nombre,
+				'usuario' : objColaborador.usuario.username,
+				'fecha' : timezone.now(),
+				'action_url' : 'hola'
+			}
+		)
+		subject = 'Cambio de contraseña'
+		user = authenticate(username=objColaborador.usuario.username, password=oldPass)
+		if user is not None:
+			if newPass==newRepeatPass:
+				objUser.set_password(newPass.strip())
+				objColaborador.fecha_ult_mod_password = timezone.now()
+				objColaborador.password_caducado = False
+				objUser.save()
+				objColaborador.save()
+				if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objColaborador.usuario.email], fail_silently=False, html_message=html_message):
+					messages.add_message(request,messages.SUCCESS, 'Contraseña actualizada exitosamente. Pero no se pudo enviar el correo de confirmación.')
+				else:
+					messages.add_message(request,messages.SUCCESS, 'Contraseña actualizada exitosamente.')
+			else:
+				messages.add_message(request,messages.ERROR, 'Error al actualizar la contraseña, validación de nueva clave falló.')
+		else:
+			messages.add_message(request,messages.ERROR, 'Error al actualizar la contraseña, contraseña actual incorrecta.')
+		ctx = {
+		'empresa' : empresas.objects.get(pk=id),
+		'username': objColaborador.usuario.username
+		}
+		return render(request, template_name, ctx)
+
 class CrearUsuarioView(View):	
 	def get(self, request, pk=None):
 		form = usuariosForm()
+		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=pk, estado=True)
+		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=pk, estado=True)
+		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=pk, estado=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, puesto__nombre__upper='SUPERVISOR', usuario__is_active=True)
 		template_name = "evaluaciones/crearUsuario.html"
+		objEmpresa = empresas.objects.get(pk=pk)
+
+		#validar licencias
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		licencias = objEmpresa.licencias
+		permitir = True
+		if usuarios_activos >= licencias:
+			messages.add_message(request,messages.WARNING,"Lo sentimos, no tiene licencias disponibles.")
+			permitir = False
+		#fin validar licencias
 		ctx = {'form':form,
-		'empresa' : empresas.objects.get(pk=pk),
-		'grupos': group_empresas.objects.filter(empresa__pk = pk)
+		'empresa' : objEmpresa,
+		'grupos': group_empresas.objects.filter(empresa__pk = pk),
+		'permitir': permitir
 		}
 		return render(request, template_name, ctx)
    
@@ -162,12 +270,21 @@ class CrearUsuarioView(View):
 		ctx={}
 		template_name = "evaluaciones/crearUsuario.html"
 		formulario = usuariosForm(request.POST)
+		objEmpresa = empresas.objects.get(pk=pk)
 		password = User.objects.make_random_password(length=8, allowed_chars='0123456789qwertyuiopasdfghjklzxcvbnm%$')
 		objUser = User(username=request.POST['email'], email=request.POST['email']
 			, first_name=request.POST['primer_nombre'], last_name=request.POST['primer_apellido'])
 		objUser.set_password(password)
+
+		#validar licencias
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		licencias = objEmpresa.licencias
+		permitir = True
+		if usuarios_activos >= licencias:
+			permitir = False
+		#fin validar licencias
 		
-		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 0:
+		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 0 and permitir is True:
 			form = formulario.save(commit = False)
 			form.usuario_creador = request.user
 			form.usuario_modificador = request.user
@@ -201,11 +318,17 @@ class CrearUsuarioView(View):
 			ctx = {'form': formulario}
 			print (formulario.errors)
 			#ctx['message'] = message
+
+		storage = messages.get_messages(request)
+		storage.used=False
+		if usuarios_activos >= licencias:
+			messages.add_message(request,messages.WARNING,"Lo sentimos, no tiene licencias disponibles.")
 		ctx['empresa'] = empresas.objects.get(pk=pk)
 		#ctx['message'] = message
 		ctx['grupos'] = group_empresas.objects.filter(empresa__pk = pk)
 		ctx['perfil'] = int(request.POST['grupo'])
 		ctx['email'] = request.POST['email']
+		ctx['permitir'] = permitir
 		if "GuardarNuevo" in request.POST:
 			return render(request, template_name, ctx)
 		else:
@@ -227,6 +350,11 @@ class ActualizarUsuarioView(View):
 	def get(self, request, pk=None, id=None):
 		objColaborador = colaboradores.objects.get(pk=pk)
 		form = usuariosForm(instance=objColaborador)
+		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=id, estado=True)
+		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=id, estado=True)
+		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=id, estado=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=id, puesto__nombre__upper='SUPERVISOR', usuario__is_active=True)
+
 		template_name = "evaluaciones/ActualizaUsuario.html"
 		ctx = {'form':form,
 		'empresa' : empresas.objects.get(pk=id),
@@ -282,10 +410,23 @@ class EstadoUsuarioView(View):
 		return HttpResponseRedirect(reverse_lazy('evaluaciones:principal_empresa', args=[id,]))
 
 	def post(self, request, pk=None, id=None):
+		objEmpresa = empresas.objects.get(pk=id)
 		objUser = User.objects.get(pk=pk)
-		objUser.is_active = False if objUser.is_active else True
-		objUser.save()
-		return HttpResponse('Activo' if objUser.is_active else 'Inactivo')
+		#validar licencias
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		licencias = objEmpresa.licencias
+		permitir = True
+		if usuarios_activos >= licencias and objUser.is_active == False:
+			permitir = False
+		#fin validar licencias
+		if permitir:
+			objUser.is_active = False if objUser.is_active else True
+			objUser.save()
+		else:
+			messages.add_message(request,messages.WARNING,"Lo sentimos, no tiene licencias disponibles.")
+		#return HttpResponse('Activo' if objUser.is_active else 'Inactivo')
+		url = reverse_lazy('evaluaciones:listar_usuario', args=[id,])
+		return HttpResponseRedirect(url)
 
 class IndexEmpresaView(View):
 	def get(self, request, pk=None):
@@ -388,8 +529,9 @@ class ActualizarPuesto(SuccessMessageMixin, FormInvalidMessageMixin, UpdateView)
 
 
 class ListarPuestos(ListView):
-	model = puestos
-	print(model)
+
+	def get_queryset(self):
+		return puestos.objects.filter(empresa__pk=self.kwargs['pk'])
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -483,7 +625,8 @@ class ActualizarDepartamento(SuccessMessageMixin, UpdateView):
 
 
 class ListarDepartamentos(ListView):
-	model = departamentos
+	def get_queryset(self):
+		return departamentos.objects.filter(empresa__pk=self.kwargs['pk'])
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -581,7 +724,8 @@ class ActualizarSucursal(SuccessMessageMixin, UpdateView):
 
 
 class ListarSucursales(ListView):
-	model = sucursales
+	def get_queryset(self):
+		return sucursales.objects.filter(empresa__pk=self.kwargs['pk'])
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -659,14 +803,28 @@ class LoginView(View):
 				if user.is_superuser:
 					return HttpResponseRedirect(reverse('evaluaciones:principal'))
 				else:
-					objColaborador = colaboradores.objects.get(usuario=user)
-					return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
+					if colaboradores.objects.filter(usuario=user).count() > 0:
+						objEmpresa = colaboradores.objects.get(usuario=user).empresa
+						if objEmpresa.estado is True:
+							objColaborador = colaboradores.objects.get(usuario=user)
+							if objColaborador.password_caducado is False:
+								return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
+							else:
+								logout(request)
+								return HttpResponseRedirect(reverse('evaluaciones:expired_password', args=[objColaborador.pk,objColaborador.empresa.pk]))
+						else:
+							messages.error(request, 'Empresa inactiva, comuníquese con el administrador.')
+					else:
+						return HttpResponseRedirect(reverse('evaluaciones:principal'))
 			else:
 				messages.error(request, 'Usuario Inactivo')
-				return HttpResponseRedirect(reverse('login'))
+			return HttpResponseRedirect(reverse('login'))
 		else:
 			# Mensaje Incorrecto
-			messages.error(request, 'Usuario o contraseña inválidos')
+			if User.objects.filter(username=request.POST['username'], is_active=False).count() > 0:
+				messages.error(request, 'Usuario Inactivo, comuníquese con el administrador.')
+			else:
+				messages.error(request, 'Usuario o contraseña inválidos')
 			return HttpResponseRedirect(reverse('login'))
 
 class LogoutView(View):
@@ -700,7 +858,8 @@ class CrearCriterio(SuccessMessageMixin, CreateView):
 
 
 class ListarCriterios(ListView):
-	model = criterios
+	def get_queryset(self):
+		return criterios.objects.filter(empresa__pk=self.kwargs['pk'])
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
@@ -768,7 +927,8 @@ class CrearPeriodos(SuccessMessageMixin, CreateView):
 
 
 class ListarPeriodos(ListView):
-	model = periodos
+	def get_queryset(self):
+		return periodos.objects.filter(empresa__pk=self.kwargs['pk'])
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
