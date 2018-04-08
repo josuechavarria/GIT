@@ -67,14 +67,53 @@ class RolesNuevoView(View):
 		return HttpResponse(0)
 
 	def post(self, request, pk=None):
-		print(request.POST)
-		objGroup = Group(name=request.POST['perfil']+'|'+str(pk))
-		objGroup.save()
-		objGroupEmpresas = group_empresas(
-			empresa=empresas.objects.get(pk=pk), perfil=objGroup)
-		objGroupEmpresas.save()
+		if not Group.objects.filter(name__upper=request.POST['perfil'].strip().upper()+'|'+str(pk)).exists():
+			objGroup = Group(name=request.POST['perfil']+'|'+str(pk))
+			objGroup.save()
+			objGroupEmpresas = group_empresas(
+				empresa=empresas.objects.get(pk=pk), perfil=objGroup)
+			objGroupEmpresas.save()
+		else:
+			messages.add_message(request,messages.ERROR, 'Error. Ya existe un perfil con el nombre de %s.'%(request.POST['perfil']))
+
 		return HttpResponseRedirect(reverse('evaluaciones:listar_roles', args=(pk,)))
 
+class RolesActualizarView(View):
+	def get(self, request, pk=None, id=None):
+		return HttpResponse(0)
+
+	def post(self, request, pk=None, id=None):
+		print(request.POST)
+		objGroup = Group.objects.get(pk=pk)
+
+		if not Group.objects.filter(name__upper=request.POST['perfil'].strip().upper()+'|'+str(id)).exists() or objGroup.name.upper() == request.POST['perfil'].strip().upper()+'|'+str(id):
+			objGroup.name = request.POST['perfil'].strip()+'|'+str(id)
+			objGroup.save()
+			messages.add_message(request,messages.SUCCESS, "Éxito. Perfil actulizado exitosamente.")
+		else:
+			messages.add_message(request,messages.ERROR, 'Error. Ya existe un perfil con el nombre de %s.'%(request.POST['perfil']))
+
+		return HttpResponseRedirect(reverse('evaluaciones:listar_roles', args=(id,)))
+
+class RolesEliminarView(View):
+	def get(self, request, pk=None, id=None):
+		return HttpResponse(0)
+
+	def post(self, request, pk=None, id=None):
+		print(request.POST)
+		objGroup = Group.objects.get(pk=pk)
+
+		try:
+			objGroup.delete()
+			messages.add_message(request,messages.SUCCESS,'Exito, Perfil borrado exitosamente')				
+		except models.ProtectedError: 
+			objGroupEmpresas = group_empresas.objects.get(
+				empresa=empresas.objects.get(pk=id), perfil=objGroup)
+			objGroupEmpresas.estado = False
+			objGroupEmpresas.save() 
+			messages.add_message(request,messages.WARNING,'info, Existen Colaboradores que dependen de este Perfil, no se puede eliminar.')
+
+		return HttpResponseRedirect(reverse('evaluaciones:listar_roles', args=(id,)))
 class ResetPasswordNotificacionView(View):	
 	def get(self, request, pk=None, id=None):
 		return HttpResponse(0)
@@ -142,6 +181,57 @@ class ResetPasswordView(View):
 				messages.add_message(request,messages.SUCCESS, 'Contraseña actualizada exitosamente.')
 		else:
 			messages.add_message(request,messages.ERROR, 'Error al actualizar la contraseña, url no válida o caducada.')
+		ctx = {
+		'empresa' : empresas.objects.get(pk=id),
+		'username': objColaborador.usuario.username
+		}
+		return render(request, template_name, ctx)
+
+class ExpiredPasswordView(View):	
+	def get(self, request, pk=None, id=None):
+		template_name = "evaluaciones/ExpiredPassword.html"
+		objColaborador = colaboradores.objects.get(pk=pk)
+		ctx = {
+		'empresa' : empresas.objects.get(pk=id),
+		'username': objColaborador.usuario.username
+		}
+		return render(request, template_name, ctx)
+   
+	def post(self, request, pk=None, id=None):
+		template_name = "evaluaciones/ExpiredPassword.html"
+		objColaborador = colaboradores.objects.get(pk=pk)
+		objUser = objColaborador.usuario
+		oldPass = request.POST['old_password']
+		newPass = request.POST['password']
+		newRepeatPass = request.POST['password_repeat']
+
+		html_message = loader.render_to_string(
+		'evaluaciones/email_resetNotificacion.html',
+			{
+				'empresa': objColaborador.empresa.nombre,
+				'name':  objColaborador.primer_nombre,
+				'usuario' : objColaborador.usuario.username,
+				'fecha' : timezone.now(),
+				'action_url' : 'hola'
+			}
+		)
+		subject = 'Cambio de contraseña'
+		user = authenticate(username=objColaborador.usuario.username, password=oldPass)
+		if user is not None:
+			if newPass==newRepeatPass:
+				objUser.set_password(newPass.strip())
+				objColaborador.fecha_ult_mod_password = timezone.now()
+				objColaborador.password_caducado = False
+				objUser.save()
+				objColaborador.save()
+				if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objColaborador.usuario.email], fail_silently=False, html_message=html_message):
+					messages.add_message(request,messages.SUCCESS, 'Contraseña actualizada exitosamente. Pero no se pudo enviar el correo de confirmación.')
+				else:
+					messages.add_message(request,messages.SUCCESS, 'Contraseña actualizada exitosamente.')
+			else:
+				messages.add_message(request,messages.ERROR, 'Error al actualizar la contraseña, validación de nueva clave falló.')
+		else:
+			messages.add_message(request,messages.ERROR, 'Error al actualizar la contraseña, contraseña actual incorrecta.')
 		ctx = {
 		'empresa' : empresas.objects.get(pk=id),
 		'username': objColaborador.usuario.username
@@ -257,6 +347,11 @@ class ActualizarUsuarioView(View):
 	def get(self, request, pk=None, id=None):
 		objColaborador = colaboradores.objects.get(pk=pk)
 		form = usuariosForm(instance=objColaborador)
+		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=id)
+		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=id)
+		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=id)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=id, puesto__nombre__upper='SUPERVISOR')
+
 		template_name = "evaluaciones/ActualizaUsuario.html"
 		ctx = {'form':form,
 		'empresa' : empresas.objects.get(pk=id),
@@ -687,17 +782,24 @@ class LoginView(View):
 		password = request.POST['password']
 		user = authenticate(username=username, password=password)
 		if user is not None:
-			objEmpresa = colaboradores.objects.get(usuario=user).empresa
 			if user.is_active:
-				if objEmpresa.estado is True:
-					login(request, user)
-					if user.is_superuser:
-						return HttpResponseRedirect(reverse('evaluaciones:principal'))
-					else:
-						objColaborador = colaboradores.objects.get(usuario=user)
-						return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
+				login(request, user)
+				if user.is_superuser:
+					return HttpResponseRedirect(reverse('evaluaciones:principal'))
 				else:
-					messages.error(request, 'Empresa inactiva, comuníquese con el administrador.')
+					if colaboradores.objects.filter(usuario=user).count() > 0:
+						objEmpresa = colaboradores.objects.get(usuario=user).empresa
+						if objEmpresa.estado is True:
+							objColaborador = colaboradores.objects.get(usuario=user)
+							if objColaborador.password_caducado is False:
+								return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
+							else:
+								logout(request)
+								return HttpResponseRedirect(reverse('evaluaciones:expired_password', args=[objColaborador.pk,objColaborador.empresa.pk]))
+						else:
+							messages.error(request, 'Empresa inactiva, comuníquese con el administrador.')
+					else:
+						return HttpResponseRedirect(reverse('evaluaciones:principal'))
 			else:
 				messages.error(request, 'Usuario Inactivo')
 			return HttpResponseRedirect(reverse('login'))

@@ -29,7 +29,7 @@
                       <i class="fa fa-close"></i>
                     </button>
                     <p></p>
-                    <strong><i class="fa fa-check"></i> Éxito! {{ message }}</strong> 
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%endif%}{% if message.tags == "error" %}close{%endif%}{% if message.tags == "warning" %}warning{%endif%}">&nbsp;</i>{{ message }}</strong> 
                 </div>
 
             {% endfor %}
@@ -86,9 +86,11 @@
                                 <a data-toggle="tooltip" data-placement="top" title="Guardado automático: Al marcar el permiso éste se guardará automáticamente en el perfil.">&nbsp;&nbsp;<i class="fa fa-question-circle"></i></a>
                             </td>
                             <td>
-                                <a href="#" onclick="$('#myModal').modal();" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar perfil"><i class="fa fa-plus"></i>&nbsp;&nbsp;  Agregar</a>
+                                <a href="#" onclick="AdminRoles('{{object.perfil.name|getgroupName:"|"}}','Agregar','{% url 'evaluaciones:crear_roles' empresa.pk %}');" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar perfil"><i class="fa fa-plus"></i></a>
                                 &nbsp;|&nbsp;
-                                <a href="#" onclick="$('#myModal').modal();" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Eliminar perfil"><i class="fa fa-trash text-red"></i>&nbsp;&nbsp;  Eliminar</a>
+                                <a href="#" onclick="AdminRoles('{{object.perfil.name|getgroupName:"|"}}','Editar','{% url 'evaluaciones:actualiza_rol' object.perfil.pk empresa.pk %}');" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Editar perfil"><i class="fa fa-edit"></i></a>
+                                &nbsp;|&nbsp;
+                                <a href="#" onclick="AdminRoles('{{object.perfil.name|getgroupName:"|"}}','Eliminar','{% url 'evaluaciones:estado_rol' object.perfil.pk empresa.pk %}');" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Eliminar perfil"><i class="fa fa-trash text-red"></i></a>
                             </td>
                         </tr>
                     {% empty %}
@@ -107,9 +109,9 @@
                       <div class="modal-content">
                         <div class="modal-header">
                           <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                          <h4 class="modal-title">Agregar perfil</h4>
+                          <h4 class="modal-title" id="h_title"></h4>
                         </div>
-                        <form action="{% url 'evaluaciones:crear_roles' empresa.pk %}" method="post">
+                        <form id="form_perfil" method="post">
                           {% csrf_token %}
                           <div class="modal-body">
                             <div class="form-group">
@@ -120,6 +122,28 @@
                           <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancelar</button>
                             <button type="submit" class="btn btn-primary">Guardar</button>
+                          </div>
+                        </form>
+                      </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                  </div><!-- /.modal -->
+                </div><!-- /.example-modal -->
+                <div class="example-modal">
+                  <div class="modal fade" id="myModal2">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title">Eliminar perfil</h4>
+                        </div>
+                        <form id="form_delete" method="post">
+                          {% csrf_token %}
+                          <div class="modal-body" id="id_modal_body">
+                            
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Aceptar</button>
                           </div>
                         </form>
                       </div><!-- /.modal-content -->
@@ -194,5 +218,24 @@ $( '.dropdown-menu a' ).on( 'click', function( event ) {
    
    return false;
 });
+
+function AdminRoles(valor, accion, url, perfil){
+  
+  if(accion=='Eliminar'){
+    $("#id_modal_body").html("¿Está seguro que desea eliminar el perfil "+valor+"?");
+    $("#form_delete").attr('action',url);
+    $('#myModal2').modal();
+  }else{
+    if(accion=='Editar'){
+      $("#id_perfil").val(valor);
+    }
+    if(accion=='Agregar'){
+      $("#id_perfil").val('');
+    }
+    $("#h_title").html(accion+" perfil");
+    $("#form_perfil").attr('action',url);
+    $('#myModal').modal();
+  }
+}
 </script>
 {% endblock %}

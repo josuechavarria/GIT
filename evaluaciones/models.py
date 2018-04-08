@@ -84,7 +84,7 @@ class colaboradores(models.Model):
 	departamento = models.ForeignKey(departamentos, on_delete=models.PROTECT)
 	sucursal = models.ForeignKey(sucursales, null=True, blank=True, default=None, on_delete=models.PROTECT)
 	supervisor = models.ForeignKey('self',null=True, blank=True, default=None, on_delete=models.CASCADE)
-	grupo = models.ForeignKey(Group, default=None, verbose_name = "Perfil")
+	grupo = models.ForeignKey(Group, default=None, verbose_name = "Perfil", on_delete=models.PROTECT)
 	usuario_creador = models.ForeignKey(
 		User, related_name='colaborador_usuario_creador')
 	fecha_creacion = models.DateField(default=now)

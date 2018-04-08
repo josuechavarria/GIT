@@ -53,7 +53,7 @@
                         <tr>
                             <td>{{forloop.counter}}</td>
                             <td>{{ object.codigo }}</td>
-                            <td>{{ object.nombre_completo}}</td>
+                            <td><a href="#" onclick="InfoUsuario('{{object.codigo}}', '{{object.nombre_completo}}', '{{object.usuario.username}}', '{{object.usuario.email}}', '{{object.supervisor.nombre_completo}}', '{{object.puesto}}', '{{object.departamento}}', '{{object.sucursal}}', '{{object.usuario.last_login}}', '{{object.fecha_ult_mod_password}}');">{{ object.nombre_completo}}</a></td>
                             <td id="td_{{object.usuario.pk}}{{object.pk}}">
                             <a href="#" onclick = "AbrirModal('{% if object.usuario.is_active %}Activo{%else%}Inactivo{%endif%}','{% url 'evaluaciones:estado_usuario' pk=object.usuario.pk id=empresa.pk %}','{{object.nombre_completo}}','{{object.usuario.pk}}{{object.pk}}')" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="{% if object.usuario.is_active %}Inactivar{%else%}Activar{%endif%} usuario">{% if object.usuario.is_active %}<small class="label bg-green">Activo</small>{%else%}<small class="label bg-red">Inactivo</small>{%endif%}
                             </a>
@@ -111,6 +111,73 @@
                           <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancelar</button>
                             <button type="button" id="btnGuardar2" data-dismiss="modal" class="btn btn-primary">Aceptar</button>
+                          </div>
+                      </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                  </div><!-- /.modal -->
+                </div><!-- /.example-modal -->
+                <div class="example-modal">
+                  <div class="modal fade" id="myModal3">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title">Detalle del usuario</h4>
+                        </div>
+                          <div class="modal-body" id="mbody3">
+                            <table id="userDetail" class="table table-bordered table-striped">
+                              <thead>
+                                  <tr>
+                                      <th width="30%">Campo</th>
+                                      <th>Valor</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>Código</td>
+                                  <td id="td_codigo"></td>
+                                </tr>
+                                <tr>
+                                  <td>Nombre</td>
+                                  <td id="td_nombre"></td>
+                                </tr>
+                                <tr>
+                                  <td>Usuario</td>
+                                  <td id="td_usuario"></td>
+                                </tr>
+                                <tr>
+                                  <td>Correo</td>
+                                  <td id="td_correo"></td>
+                                </tr>
+                                <tr>
+                                  <td>Supervisor</td>
+                                  <td id="td_supervisor"></td>
+                                </tr>
+                                <tr>
+                                  <td>Puesto</td>
+                                  <td id="td_puesto"></td>
+                                </tr>
+                                <tr>
+                                  <td>Departamento</td>
+                                  <td id="td_departamento"></td>
+                                </tr>
+                                <tr>
+                                  <td>Sucursal</td>
+                                  <td id="td_sucursal"></td>
+                                </tr>
+                                 <tr>
+                                  <td>Última sesión</td>
+                                  <td id="td_ultima_sesion"></td>
+                                </tr>
+                                <tr>
+                                  <td>Último cambio contraseña</td>
+                                  <td id="td_ultimo_cambio_password"></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" id="btnGuardar3" data-dismiss="modal" class="btn btn-primary">Aceptar</button>
                           </div>
                       </div><!-- /.modal-content -->
                     </div><!-- /.modal-dialog -->
@@ -179,5 +246,19 @@
             alert( "Reestablecer contraseña falló: " + textStatus);
           });
     }
+    function InfoUsuario(codigo, nombre, usuario, correo, supervisor, puesto, departamento, sucursal, ultima_sesion, ultimo_cambio_password){
+      $("#td_codigo").html(codigo);
+      $("#td_nombre").html(nombre);
+      $("#td_usuario").html(usuario);
+      $("#td_correo").html(correo);
+      $("#td_supervisor").html(supervisor);
+      $("#td_puesto").html(puesto);
+      $("#td_departamento").html(departamento);
+      $("#td_sucursal").html(sucursal);
+      $("#td_ultima_sesion").html(ultima_sesion);
+      $("#td_ultimo_cambio_password").html(ultimo_cambio_password);
+
+      $('#myModal3').modal();
+    }   
 </script>
 {% endblock %}

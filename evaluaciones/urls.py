@@ -6,10 +6,10 @@ from django.contrib.auth.decorators import login_required, permission_required
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.principal, name='principal'),
+    url(r'^$', permission_required('evaluaciones.evaluaciones_enterprise')(views.principal), name='principal'),
     #url(r'^accounts/login/$', views.LoginView.as_view(), name='login'), 
     url(r'^logout/$', views.LogoutView.as_view(), name='logout'),    
-    url(r'^empresas/(?P<pk>\d+)/$', views.IndexEmpresaView.as_view(), name='principal_empresa'),
+    url(r'^empresas/(?P<pk>\d+)/$', login_required(views.IndexEmpresaView.as_view()), name='principal_empresa'),
     url(r'^empresas/crear/$', permission_required('evaluaciones.evaluaciones_enterprise')(views.CrearEmpresa.as_view(model= empresas)), name='crear_empresa'),
     url(r'^empresas/actualizar/(?P<pk>\d+)/$', permission_required('evaluaciones.evaluaciones_enterprise')(views.ActualizarEmpresa.as_view(model= empresas)), name='actualiza_empresa'),
     url(r'^empresas/listar', permission_required('evaluaciones.evaluaciones_enterprise')(views.ListarEmpresas.as_view(model= empresas)), name='listar_empresa'),
@@ -63,4 +63,8 @@ urlpatterns = [
     url(r'^usuario/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.EstadoUsuarioView.as_view(), name='estado_usuario'),
     url(r'^usuario/actualizar/pass/(?P<pk>\d+)/(?P<id>\d+)/(?P<oldpass>\w+)/$', views.ResetPasswordView.as_view(), name='actualiza_password'),
     url(r'^usuario/actualizar/pass/notificacion/(?P<pk>\d+)/(?P<id>\d+)/$', views.ResetPasswordNotificacionView.as_view(), name='notificacion_password'),
+    url(r'^usuario/actualizar/pass/(?P<pk>\d+)/(?P<id>\d+)/$', views.ExpiredPasswordView.as_view(), name='expired_password'),
+    url(r'^roles/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesActualizarView.as_view(), name='actualiza_rol'),
+    url(r'^roles/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesEliminarView.as_view(), name='estado_rol'),
+
 ]
