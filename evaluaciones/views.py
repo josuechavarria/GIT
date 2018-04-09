@@ -428,9 +428,12 @@ class EstadoUsuarioView(View):
 		return HttpResponseRedirect(url)
 
 class IndexEmpresaView(View):
-	def get(self, request, pk=None):
+	def get(self, request, pk=None):				
 		template_name = "evaluaciones/index_empresa.html"
-		ctx = {'empresa': empresas.objects.get(pk=pk)}
+		ctx = {'empresa': empresas.objects.get(pk=pk),
+			   'colaborador' : colaboradores.objects.get(usuario_id = request.user.id),
+			   'perfil' : perfil.objects.get(usuario_id = request.user.id)
+		}
 		return render(request, template_name, ctx)
 
 # Vistas para la creación
@@ -472,8 +475,9 @@ class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 #Listas, tablas
 
 
-class ListarEmpresas(ListView):
+class ListarEmpresas(ListView):	
 	def get_queryset(self):
+		print('usuario')
 		return empresas.objects.raw("SELECT e.*,count(c.id) colaboradores FROM evaluaciones_empresas e left outer join evaluaciones_colaboradores c on c.empresa_id = e.id group by e.id ")
 	
 	def get_context_data(self, **kwargs):
