@@ -1,4 +1,6 @@
 from django.conf.urls import url
+from django.conf import settings
+from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from evaluaciones.models import *
 from django.core.urlresolvers import reverse_lazy
@@ -7,6 +9,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.principal, name='principal'),
+
     #url(r'^accounts/login/$', views.LoginView.as_view(), name='login'), 
     url(r'^logout/$', views.LogoutView.as_view(), name='logout'),    
     url(r'^empresas/(?P<pk>\d+)/$', views.IndexEmpresaView.as_view(), name='principal_empresa'),
@@ -58,9 +61,12 @@ urlpatterns = [
     url(r'^departamentos/activo/', views.activar_departamento.as_view(),
         name='activar_departamento'),
     url(r'^usuario/crear/(?P<pk>\d+)/$', views.CrearUsuarioView.as_view(), name='crear_usuario'),
+    url(r'^usuario/perfil/(?P<pk>\d+)/(?P<id>\d+)/$', views.Perfil_.as_view(), name='perfil_'),
     url(r'^usuario/listar/(?P<pk>\d+)/$', views.ListarUsuarioView.as_view(), name='listar_usuario'),
     url(r'^usuario/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarUsuarioView.as_view(), name='actualiza_usuario'),
     url(r'^usuario/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.EstadoUsuarioView.as_view(), name='estado_usuario'),
     url(r'^usuario/actualizar/pass/(?P<pk>\d+)/(?P<id>\d+)/(?P<oldpass>\w+)/$', views.ResetPasswordView.as_view(), name='actualiza_password'),
     url(r'^usuario/actualizar/pass/notificacion/(?P<pk>\d+)/(?P<id>\d+)/$', views.ResetPasswordNotificacionView.as_view(), name='notificacion_password'),
-]
+] 
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -69,12 +69,13 @@
                             <td>{{puesto.id}}</td>
                             <td>{{ puesto.nombre }}</td>
                             <td>{{ puesto.orden_jerarquico}}</td>
-                            <td>
-                                <small class="label pull-center bg-red">Inactivo</small>
+                            <td>                                
+                                <a href="#" id="id_{{puesto.id}}" name="activar" onclick="modal('{{ puesto.id }}')"
+                                    data-toggle="tooltip" data-placement="top" title="Activar Puesto">
+                                    <small class="label pull-center bg-red">Inactivo</small>
+                                </a>
                             </td>
-                            <td>                           
-                                <input type="checkbox" id="id_{{puesto.id}}" name="activar" onclick="modal('{{ puesto.id }}')" class="label-success"
-                                value="activar"> Activar
+                            <td>
                             </td>
                         </tr>
                     {% endif %}

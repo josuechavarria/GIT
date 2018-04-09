@@ -68,10 +68,13 @@
                             <td>{{ objetivo.id }}</td>
                             <td>{{ objetivo.nombre }}</td>
                             <td>                            
-                            <small class="label pull-center bg-red">Inactivo</small>
+                            <a href="#" id="id_{{objetivo.pk}}" name="activar" onclick="modal('{{ objetivo.pk }}')" data-toggle="tooltip" data-placement="top"
+                                title="Activar Objetivo">
+                                <small class="label pull-center bg-red">Inactivo</small>
+                            </a>
                             </td>
                             <td>
-                                <input type="checkbox" id="id_{{objetivo.pk}}"  name="activar" onclick="modal('{{ objetivo.pk }}')" class="label-success" value="activar"> Activar
+                                
                             </td>
                         </tr>
                     {% endif %}
