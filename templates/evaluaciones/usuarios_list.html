@@ -1,5 +1,6 @@
 {% extends 'evaluaciones/base_empresa.html'%}
 {% load static %}
+{% load evaluaciones_tags %}
 {% block style %}
 <!-- DataTables -->
     <link rel="stylesheet" href="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.css' %}">
@@ -53,7 +54,7 @@
                         <tr>
                             <td>{{forloop.counter}}</td>
                             <td>{{ object.codigo }}</td>
-                            <td>{{ object.nombre_completo}}</td>
+                            <td><a href="#" onclick="InfoUsuario('{{object.codigo}}', '{{object.nombre_completo}}', '{{object.usuario.username}}', '{{object.usuario.email}}', '{{object.supervisor.nombre_completo}}', '{{object.puesto}}', '{{object.departamento}}', '{{object.sucursal}}', '{{object.usuario.last_login}}', '{{object.fecha_ult_mod_password}}', '{{object.grupo.name|getgroupName:"|"}}');">{{ object.nombre_completo}}</a></td>
                             <td id="td_{{object.usuario.pk}}{{object.pk}}">
                             <a href="#" onclick = "AbrirModal('{% if object.usuario.is_active %}Activo{%else%}Inactivo{%endif%}','{% url 'evaluaciones:estado_usuario' pk=object.usuario.pk id=empresa.pk %}','{{object.nombre_completo}}','{{object.usuario.pk}}{{object.pk}}')" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error" data-toggle="tooltip" data-placement="top" title="{% if object.usuario.is_active %}Inactivar{%else%}Activar{%endif%} usuario">{% if object.usuario.is_active %}<small class="label bg-green">Activo</small>{%else%}<small class="label bg-red">Inactivo</small>{%endif%}
                             </a>
@@ -90,10 +91,14 @@
                         </div>
                           <div class="modal-body" id="mbody">
                           </div>
+                          <form id="form_estado" method="post">
+                            {%csrf_token%}
+                          
                           <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancelar</button>
-                            <button type="button" id="btnGuardar" data-dismiss="modal" class="btn btn-primary">Aceptar</button>
+                            <button type="submit" id="btnGuardar" class="btn btn-primary">Aceptar</button>
                           </div>
+                          </form>
                       </div><!-- /.modal-content -->
                     </div><!-- /.modal-dialog -->
                   </div><!-- /.modal -->
@@ -111,6 +116,77 @@
                           <div class="modal-footer">
                             <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancelar</button>
                             <button type="button" id="btnGuardar2" data-dismiss="modal" class="btn btn-primary">Aceptar</button>
+                          </div>
+                      </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                  </div><!-- /.modal -->
+                </div><!-- /.example-modal -->
+                <div class="example-modal">
+                  <div class="modal fade" id="myModal3">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                          <h4 class="modal-title">Detalle del usuario</h4>
+                        </div>
+                          <div class="modal-body" id="mbody3">
+                            <table id="userDetail" class="table table-bordered table-striped">
+                              <thead>
+                                  <tr>
+                                      <th width="30%">Campo</th>
+                                      <th>Valor</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>Código</td>
+                                  <td id="td_codigo"></td>
+                                </tr>
+                                <tr>
+                                  <td>Nombre</td>
+                                  <td id="td_nombre"></td>
+                                </tr>
+                                <tr>
+                                  <td>Usuario</td>
+                                  <td id="td_usuario"></td>
+                                </tr>
+                                <tr>
+                                  <td>Perfil</td>
+                                  <td id="td_perfil"></td>
+                                </tr>
+                                <tr>
+                                  <td>Correo</td>
+                                  <td id="td_correo"></td>
+                                </tr>
+                                <tr>
+                                  <td>Supervisor</td>
+                                  <td id="td_supervisor"></td>
+                                </tr>
+                                <tr>
+                                  <td>Puesto</td>
+                                  <td id="td_puesto"></td>
+                                </tr>
+                                <tr>
+                                  <td>Departamento</td>
+                                  <td id="td_departamento"></td>
+                                </tr>
+                                <tr>
+                                  <td>Sucursal</td>
+                                  <td id="td_sucursal"></td>
+                                </tr>
+                                 <tr>
+                                  <td>Última sesión</td>
+                                  <td id="td_ultima_sesion"></td>
+                                </tr>
+                                <tr>
+                                  <td>Último cambio contraseña</td>
+                                  <td id="td_ultimo_cambio_password"></td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" id="btnGuardar3" data-dismiss="modal" class="btn btn-primary">Aceptar</button>
                           </div>
                       </div><!-- /.modal-content -->
                     </div><!-- /.modal-dialog -->
@@ -134,7 +210,8 @@
         estado = estado == 'Activo' ? 'Inactivo' : 'Activo';
         //alert('Se actualizará el estado del usuario a <b>'+ estado +'</b> del colaborador "'+nombre+'"')
         $('#mbody').html('Se actualizará el estado del usuario a <b>'+ estado +'</b> del colaborador "'+nombre+'"');
-        $('#btnGuardar').attr('onclick',"CambiarEstado('"+url+"','"+tdid+"')")
+        //$('#btnGuardar').attr('onclick',"CambiarEstado('"+url+"','"+tdid+"')")
+        $("#form_estado").attr("action",url)
         $('#myModal').modal();
     }
     function AbrirModal2(url, nombre){
@@ -144,14 +221,15 @@
         $('#myModal2').modal();
     }
     function CambiarEstado(url, tdid){
-        var color;
+        $("#form_estado").attr("action",url)
+        /*var color;
         $.ajax({
           method: "POST",
           url: url,
           data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
         })
           .done(function( msg ) {
-            /*color = msg == 'Activo' ? 'green' : 'red';
+            color = msg == 'Activo' ? 'green' : 'red';
             icono = msg == 'Activo' ? 'fa fa-user-times text-red' : 'fa fa-user text-green';
             $('#td_'+tdid).html('<small class="label bg-'+ color +'">'+msg+'</small>')
             $('#eicon_'+tdid).attr('class',icono);
@@ -161,9 +239,9 @@
             }else{
                 $('#cicon_'+tdid).html('')
                 $('#edit_'+tdid).attr('hidden','true');
-            }*/
+            }
             location.href = "";
-          });
+          });*/
     }
     function Reestablecer(url){
         var color;
@@ -179,5 +257,20 @@
             alert( "Reestablecer contraseña falló: " + textStatus);
           });
     }
+    function InfoUsuario(codigo, nombre, usuario, correo, supervisor, puesto, departamento, sucursal, ultima_sesion, ultimo_cambio_password, perfil){
+      $("#td_codigo").html(codigo);
+      $("#td_nombre").html(nombre);
+      $("#td_usuario").html(usuario);
+      $("#td_perfil").html(perfil);
+      $("#td_correo").html(correo);
+      $("#td_supervisor").html(supervisor);
+      $("#td_puesto").html(puesto);
+      $("#td_departamento").html(departamento);
+      $("#td_sucursal").html(sucursal);
+      $("#td_ultima_sesion").html(ultima_sesion);
+      $("#td_ultimo_cambio_password").html(ultimo_cambio_password);
+
+      $('#myModal3').modal();
+    }   
 </script>
 {% endblock %}
