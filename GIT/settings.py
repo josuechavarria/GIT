@@ -125,7 +125,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = '/accounts/login/'
-SITE_URL = 'http://localhost:8000'
+SITE_URL = 'https://fathomless-oasis-80446.herokuapp.com'
 
 #configuracion de server de correo
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
