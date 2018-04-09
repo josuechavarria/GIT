@@ -98,7 +98,7 @@
                     {% empty %}
                         
                             <div align="center">
-                                <a href="#" onclick="$('#myModal').modal();" class="btn btn-sm btn-raised btn-success" data-toggle="tooltip" data-placement="top" title="Agregar perfil"><i class="fa fa-plus"></i>&nbsp;&nbsp;  Agregar</a>
+                                <a href="#" onclick="AdminRoles('{{object.perfil.name|getgroupName:"|"}}','Agregar','{% url 'evaluaciones:crear_roles' empresa.pk %}');" class="btn btn-sm btn-raised btn-success" data-toggle="tooltip" data-placement="top" title="Agregar perfil"><i class="fa fa-plus"></i>&nbsp;&nbsp;  Agregar</a>
                             </div>
                     {% endfor %}
                     </tbody>
