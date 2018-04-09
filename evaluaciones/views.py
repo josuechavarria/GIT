@@ -371,8 +371,7 @@ class ActualizarUsuarioView(View):
 		objColaborador = colaboradores.objects.get(pk=pk)
 		formulario = usuariosForm(request.POST, instance=objColaborador)
 		error = False
-		objUser = objColaborador.usuario
-		
+		objUser = objColaborador.usuario		
 		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 1 and objUser.email ==request.POST['email']:
 			form = formulario.save(commit = False)
 			form.usuario_modificador = request.user
@@ -474,7 +473,9 @@ class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 
 
 class ListarEmpresas(ListView):
-	model = empresas
+	def get_queryset(self):
+		return empresas.objects.raw("SELECT e.*,count(c.id) colaboradores FROM evaluaciones_empresas e left outer join evaluaciones_colaboradores c on c.empresa_id = e.id group by e.id ")
+	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['now'] = timezone.now()		
@@ -829,17 +830,102 @@ class LoginView(View):
 
 class LogoutView(View):
 	def get(self, request):
-		logout(request)
+		logout(request)		
 		return HttpResponseRedirect('/accounts/login/')
 
 # Criterios
 
+class Perfil_(View):
+	def get(self, request,pk,id):		
+		template_name = "evaluaciones/perfil.html"		
+		#perfil_ = None
+		# Si el colaborador ya tiene perfil ACTUALIZAR		
+		colaborador = colaboradores.objects.get(usuario_id = request.user.id)		
+		if perfil.objects.filter(usuario_id =id).exists():			
+			perfil_ = perfil.objects.get(usuario_id =id)
+			form = PerfilForm(instance=perfil_)			
+			ctx = {'form':form,
+					'empresa': empresas.objects.get(pk = pk),
+					'perfil': perfil_,
+					'colaborador' : colaborador
+					}
+			ctx['foto'] = perfil_.foto
+			ctx['sexo'] = perfil_.sexo
+			ctx['bandera'] = 1
+			ctx['fecha_nacimiento'] = perfil_.fecha_nacimiento
+			ctx['pasa_tiempos'] = perfil_.pasa_tiempos
+		# Si el colaborador no tiene perfil , CREAR
+		else:
+			form = PerfilForm()
+			ctx = {'form':form,
+				'empresa': empresas.objects.get(pk = pk)}
+		return render(request, template_name, ctx)
+		
+	def post(self, request,id=None,pk=None):
+		print(request.POST)				
+		if 'Actualizar' in request.POST and perfil.objects.filter(usuario_id =id).exists():
+			perfil_ = perfil.objects.get(usuario_id =id)		
+			print('Actualizar')
+			formulario = PerfilForm(request.POST,request.FILES, instance = perfil_)			
+			print(request.FILES['foto'])
+			colaborador = colaboradores.objects.get(usuario_id = id)
+			empresa_pk = colaborador.empresa.pk
+			usuario_id = id	
+			url = reverse_lazy('evaluaciones:perfil_' , kwargs ={'pk' : pk, 'id' : id })		
+			if formulario.is_valid():
+				form = formulario.save(commit=False)
+				print('VALIDO')						
+				perfil_.save()				
+				messages.add_message(request, messages.SUCCESS,
+			                     "Datos Actualizados con Exito!")
+			else:
+				print('ERRONEO')
+				messages.add_message(request, messages.ERROR,
+			                     "Formulario contiene errores!!")
+		else:
+			print('otro')
+			formulario = PerfilForm(request.POST,request.FILES)
+			colaborador = colaboradores.objects.get(usuario_id = request.user.id)			
+			empresa_pk = colaborador.empresa.pk
+			empresa = empresas.objects.get(pk =empresa_pk )
+			usuario_id = request.user.id	
+			url = reverse_lazy('evaluaciones:perfil_' , kwargs ={'pk' : pk, 'id' : id })		
+			if formulario.is_valid():
+				print('Valido')				
+				form = formulario.save(commit=False)
+				form.colaborador_id = colaborador.pk
+				form.empresa = empresa
+				form.usuario = request.user
+				form.save()
+				messages.add_message(request, messages.SUCCESS,
+			                     "Perfil agregado con Exito!")	
+			else:
+				messages.add_message(request, messages.ERROR,
+			                     "Formulario contiene errores!!")
+		return HttpResponseRedirect(url)
+
+
 
 class CrearCriterio(SuccessMessageMixin, CreateView):
 	model = criterios
-	form_class = CriteriosForm
+	form_class = CriteriosForm	
 	template_name = "evaluaciones/CrearCriterio.html"
-	success_message = "Criterio creado satisfactoriamente."
+
+	def post(self,request,pk=None):
+		empresa_id = request.POST['empresa']
+		print(empresa_id)
+		formulario = CriteriosForm(request.POST)
+		success_url = reverse('evaluaciones:crear_criterio',
+						  kwargs={'pk': empresa_id})				
+		if formulario.is_valid():
+			new_rec = formulario.save(commit = False)
+			# new_rec.periodo = periodos.objects.filter(empresa__pk = empresa_id).order_by('-pk')[:1][0].pk
+			new_rec.periodo = periodos.objects.get(pk = 2)
+			new_rec.save()
+			messages.add_message(request,messages.SUCCESS,'Criterio Creado Exitosamente.')			
+		else:
+			messages.add_message(request,messages.ERROR,'Criterio Erroneo.')			
+		return HttpResponseRedirect(success_url)
 
 	def get_success_url(self, **kwargs):
 		print(self.request.POST)
@@ -906,14 +992,15 @@ class BorrarCriterios(SuccessMessageMixin, DeleteView):
 # Periodos
 class CrearPeriodos(SuccessMessageMixin, CreateView):
 	model = periodos
+	print('Creando')
 	form_class = PeriodosForm
 	template_name = "evaluaciones/CrearPeriodo.html"
 	success_message = "Periodo creado satisfactoriamente."
-
+	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
-		return context
+		return context        
 
 	def get_success_url(self, **kwargs):
 		print(self.request.POST)
@@ -1137,3 +1224,22 @@ class activar_sucursal(View):
 			sucursal.save()
 			print(sucursal.estado)		 
 		return HttpResponse(success_url)
+
+class CrearPerfil(SuccessMessageMixin, CreateView):
+	model = perfil
+	form_class = PerfilForm
+	template_name = "evaluaciones/crearPerfil.html"
+	success_message = "Criterio creado satisfactoriamente."
+
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_perfil',
+							   args=[self.kwargs['pk']])				
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+

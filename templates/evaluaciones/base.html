@@ -249,32 +249,21 @@
                 </ul>
               </li>
               <!-- User Account: style can be found in dropdown.less -->
-              <li class="dropdown user user-menu">
+              <li class="dropdown user user-menu">              
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <span class="hidden-xs">{{user.first_name}}-{{user.last_name}} </span>
                   <img src="{% static 'evaluaciones/dist/img/user2-160x160.jpg' %}" class="user-image" alt="User Image">
-                  <span class="hidden-xs">{{user.first_name}} {{user.last_name}}</span>
                 </a>
                 <ul class="dropdown-menu">
                   <!-- User image -->
                   <li class="user-header">
                     <img src="{% static 'evaluaciones/dist/img/user2-160x160.jpg' %}" class="img-circle" alt="User Image">
                     <p>
-                      {{user.first_name}} {{user.last_name}} - Web Developer
-                      <small>Member since Nov. 2012</small>
+                      <strong>{{user.first_name}}-{{user.last_name}}</strong>
+                      <small>Miembros desde: <strong>{{ user.date_joined}}</strong></small>
                     </p>
                   </li>
-                  <!-- Menu Body -->
-                  <li class="user-body">
-                    <div class="col-xs-4 text-center">
-                      <a href="#">Followers</a>
-                    </div>
-                    <div class="col-xs-4 text-center">
-                      <a href="#">Sales</a>
-                    </div>
-                    <div class="col-xs-4 text-center">
-                      <a href="#">Friends</a>
-                    </div>
-                  </li>
+                  <!-- Menu Body -->                 
                   <!-- Menu Footer-->
                   <li class="user-footer">
                     <div class="pull-left">
@@ -298,7 +287,7 @@
       <aside class="main-sidebar">
         <!-- sidebar: style can be found in sidebar.less -->
         <section class="sidebar">
-          <!-- Sidebar user panel -->
+          <!-- Sidebar user panel -->          
           <div class="user-panel">
             <div class="pull-left image">
               <img src="{% static 'evaluaciones/dist/img/user2-160x160.jpg' %}" class="img-circle" alt="User Image">
@@ -307,7 +296,7 @@
               <p>{{user.first_name}} {{user.last_name}}</p>
               <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
-          </div>
+          </div>    
           <!-- search form -->
           <form action="#" method="get" class="sidebar-form">
             <div class="input-group">

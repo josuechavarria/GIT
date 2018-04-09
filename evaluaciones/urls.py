@@ -1,4 +1,6 @@
 from django.conf.urls import url
+from django.conf import settings
+from django.conf.urls.static import static
 from django.views.generic import TemplateView
 from evaluaciones.models import *
 from django.core.urlresolvers import reverse_lazy
@@ -58,6 +60,7 @@ urlpatterns = [
     url(r'^departamentos/activo/', views.activar_departamento.as_view(),
         name='activar_departamento'),
     url(r'^usuario/crear/(?P<pk>\d+)/$', views.CrearUsuarioView.as_view(), name='crear_usuario'),
+    url(r'^usuario/perfil/(?P<pk>\d+)/(?P<id>\d+)/$', views.Perfil_.as_view(), name='perfil_'),
     url(r'^usuario/listar/(?P<pk>\d+)/$', views.ListarUsuarioView.as_view(), name='listar_usuario'),
     url(r'^usuario/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarUsuarioView.as_view(), name='actualiza_usuario'),
     url(r'^usuario/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.EstadoUsuarioView.as_view(), name='estado_usuario'),
@@ -66,5 +69,7 @@ urlpatterns = [
     url(r'^usuario/actualizar/pass/(?P<pk>\d+)/(?P<id>\d+)/$', views.ExpiredPasswordView.as_view(), name='expired_password'),
     url(r'^roles/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesActualizarView.as_view(), name='actualiza_rol'),
     url(r'^roles/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesEliminarView.as_view(), name='estado_rol'),
-
 ]
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
