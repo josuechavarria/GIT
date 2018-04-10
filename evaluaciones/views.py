@@ -431,8 +431,8 @@ class IndexEmpresaView(View):
 	def get(self, request, pk=None):				
 		template_name = "evaluaciones/index_empresa.html"
 		ctx = {'empresa': empresas.objects.get(pk=pk),
-			   'colaborador' : colaboradores.objects.get(usuario_id = request.user.id),
-			   'perfil' : perfil.objects.get(usuario_id = request.user.id)
+			   'colaborador' : '',
+			   'perfil' : ''
 		}
 		return render(request, template_name, ctx)
 
