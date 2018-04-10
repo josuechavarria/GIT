@@ -78,7 +78,12 @@
                             </a>
                             </td>
                             <td>
-                                
+                                 {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}
+                                <a href="{% url 'evaluaciones:crear_objetivos' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
+                                    data-toggle="tooltip" data-placement="top" title="Agregar objetivo">
+                                    <i class="fa fa-plus text-green"></i>
+                                </a> &nbsp;&nbsp;
+                                {% endif %}                                
                             </td>
                         </tr>
                     {% endif %}

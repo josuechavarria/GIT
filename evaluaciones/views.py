@@ -428,12 +428,13 @@ class EstadoUsuarioView(View):
 		return HttpResponseRedirect(url)
 
 class IndexEmpresaView(View):
-	def get(self, request, pk=None):				
+	def get(self, request, pk=None):
+		if perfil.objects.filter(usuario_id =request.user.id).exists():
+			p = perfil.objects.get(usuario_id=request.user.id)
+			request.session['picture'] = p.foto.name
 		template_name = "evaluaciones/index_empresa.html"
-		ctx = {'empresa': empresas.objects.get(pk=pk),
-			   'colaborador' : '',
-			   'perfil' : ''
-		}
+
+		ctx = {'empresa': empresas.objects.get(pk=pk)}
 		return render(request, template_name, ctx)
 
 # Vistas para la creación
@@ -913,7 +914,7 @@ class Perfil_(View):
 class CrearCriterio(SuccessMessageMixin, CreateView):
 	model = criterios
 	form_class = CriteriosForm	
-	template_name = "evaluaciones/CrearCriterio.html"
+	template_name = "evaluaciones/crearCriterio.html"
 
 	def post(self,request,pk=None):
 		empresa_id = request.POST['empresa']
@@ -998,7 +999,7 @@ class CrearPeriodos(SuccessMessageMixin, CreateView):
 	model = periodos
 	print('Creando')
 	form_class = PeriodosForm
-	template_name = "evaluaciones/CrearPeriodo.html"
+	template_name = "evaluaciones/crearPeriodo.html"
 	success_message = "Periodo creado satisfactoriamente."
 	
 	def get_context_data(self, **kwargs):
