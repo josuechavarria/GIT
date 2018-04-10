@@ -913,7 +913,7 @@ class Perfil_(View):
 class CrearCriterio(SuccessMessageMixin, CreateView):
 	model = criterios
 	form_class = CriteriosForm	
-	template_name = "evaluaciones/CrearCriterio.html"
+	template_name = "evaluaciones/crearCriterio.html"
 
 	def post(self,request,pk=None):
 		empresa_id = request.POST['empresa']
@@ -998,7 +998,7 @@ class CrearPeriodos(SuccessMessageMixin, CreateView):
 	model = periodos
 	print('Creando')
 	form_class = PeriodosForm
-	template_name = "evaluaciones/CrearPeriodo.html"
+	template_name = "evaluaciones/crearPeriodo.html"
 	success_message = "Periodo creado satisfactoriamente."
 	
 	def get_context_data(self, **kwargs):
