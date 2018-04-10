@@ -428,12 +428,12 @@ class EstadoUsuarioView(View):
 		return HttpResponseRedirect(url)
 
 class IndexEmpresaView(View):
-	def get(self, request, pk=None):				
+	def get(self, request, pk=None):
+		if perfil.objects.filter(usuario_id =request.user.id).exists():
+			p = perfil.objects.get(usuario_id=request.user.id)
+			request.session['picture'] = p.foto.name
 		template_name = "evaluaciones/index_empresa.html"
-		ctx = {'empresa': empresas.objects.get(pk=pk),
-			   'colaborador' : colaboradores.objects.get(usuario_id = request.user.id),
-			   'perfil' : perfil.objects.get(usuario_id = request.user.id)
-		}
+		ctx = {'empresa': empresas.objects.get(pk=pk)}
 		return render(request, template_name, ctx)
 
 # Vistas para la creación
