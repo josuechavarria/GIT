@@ -31,12 +31,8 @@
                         <img class="profile-user-img img-responsive img-circle" src="{{ perfil.foto.url }}" alt="User profile picture">
                         <h3 class="profile-username text-center">{{ user.first_name }} {{ user.last_name }}</h3>
                         <p class="text-muted text-center">{{ colaborador.puesto}}</p>
-
+                        <br>
                         <ul class="list-group list-group-unbordered">
-                            <li class="list-group-item">
-                                <b>{{request.session.foto}}</b>
-                                <a class="pull-right">1,322</a>
-                            </li>
                             <li class="list-group-item">
                                 <b>Following</b>
                                 <a class="pull-right">543</a>
@@ -47,9 +43,6 @@
                             </li>
                         </ul>
 
-                        <a href="#" class="btn btn-primary btn-block">
-                            <b>Follow</b>
-                        </a>
                     </div>
                     <!-- /.box-body -->
                 </div>
@@ -63,7 +56,7 @@
                     <!-- /.box-header -->
                     <div class="box-body">
                         <strong>
-                            <i class="fa fa-book margin-r-5"></i> Education</strong>
+                            <i class="fa fa-book margin-r-5"></i> Educación </strong>
                         <p class="text-muted">
                             B.S. in Computer Science from the University of Tennessee at Knoxville
                         </p>
@@ -109,9 +102,7 @@
                             <a href="#settings" data-toggle="tab">Registro Inicial</a>
                         </li>
                         {% endif %}
-                        <li>
-                            <a href="#timeline" data-toggle="tab">Evaluaciones {{bandera}}</a>
-                        </li>                        
+                                               
                     </ul>
                     <div class="tab-content">  
                          {% if messages %} {% for message in messages %}
@@ -192,6 +183,32 @@
                 <!-- /.nav-tabs-custom -->
             </div>
             <!-- /.col -->
+            <div class="box">
+                <div class="box-header with-border">
+                    <h3 class="box-title">información de Usuario <i class="fa fa-user"></i></h3>
+                    <div class="box-tools pull-right">
+                        <button class="btn btn-box-tool" data-widget="collapse" data-toggle="tooltip" title="Collapse">
+                            <i class="fa fa-minus"></i>
+                        </button>
+                        <button class="btn btn-box-tool" data-widget="remove" data-toggle="tooltip" title="Remove">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <strong> Ultimo Inicio de Sesión: </strong> <p>{{user.last_login}}</p>
+                </div>
+                <!-- /.box-body -->
+                <div class="box-footer">
+                    <strong> Ultimo Cambio de Contraseña: </strong> <p>{{colaborador.fecha_ult_mod_password}}</p>
+                </div>
+                <!-- /.box-footer-->
+            </div>
+            <!-- /.box -->
+            </section>
+            <!-- /.content -->
+            </div>
+            <!-- /.content-wrapper --
         </div>
         <!-- /.row -->
 {% endblock %}
