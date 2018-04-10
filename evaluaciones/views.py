@@ -433,6 +433,7 @@ class IndexEmpresaView(View):
 			p = perfil.objects.get(usuario_id=request.user.id)
 			request.session['picture'] = p.foto.name
 		template_name = "evaluaciones/index_empresa.html"
+
 		ctx = {'empresa': empresas.objects.get(pk=pk)}
 		return render(request, template_name, ctx)
 

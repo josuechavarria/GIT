@@ -125,7 +125,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 LOGIN_REDIRECT_URL = '/accounts/login/'
-SITE_URL = 'http://localhost:8000'
+SITE_URL = 'https://fathomless-oasis-80446.herokuapp.com'
 
 #configuracion de server de correo
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -136,9 +136,9 @@ EMAIL_HOST_USER = 'josuechavarria89@gmail.com' #hancoir@gmail.com
 EMAIL_HOST_PASSWORD = '31829kmx' #******
 
 # Update database configuration with $DATABASE_URL.
-#import dj_database_url  
-#db_from_env = dj_database_url.config(conn_max_age=500)  
-#DATABASES['default'].update(db_from_env)
+import dj_database_url  
+db_from_env = dj_database_url.config(conn_max_age=500)  
+DATABASES['default'].update(db_from_env)
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  
 STATIC_URL = '/static/'
