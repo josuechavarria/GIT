@@ -76,11 +76,14 @@
                             <td>{{ object.empresa.nombre}}</td>
                             <td>{{ object.direccion}}</td>
                             <td>
-                                <small class="label pull-center bg-red">Inactivo</small>
+                                <td>
+                                    <a href="#" id="id_{{object.pk}}" name="activar" onclick="modal('{{ object.pk }}')" data-toggle="tooltip" data-placement="top"
+                                        title="Activar Sucursal">
+                                        <small class="label pull-center bg-red">Inactiva</small>
+                                    </a>
+                                </td>
                             </td>
-                            <td>
-                                <input type="checkbox" id="id_{{object.id}}" name="activar" onclick="modal('{{ object.id }}')" class="label-success"
-                                    value="activar"> Activar
+                            <td>                                
                             </td>
                         </tr>
                     {% endif %}
