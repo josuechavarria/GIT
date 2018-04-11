@@ -78,8 +78,8 @@ class PeriodosForm(ModelForm):
         fields = ('fecha_inico', 'fecha_fin', 'activo','empresa','tiempo')
         widgets = {
             'empresa': Select(attrs={'class': 'form-control'}), 
-            'fecha_inico': forms.DateInput(attrs={'class':'datepicker'}),
-            'fecha_fin': forms.DateInput(attrs={'class':'datepicker'}),
+            'fecha_inico': forms.DateInput( format = '%Y-%m-%d',attrs={'class':'datepicker'}),
+            'fecha_fin': forms.DateInput( format = '%Y-%m-%d',attrs={'class':'datepicker'}),
             'activo': CheckboxInput(attrs={'class': 'checkbox'}),                      
             'tiempo': TextInput(attrs={'class': 'form-control'}),
         }
@@ -105,7 +105,7 @@ class PerfilForm(ModelForm):
     foto =  forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}))    
     sexo = forms.ChoiceField(choices=CATEGORY_CHOICES, widget=forms.Select(
         attrs={'class': 'form-control'}))
-    fecha_nacimiento = forms.CharField(widget=forms.DateInput(attrs={'class': 'datepicker'}))
+    fecha_nacimiento = forms.CharField(widget=forms.DateInput( format = '%Y-%m-%d',attrs={'class': 'datepicker'}),required = False)                                      
     pasa_tiempos = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
     class Meta:
         model = perfil         

@@ -46,6 +46,7 @@
                             <th>Descripción</th>
                             <th>Empresa</th>
                             <th>Objetivo</th>
+                            <th>Estado</th>
                             <th>Periodo</th>
                             <th>Acciones</th>
                         </tr>
@@ -58,15 +59,47 @@
                             <td>{{ criterio.descripcion }}</td>
                             <td>{{ criterio.empresa }}</td>
                             <td>{{ criterio.objetivo }}</td>
-                            <td>{{ criterio.objetivo.estado }}</td>
-                            <td>{{ criterio.periodos.year }}</td>
-                            <td>
-                                <a href="{% url 'evaluaciones:crear_criterio' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info" data-toggle="tooltip" data-placement="top" title="Agregar criterio"><i class="fa fa-plus"> Crear |</i></a> &nbsp;&nbsp;                                
-                                <a href="{% url 'evaluaciones:borrar_criterios' pk=criterio.pk id=empresa.pk %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error"
-                                    data-toggle="tooltip" data-placement="top" title="Borrar Criterios">
-                                    <i class="fa fa-trash text-red"> Borrar </i>
-                                </a>
+                             {% if criterio.estado %}
+                            <td>                           
+                                <small class="label pull-center bg-green">Activo</small>
+                                                            
                             </td>
+                            <td>{{ criterio.periodo }}</td>
+                            <td>
+                                 {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}
+                                <a href="{% url 'evaluaciones:crear_criterio' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
+                                    data-toggle="tooltip" data-placement="top" title="Agregar Criterio">
+                                    <i class="fa fa-plus text-green"></i>
+                                </a> &nbsp;&nbsp;
+                                <a href="{% url 'evaluaciones:actualizar_criterio' pk=criterio.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
+                                    data-toggle="tooltip" data-placement="top" title="Editar Criterio">
+                                    <i class="fa fa-edit"></i>
+                                </a> &nbsp;&nbsp; {% endif %} {% if 'evaluaciones.eliminar_listasdesplegables' in perms %}
+                                <a href="{% url 'evaluaciones:borrar_criterios' pk=criterio.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error"
+                                    data-toggle="tooltip" data-placement="top" title="Eliminar criterio">
+                                    <i class="fa fa-trash text-red"></i>
+                                </a>
+                                {% endif %}
+                                
+                            </td>
+                            {% else %}
+                            <td>
+                                <a href="#" id="id_{{criterio.id}}" name="activar" onclick="modal('{{ criterio.id }}')" data-toggle="tooltip" data-placement="top"
+                                    title="Activar criterio"><small class="label pull-center bg-red">Inactivo</small>
+                                </a>
+                            
+                            </td>
+                            <td>{{ criterio.periodo }}</td>
+                            <td>
+                                {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}
+                                <a href="{% url 'evaluaciones:crear_criterio' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
+                                    data-toggle="tooltip" data-placement="top" title="Agregar Criterio">
+                                    <i class="fa fa-plus text-green"></i>
+                                </a> &nbsp;&nbsp;
+                               
+                               {% endif %}                            
+                            </td>                           
+                             {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -86,13 +119,71 @@
     </div>
 </div>
 </section>
+<div class="example-modal">
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="location.reload();">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Activar Criterio</h4>
+                </div>
+                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">
+                    <div class="box-body">
+                        <p>Esta seguro que desea activar el Criterio seleccionado?
+                    </div>
+                    <div class="box-footer">
+                        <div class="col-md-3 col-md-offset-6">
+                            <button class="btn btn-raised btn-success pull-left" id="activar_" type="submit" onclick="" value="Confirm">
+                                <i class="fa fa-eraser"></i>&nbsp;Activar</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
 {% endblock %}
 {% block script %}
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script>
+     function modal(criterio_id) {
+            console.log(criterio_id)
+            $('#myModal').modal();
+            $('#form_modal').on('submit', function (e) {
+                activar(criterio_id);
+            })
+        };
+        function activar(criterio_id) {
+            console.log('intentaremos guardar');
+            $.ajax({
+                method: "POST",
+                url: "{% url 'evaluaciones:activar_criterio' %}",
+                data: { pk: criterio_id, csrfmiddlewaretoken: '{{ csrf_token }}', empresa_id: '{{ empresa.pk }}' }
+            }).done(function (msg) {
+                location.reload();
+            });
+        }  
       $(function () {
-        $("#empresas").DataTable();
+        $("#empresas").DataTable({
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros por pagina",
+                "search": "Buscar:",
+                "zeroRecords": "Ningún Registro encontrado",
+                "info": "Mostrando pagina _PAGE_ de _PAGES_",
+                "infoEmpty": "Registros no disponibles",
+                "infoFiltered": "(filtrado de  _MAX_ registros totales)",
+                "paginate": {
+                    "previous": "Anterior",
+                    "next": "Siguiente"
+                }
+            }
+        });
       });
     </script>
 {% endblock %}
