@@ -430,8 +430,12 @@ class EstadoUsuarioView(View):
 class IndexEmpresaView(View):
 	def get(self, request, pk=None):
 		if perfil.objects.filter(usuario_id =request.user.id).exists():
+			print('hay algo')
 			p = perfil.objects.get(usuario_id=request.user.id)
-			request.session['picture'] = p.foto.name
+			print(p)
+			request.session['picture'] = p.foto.url
+		else: 
+			print('no hay nada')
 		template_name = "evaluaciones/index_empresa.html"
 
 		ctx = {'empresa': empresas.objects.get(pk=pk)}
@@ -845,8 +849,9 @@ class Perfil_(View):
 		template_name = "evaluaciones/perfil.html"		
 		#perfil_ = None
 		# Si el colaborador ya tiene perfil ACTUALIZAR		
-		colaborador = colaboradores.objects.get(usuario_id = request.user.id)		
+		
 		if perfil.objects.filter(usuario_id =id).exists():			
+			colaborador = colaboradores.objects.get(usuario_id = request.user.id)		
 			perfil_ = perfil.objects.get(usuario_id =id)
 			form = PerfilForm(instance=perfil_)			
 			ctx = {'form':form,
@@ -866,8 +871,7 @@ class Perfil_(View):
 				'empresa': empresas.objects.get(pk = pk)}
 		return render(request, template_name, ctx)
 		
-	def post(self, request,id=None,pk=None):
-		print(request.POST)				
+	def post(self, request,id=None,pk=None):		
 		if 'Actualizar' in request.POST and perfil.objects.filter(usuario_id =id).exists():
 			perfil_ = perfil.objects.get(usuario_id =id)		
 			print('Actualizar')
@@ -880,7 +884,8 @@ class Perfil_(View):
 			if formulario.is_valid():
 				form = formulario.save(commit=False)
 				print('VALIDO')						
-				perfil_.save()				
+				perfil_.save()
+				request.session['picture'] = perfil_.foto.url
 				messages.add_message(request, messages.SUCCESS,
 			                     "Datos Actualizados con Exito!")
 			else:
@@ -1248,3 +1253,82 @@ class CrearPerfil(SuccessMessageMixin, CreateView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
+
+
+class ActualizarPeriodos(SuccessMessageMixin, UpdateView):
+	model = periodos
+	form_class = PeriodosForm
+	template_name = "evaluaciones/ActualizaPeriodo.html"
+	success_message = "Periodo actualizado satisfactoriamente."
+	error_message = "El Periodo no se pudo actualizar, inténtelo nuevamente."
+
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:						
+			url = reverse_lazy('evaluaciones:crear_periodo',
+							  args=[self.kwargs['id']])
+		else:			
+			url = reverse_lazy('evaluaciones:listar_periodos',
+                            args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+
+class BorrarPeriodo(SuccessMessageMixin, DeleteView):
+	model = periodos
+	success_message = "Periodo borrado con exito"
+
+	def get_success_url(self):
+		empresa_id = self.kwargs['id']
+		print(self.request.POST)
+		if "Confirm" in self.request.POST:
+			url = reverse('evaluaciones:listar_periodos',
+						  kwargs={'pk': empresa_id})
+		else:
+			url = reverse('evaluaciones:listar_periodos',
+						  kwargs={'pk': empresa_id})
+		return url	
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+	def get_error_url(self):
+		error_url = reverse_lazy(
+			'evaluaciones:listar_periodos', args=[self.kwargs['id']])
+		if error_url:			
+			return error_url.format(**self.object.__dict__)
+		else:
+			raise ImproperlyConfigured(
+				"No error URL to redirect to. Provide a error_url.")
+	def delete(self, request, *args, **kwargs):		   
+		self.object = self.get_object()
+		success_url = self.get_success_url()
+		error_url = self.get_error_url()
+		try:
+			self.object.delete()
+			messages.add_message(request,messages.SUCCESS,'Exito, Periodo borrado exitosamente')				
+			return HttpResponseRedirect(success_url)
+		except models.ProtectedError:  			
+			messages.add_message(request,messages.WARNING,'info, Existen Empresas que dependen de este Periodo, el estado paso a inactivo.')
+			self.object.estado = False
+			self.object.save()
+			return HttpResponseRedirect(error_url)
+
+class activar_periodo(View):
+	def post(self,request,pk=None):
+		print(request.POST['empresa_id'])
+		empresa_id = request.POST['empresa_id']
+		messages.add_message(request,messages.SUCCESS,'info,Periodo activado')
+		success_url = reverse('evaluaciones:listar_periodos',
+						  kwargs={'pk': empresa_id})
+		periodo_ = request.POST['pk']
+		obj = periodos.objects.get(pk = periodo_)
+		if obj:
+			print(obj.estado)
+			obj.estado = True
+			obj.save()
+			print(obj.estado)		 
+		return HttpResponse(success_url)
