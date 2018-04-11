@@ -953,6 +953,29 @@ class CrearCriterio(SuccessMessageMixin, CreateView):
 		return context
 
 
+class ActualizarCriterios(SuccessMessageMixin, UpdateView):
+	model = criterios
+	form_class = CriteriosForm
+	template_name = "evaluaciones/ActualizaCriterio.html"
+	success_message = "Criterio actualizado satisfactoriamente."
+	error_message = "El Criterio no se pudo actualizar, inténtelo nuevamente."
+
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:						
+			url = reverse_lazy('evaluaciones:crear_criterio',
+							  args=[self.kwargs['id']])
+		else:			
+			url = reverse_lazy('evaluaciones:listar_criterios',
+                            args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+
+
 class ListarCriterios(ListView):
 	def get_queryset(self):
 		return criterios.objects.filter(empresa__pk=self.kwargs['pk'])
@@ -1326,6 +1349,22 @@ class activar_periodo(View):
 						  kwargs={'pk': empresa_id})
 		periodo_ = request.POST['pk']
 		obj = periodos.objects.get(pk = periodo_)
+		if obj:
+			print(obj.estado)
+			obj.estado = True
+			obj.save()
+			print(obj.estado)		 
+		return HttpResponse(success_url)
+
+class activar_criterio(View):
+	def post(self,request,pk=None):
+		print(request.POST['empresa_id'])
+		empresa_id = request.POST['empresa_id']
+		messages.add_message(request,messages.SUCCESS,'info,Criterio activado')
+		success_url = reverse('evaluaciones:listar_criterios',
+						  kwargs={'pk': empresa_id})
+		criterio_ = request.POST['pk']
+		obj = criterios.objects.get(pk = criterio_)
 		if obj:
 			print(obj.estado)
 			obj.estado = True

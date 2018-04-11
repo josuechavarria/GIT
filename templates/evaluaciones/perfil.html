@@ -215,11 +215,14 @@
 
  {% block script %}
 <script type="text/javascript">    
-    $(".datepicker").datepicker({
-        changeMonth: true,
-        changeYear: true,
-        yearRange: "1900:2012",
-        format: 'yyyy-mm-dd'
-        // You can put more options here.
-    });
+ $(document).ready(function () {
+     $(".datepicker").datepicker({
+         changeMonth: true,
+         changeYear: true,
+         yearRange: "1950:2018",
+         format: 'yyyy-mm-dd'
+         // You can put more options here.
+     });     
+ })
+    
 </script> {% endblock %}

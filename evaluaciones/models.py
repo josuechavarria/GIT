@@ -159,7 +159,7 @@ class evaluaciones(models.Model):
 	empresa = models.ForeignKey(empresas)
 	periodo = models.ForeignKey(periodos)
 	puesto = models.ForeignKey(puestos)
-	criterio = models.ForeignKey(criterios)
+	criterio = models.ForeignKey(criterios, on_delete=models.PROTECT)
 	ponderacion = models.DecimalField(max_digits=3, decimal_places=2)
 	porcentaje_meta = models.DecimalField(max_digits=3, decimal_places=2)
 	estado = models.BooleanField(default=True)
