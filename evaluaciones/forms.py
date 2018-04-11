@@ -64,7 +64,7 @@ class SucursalesForm(ModelForm):
 class CriteriosForm(ModelForm):
     class Meta:
         model = criterios
-        fields = ('nombre', 'descripcion', 'empresa','objetivo','periodo')
+        fields = ('empresa', 'nombre', 'descripcion','objetivo','periodo')
         widgets = {
             'empresa': Select(attrs={'class': 'form-control'}),            
             'nombre': TextInput(attrs={'class': 'form-control'}),
@@ -75,7 +75,7 @@ class CriteriosForm(ModelForm):
 class PeriodosForm(ModelForm):
     class Meta:
         model = periodos
-        fields = ('fecha_inico', 'fecha_fin', 'activo','empresa','tiempo')
+        fields = ('empresa','fecha_inico', 'fecha_fin','tiempo', 'activo')
         widgets = {
             'empresa': Select(attrs={'class': 'form-control'}), 
             'fecha_inico': forms.DateInput(attrs={'class':'datepicker'}),

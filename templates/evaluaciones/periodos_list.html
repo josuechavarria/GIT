@@ -45,8 +45,7 @@
                             <th>fecha Inicio</th>
                             <th>fecha Fin</th>
                             <th>Estado </th>
-                            <th>Empresa</th>
-                            <th>Duración</th>
+                            <th>Frecuencia</th>
                             <th>Opciones</th>
                         </tr>
                     </thead>
@@ -54,7 +53,7 @@
                     {% for periodo in object_list %}                   
                         <tr>
                             <td>{{periodo.id}}</td>
-                            <td>{{ periodo.fecha_inicio }}</td>
+                            <td>{{ periodo.fecha_inico }}</td>
                             <td>{{ periodo.fecha_fin}}</td>
                             {% if periodo.estado %}
                             <td>
@@ -68,8 +67,7 @@
                                 </a>
                             </td>                            
                              {% endif %}
-                            <td>{{ periodo.empresa}}</td>´
-                            <td>{{ periodo.tiempo}} Meses</td>                                                         
+                            <td>Cada {{ periodo.tiempo}} Meses</td>
                             <td>
                                  {% if periodo.estado %}
                                  {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}                                 
@@ -101,7 +99,6 @@
                             <th>fecha Inicio</th>
                             <th>fecha Fin</th>
                             <th>Estado </th>
-                            <th>Empresa</th>
                             <th>Duracion</th>
                             <th>Opciones</th>
                         </tr>
