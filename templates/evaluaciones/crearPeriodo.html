@@ -32,6 +32,7 @@
         <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Registrar periodos</h3>
+              <a href="{% url 'evaluaciones:listar_periodos' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar periodos</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
             <form role="form" id="form_" class="form-horizontal" enctype="multipart/form-data" method="post">
@@ -67,7 +68,6 @@
         var fecha = document.getElementById('id_fecha_inico').value;
        console.log('Probando')
        console.log('el valor es: ' + fecha)
-       alert(fecha)
 
     })
 $("#id_empresa").val("{{empresa.pk}}");

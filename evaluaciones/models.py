@@ -125,7 +125,7 @@ class periodos(models.Model):
 	fecha_fin = models.DateTimeField()
 	estado = models.BooleanField(default=True)
 	activo = models.NullBooleanField(default=True)
-	tiempo = models.IntegerField(default=3)
+	tiempo = models.IntegerField(default=1, verbose_name='Frecuencia de evaluaciones')
 	def get_year(self):
 		print(self.fecha_inicio.year)
 		return self.fecha_inico.year

@@ -930,7 +930,7 @@ class CrearCriterio(SuccessMessageMixin, CreateView):
 		if formulario.is_valid():
 			new_rec = formulario.save(commit = False)
 			# new_rec.periodo = periodos.objects.filter(empresa__pk = empresa_id).order_by('-pk')[:1][0].pk
-			new_rec.periodo = periodos.objects.get(pk = 2)
+			new_rec.periodo = periodos.objects.last()
 			new_rec.save()
 			messages.add_message(request,messages.SUCCESS,'Criterio Creado Exitosamente.')			
 		else:
