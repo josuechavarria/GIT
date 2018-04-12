@@ -1041,7 +1041,7 @@ class CrearPeriodos(SuccessMessageMixin, CreateView):
 			url = reverse_lazy('evaluaciones:crear_periodo',
 							   args=[self.kwargs['pk']])
 		else:
-			url = reverse_lazy('evaluaciones:listar_periodo',
+			url = reverse_lazy('evaluaciones:listar_periodos',
 							   args=[self.kwargs['pk']])
 		return url
 

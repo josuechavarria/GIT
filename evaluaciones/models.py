@@ -154,6 +154,9 @@ class criterios(models.Model):
 	objetivo = models.ForeignKey(objetivos,on_delete=models.PROTECT)
 	estado = models.BooleanField(default=True)
 
+	def __str__(self):
+		return self.nombre
+
 
 class evaluaciones(models.Model):
 	empresa = models.ForeignKey(empresas)
