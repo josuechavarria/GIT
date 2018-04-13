@@ -107,13 +107,19 @@
               <!-- User Account: style can be found in dropdown.less -->
               <li class="dropdown user user-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                   {% if bandera == 1 %}
                   <img src="{{request.session.picture}}" class="user-image" alt="User Image">
+                   {% else %}
+                  <img src="{% static "evaluaciones/dist/img/photo1.png" %}" class="user-image" alt="User Image">
+                  {% endif %}
                   <span class="hidden-xs">{{user.first_name}} {{user.last_name}}</span>
                 </a>
                 <ul class="dropdown-menu">
                   <!-- User image -->
                   <li class="user-header">
-                    <img src="{{request.session.picture}}" class="img-circle" alt="User Image">
+                     {% if bandera == 1 %}
+                    <img src="{{request.session.picture}}" class="img-circle" alt="User Image"> {% else %}
+                    <img src="{% static "evaluaciones/dist/img/photo1.png" %}" class="img-circle" alt="User Image"> {% endif %}
                     <p>
                       {{user.first_name}} {{user.last_name}} - {{colaborador.puesto}}
                       <small>Miembro desde {{ user.date_joined}} </small>
@@ -154,7 +160,11 @@
           <!-- Sidebar user panel -->
           <div class="user-panel">
             <div class="pull-left image">
+            {% if bandera == 1 %}
               <img src="{{request.session.picture}}" class="img-circle" alt="User Image">
+            {% else %}
+            <img src= "{% static "evaluaciones/dist/img/photo1.png" %}" class="img-circle" alt="User Image">
+            {% endif %}
             </div>
             <div class="pull-left info">
               <p>{{user.first_name}} {{user.last_name}}</p>

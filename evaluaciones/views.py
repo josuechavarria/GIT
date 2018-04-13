@@ -429,16 +429,19 @@ class EstadoUsuarioView(View):
 
 class IndexEmpresaView(View):
 	def get(self, request, pk=None):
+		bandera = False		
 		if perfil.objects.filter(usuario_id =request.user.id).exists():
 			print('hay algo')
 			p = perfil.objects.get(usuario_id=request.user.id)
 			print(p)
 			request.session['picture'] = p.foto.url
-		else: 
+			bandera =True
+		else: 			
 			print('no hay nada')
 		template_name = "evaluaciones/index_empresa.html"
 
-		ctx = {'empresa': empresas.objects.get(pk=pk)}
+		ctx = {'empresa': empresas.objects.get(pk=pk),
+			    'bandera': bandera}
 		return render(request, template_name, ctx)
 
 # Vistas para la creación
@@ -849,7 +852,6 @@ class Perfil_(View):
 		template_name = "evaluaciones/perfil.html"		
 		#perfil_ = None
 		# Si el colaborador ya tiene perfil ACTUALIZAR		
-		
 		if perfil.objects.filter(usuario_id =id).exists():			
 			colaborador = colaboradores.objects.get(usuario_id = request.user.id)		
 			perfil_ = perfil.objects.get(usuario_id =id)
