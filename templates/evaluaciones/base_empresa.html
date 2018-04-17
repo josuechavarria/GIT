@@ -110,7 +110,7 @@
                    {% if bandera == 1 %}
                   <img src="{{request.session.picture}}" class="user-image" alt="User Image">
                    {% else %}
-                  <img src="{% static "evaluaciones/dist/img/photo1.png" %}" class="user-image" alt="User Image">
+                  <img src="{% static "evaluaciones/dist/img/default.png" %}" class="user-image" alt="User Image">
                   {% endif %}
                   <span class="hidden-xs">{{user.first_name}} {{user.last_name}}</span>
                 </a>
@@ -119,7 +119,7 @@
                   <li class="user-header">
                      {% if bandera == 1 %}
                     <img src="{{request.session.picture}}" class="img-circle" alt="User Image"> {% else %}
-                    <img src="{% static "evaluaciones/dist/img/photo1.png" %}" class="img-circle" alt="User Image"> {% endif %}
+                    <img src="{% static "evaluaciones/dist/img/default.png" %}" class="img-circle" alt="User Image"> {% endif %}
                     <p>
                       {{user.first_name}} {{user.last_name}} - {{colaborador.puesto}}
                       <small>Miembro desde {{ user.date_joined}} </small>
@@ -163,7 +163,7 @@
             {% if bandera == 1 %}
               <img src="{{request.session.picture}}" class="img-circle" alt="User Image">
             {% else %}
-            <img src= "{% static "evaluaciones/dist/img/photo1.png" %}" class="img-circle" alt="User Image">
+            <img src= "{% static "evaluaciones/dist/img/default.png" %}" class="img-circle" alt="User Image">
             {% endif %}
             </div>
             <div class="pull-left info">
@@ -515,6 +515,29 @@
 
     <!-- AdminLTE for demo purposes -->
     <script src="{% static 'evaluaciones/dist/js/demo.js' %}"></script>
+    <div class="example-modal">
+    <div class="modal fade" id="myModalLoader">
+        <img style="width: 64px;
+    height:64px;
+    text-align: left;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left:-70px;
+    margin-top:-50px;" src="{% static 'evaluaciones/dist/img/loading.gif' %}">
+    </div>
+        <!-- /.modal -->
+    </div>
+    <script type="text/javascript">
+      $("#myModalLoader").modal()
+    </script>
+
+  </body>
+  <script type="text/javascript">
+    $( document ).ready(function() {
+        $("#myModalLoader").modal('hide')
+    });
+  </script>
   </body>
   {% block script %}
   {% endblock %}

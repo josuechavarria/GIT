@@ -245,15 +245,18 @@
     }
     function Reestablecer(url){
         var color;
+        $("#myModalLoader").modal();
         var request = $.ajax({
           method: "POST",
           url: url,
           data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
         })
         request.done(function(msg) {
+            $("#myModalLoader").modal('hide');
             alert(msg);
           });
         request.fail(function(jqXHR, textStatus) {
+            $("#myModalLoader").modal('hide');
             alert( "Reestablecer contraseña falló: " + textStatus);
           });
     }
