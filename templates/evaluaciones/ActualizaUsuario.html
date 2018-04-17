@@ -36,7 +36,7 @@
               <a href="{% url 'evaluaciones:listar_usuario' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar usuarios</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
-            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post" onsubmit="$('#id_empresa').removeAttr('disabled');">
+            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post" onsubmit="$('#myModalLoader').modal();$('#id_empresa').removeAttr('disabled');">
                 <div class="box-body">
                     {% csrf_token %} 
                     <div class="form-group">
