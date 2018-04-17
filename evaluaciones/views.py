@@ -442,6 +442,10 @@ class IndexEmpresaView(View):
 
 		ctx = {'empresa': empresas.objects.get(pk=pk),
 			    'bandera': bandera}
+		if colaboradores.objects.filter(usuario=request.user).exists():
+			request.session['puesto'] = colaboradores.objects.get(usuario=request.user).puesto.nombre
+		else:
+			request.session['puesto'] = 'Super Admin'
 		return render(request, template_name, ctx)
 
 # Vistas para la creación
