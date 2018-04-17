@@ -9,6 +9,12 @@
     {% load static %}
     <!-- Bootstrap 3.3.5 -->
     <link rel="stylesheet" href="{% static 'evaluaciones/bootstrap/css/bootstrap.min.css' %}">
+
+        <!-- jQuery 2.1.4 -->
+    <script src="{% static 'evaluaciones/plugins/jQuery/jQuery-2.1.4.min.js' %}"></script>
+
+    <!-- Bootstrap 3.3.5 -->
+    <script src="{% static 'evaluaciones/bootstrap/js/bootstrap.min.js' %}"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
     <!-- Ionicons -->
@@ -43,6 +49,22 @@
     <![endif]-->
   </head>
   <body class="hold-transition skin-blue sidebar-mini">
+        <div class="example-modal">
+    <div class="modal fade" id="myModalLoader">
+        <img style="width: 64px;
+    height:64px;
+    text-align: left;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left:-70px;
+    margin-top:-50px;" src="{% static 'evaluaciones/dist/img/loading.gif' %}">
+    </div>
+        <!-- /.modal -->
+    </div>
+    <script type="text/javascript">
+      $("#myModalLoader").modal();
+    </script>
     <div class="wrapper">
 
       <header class="main-header">
@@ -809,14 +831,9 @@
       <div class="control-sidebar-bg"></div>
     </div><!-- ./wrapper -->
 
-    <!-- jQuery 2.1.4 -->
-    <script src="{% static 'evaluaciones/plugins/jQuery/jQuery-2.1.4.min.js' %}"></script>
     <!-- jQuery UI 1.11.4 -->
-
     <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 
-    <!-- Bootstrap 3.3.5 -->
-    <script src="{% static 'evaluaciones/bootstrap/js/bootstrap.min.js' %}"></script>
     <!-- Morris.js charts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="{% static 'evaluaciones/plugins/morris/morris.min.js' %}"></script>
@@ -844,27 +861,11 @@
 
     <!-- AdminLTE for demo purposes -->
     <script src="{% static 'evaluaciones/dist/js/demo.js' %}"></script>
-    <div class="example-modal">
-    <div class="modal fade" id="myModalLoader">
-        <img style="width: 64px;
-    height:64px;
-    text-align: left;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-left:-70px;
-    margin-top:-50px;" src="{% static 'evaluaciones/dist/img/loading.gif' %}">
-    </div>
-        <!-- /.modal -->
-    </div>
-    <script type="text/javascript">
-      $("#myModalLoader").modal()
-    </script>
 
   </body>
   <script type="text/javascript">
     $( document ).ready(function() {
-        $("#myModalLoader").modal('hide')
+        $("#myModalLoader").modal('hide');
     });
   </script>
   {% block script %}
