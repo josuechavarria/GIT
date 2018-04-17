@@ -63,7 +63,7 @@
         <!-- /.modal -->
     </div>
     <script type="text/javascript">
-      $("#myModalLoader").modal();
+      //$("#myModalLoader").modal();
     </script>
     <div class="wrapper">
 
@@ -867,6 +867,9 @@
     $( document ).ready(function() {
         $("#myModalLoader").modal('hide');
     });
+    function disableSubmit(){
+      $(':input[type="submit"]').prop('disabled', true);
+    }
   </script>
   {% block script %}
   {% endblock %}

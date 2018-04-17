@@ -35,7 +35,7 @@
               <a href="{% url 'evaluaciones:listar_criterios' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar Criterios</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
-            <form role="form" class="form-horizontal" onsubmit="$('#id_empresa').removeAttr('disabled');" enctype="multipart/form-data" method="post">
+            <form role="form" class="form-horizontal" onsubmit="disableSubmit();$('#myModalLoader').modal();$('#id_empresa').removeAttr('disabled');" enctype="multipart/form-data" method="post">
                 <div class="box-body">
                     {% csrf_token %} 
                     {% for field in form %}
