@@ -24,7 +24,7 @@
               <a href="{% url 'evaluaciones:listar_objetivos' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar objetivos</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
-            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
+            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post" onsubmit="$('#myModalLoader').modal();">
                 <div class="box-body">
                     {% csrf_token %} 
                     {% for field in form %}

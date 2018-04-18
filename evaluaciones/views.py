@@ -371,8 +371,7 @@ class ActualizarUsuarioView(View):
 		objColaborador = colaboradores.objects.get(pk=pk)
 		formulario = usuariosForm(request.POST, instance=objColaborador)
 		error = False
-		objUser = objColaborador.usuario
-		
+		objUser = objColaborador.usuario		
 		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 1 and objUser.email ==request.POST['email']:
 			form = formulario.save(commit = False)
 			form.usuario_modificador = request.user
@@ -430,8 +429,23 @@ class EstadoUsuarioView(View):
 
 class IndexEmpresaView(View):
 	def get(self, request, pk=None):
+		bandera = False		
+		if perfil.objects.filter(usuario_id =request.user.id).exists():
+			print('hay algo')
+			p = perfil.objects.get(usuario_id=request.user.id)
+			print(p)
+			request.session['picture'] = p.foto.url
+			bandera =True
+		else: 			
+			print('no hay nada')
 		template_name = "evaluaciones/index_empresa.html"
-		ctx = {'empresa': empresas.objects.get(pk=pk)}
+
+		ctx = {'empresa': empresas.objects.get(pk=pk),
+			    'bandera': bandera}
+		if colaboradores.objects.filter(usuario=request.user).exists():
+			request.session['puesto'] = colaboradores.objects.get(usuario=request.user).puesto.nombre
+		else:
+			request.session['puesto'] = 'Super Admin'
 		return render(request, template_name, ctx)
 
 # Vistas para la creación
@@ -473,8 +487,11 @@ class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 #Listas, tablas
 
 
-class ListarEmpresas(ListView):
-	model = empresas
+class ListarEmpresas(ListView):	
+	def get_queryset(self):
+		print('usuario')
+		return empresas.objects.raw("SELECT e.*,count(c.id) colaboradores FROM evaluaciones_empresas e left outer join evaluaciones_colaboradores c on c.empresa_id = e.id group by e.id ")
+	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['now'] = timezone.now()		
@@ -829,17 +846,102 @@ class LoginView(View):
 
 class LogoutView(View):
 	def get(self, request):
-		logout(request)
+		logout(request)		
 		return HttpResponseRedirect('/accounts/login/')
 
 # Criterios
 
+class Perfil_(View):
+	def get(self, request,pk,id):		
+		template_name = "evaluaciones/perfil.html"		
+		#perfil_ = None
+		# Si el colaborador ya tiene perfil ACTUALIZAR		
+		if perfil.objects.filter(usuario_id =id).exists():			
+			colaborador = colaboradores.objects.get(usuario_id = request.user.id)		
+			perfil_ = perfil.objects.get(usuario_id =id)
+			form = PerfilForm(instance=perfil_)			
+			ctx = {'form':form,
+					'empresa': empresas.objects.get(pk = pk),
+					'perfil': perfil_,
+					'colaborador' : colaborador
+					}
+			ctx['foto'] = perfil_.foto
+			ctx['sexo'] = perfil_.sexo
+			ctx['bandera'] = 1
+			ctx['fecha_nacimiento'] = perfil_.fecha_nacimiento
+			ctx['pasa_tiempos'] = perfil_.pasa_tiempos
+		# Si el colaborador no tiene perfil , CREAR
+		else:
+			form = PerfilForm()
+			ctx = {'form':form,
+				'empresa': empresas.objects.get(pk = pk)}
+		return render(request, template_name, ctx)
+		
+	def post(self, request,id=None,pk=None):		
+		if 'Actualizar' in request.POST and perfil.objects.filter(usuario_id =id).exists():
+			perfil_ = perfil.objects.get(usuario_id =id)		
+			print('Actualizar')
+			formulario = PerfilForm(request.POST,request.FILES, instance = perfil_)			
+			print(request.FILES['foto'])
+			colaborador = colaboradores.objects.get(usuario_id = id)
+			empresa_pk = colaborador.empresa.pk
+			usuario_id = id	
+			url = reverse_lazy('evaluaciones:perfil_' , kwargs ={'pk' : pk, 'id' : id })		
+			if formulario.is_valid():
+				form = formulario.save(commit=False)
+				print('VALIDO')						
+				perfil_.save()
+				request.session['picture'] = perfil_.foto.url
+				messages.add_message(request, messages.SUCCESS,
+			                     "Datos Actualizados con Exito!")
+			else:
+				print('ERRONEO')
+				messages.add_message(request, messages.ERROR,
+			                     "Formulario contiene errores!!")
+		else:
+			print('otro')
+			formulario = PerfilForm(request.POST,request.FILES)
+			colaborador = colaboradores.objects.get(usuario_id = request.user.id)			
+			empresa_pk = colaborador.empresa.pk
+			empresa = empresas.objects.get(pk =empresa_pk )
+			usuario_id = request.user.id	
+			url = reverse_lazy('evaluaciones:perfil_' , kwargs ={'pk' : pk, 'id' : id })		
+			if formulario.is_valid():
+				print('Valido')				
+				form = formulario.save(commit=False)
+				form.colaborador_id = colaborador.pk
+				form.empresa = empresa
+				form.usuario = request.user
+				form.save()
+				messages.add_message(request, messages.SUCCESS,
+			                     "Perfil agregado con Exito!")	
+			else:
+				messages.add_message(request, messages.ERROR,
+			                     "Formulario contiene errores!!")
+		return HttpResponseRedirect(url)
+
+
 
 class CrearCriterio(SuccessMessageMixin, CreateView):
 	model = criterios
-	form_class = CriteriosForm
-	template_name = "evaluaciones/CrearCriterio.html"
-	success_message = "Criterio creado satisfactoriamente."
+	form_class = CriteriosForm	
+	template_name = "evaluaciones/crearCriterio.html"
+
+	def post(self,request,pk=None):
+		empresa_id = request.POST['empresa']
+		print(empresa_id)
+		formulario = CriteriosForm(request.POST)
+		success_url = reverse('evaluaciones:crear_criterio',
+						  kwargs={'pk': empresa_id})				
+		if formulario.is_valid():
+			new_rec = formulario.save(commit = False)
+			# new_rec.periodo = periodos.objects.filter(empresa__pk = empresa_id).order_by('-pk')[:1][0].pk
+			new_rec.periodo = periodos.objects.last()
+			new_rec.save()
+			messages.add_message(request,messages.SUCCESS,'Criterio Creado Exitosamente.')			
+		else:
+			messages.add_message(request,messages.ERROR,'Criterio Erroneo.')			
+		return HttpResponseRedirect(success_url)
 
 	def get_success_url(self, **kwargs):
 		print(self.request.POST)
@@ -854,6 +956,29 @@ class CrearCriterio(SuccessMessageMixin, CreateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+
+class ActualizarCriterios(SuccessMessageMixin, UpdateView):
+	model = criterios
+	form_class = CriteriosForm
+	template_name = "evaluaciones/ActualizaCriterio.html"
+	success_message = "Criterio actualizado satisfactoriamente."
+	error_message = "El Criterio no se pudo actualizar, inténtelo nuevamente."
+
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:						
+			url = reverse_lazy('evaluaciones:crear_criterio',
+							  args=[self.kwargs['id']])
+		else:			
+			url = reverse_lazy('evaluaciones:listar_criterios',
+                            args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
 		return context
 
 
@@ -906,14 +1031,15 @@ class BorrarCriterios(SuccessMessageMixin, DeleteView):
 # Periodos
 class CrearPeriodos(SuccessMessageMixin, CreateView):
 	model = periodos
+	print('Creando')
 	form_class = PeriodosForm
-	template_name = "evaluaciones/CrearPeriodo.html"
+	template_name = "evaluaciones/crearPeriodo.html"
 	success_message = "Periodo creado satisfactoriamente."
-
+	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
-		return context
+		return context        
 
 	def get_success_url(self, **kwargs):
 		print(self.request.POST)
@@ -921,7 +1047,7 @@ class CrearPeriodos(SuccessMessageMixin, CreateView):
 			url = reverse_lazy('evaluaciones:crear_periodo',
 							   args=[self.kwargs['pk']])
 		else:
-			url = reverse_lazy('evaluaciones:listar_periodo',
+			url = reverse_lazy('evaluaciones:listar_periodos',
 							   args=[self.kwargs['pk']])
 		return url
 
@@ -1136,4 +1262,118 @@ class activar_sucursal(View):
 			sucursal.estado = True
 			sucursal.save()
 			print(sucursal.estado)		 
+		return HttpResponse(success_url)
+
+class CrearPerfil(SuccessMessageMixin, CreateView):
+	model = perfil
+	form_class = PerfilForm
+	template_name = "evaluaciones/crearPerfil.html"
+	success_message = "Criterio creado satisfactoriamente."
+
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_perfil',
+							   args=[self.kwargs['pk']])				
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+
+
+class ActualizarPeriodos(SuccessMessageMixin, UpdateView):
+	model = periodos
+	form_class = PeriodosForm
+	template_name = "evaluaciones/ActualizaPeriodo.html"
+	success_message = "Periodo actualizado satisfactoriamente."
+	error_message = "El Periodo no se pudo actualizar, inténtelo nuevamente."
+
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:						
+			url = reverse_lazy('evaluaciones:crear_periodo',
+							  args=[self.kwargs['id']])
+		else:			
+			url = reverse_lazy('evaluaciones:listar_periodos',
+                            args=[self.kwargs['id']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+
+class BorrarPeriodo(SuccessMessageMixin, DeleteView):
+	model = periodos
+	success_message = "Periodo borrado con exito"
+
+	def get_success_url(self):
+		empresa_id = self.kwargs['id']
+		print(self.request.POST)
+		if "Confirm" in self.request.POST:
+			url = reverse('evaluaciones:listar_periodos',
+						  kwargs={'pk': empresa_id})
+		else:
+			url = reverse('evaluaciones:listar_periodos',
+						  kwargs={'pk': empresa_id})
+		return url	
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['id'])
+		return context
+	def get_error_url(self):
+		error_url = reverse_lazy(
+			'evaluaciones:listar_periodos', args=[self.kwargs['id']])
+		if error_url:			
+			return error_url.format(**self.object.__dict__)
+		else:
+			raise ImproperlyConfigured(
+				"No error URL to redirect to. Provide a error_url.")
+	def delete(self, request, *args, **kwargs):		   
+		self.object = self.get_object()
+		success_url = self.get_success_url()
+		error_url = self.get_error_url()
+		try:
+			self.object.delete()
+			messages.add_message(request,messages.SUCCESS,'Exito, Periodo borrado exitosamente')				
+			return HttpResponseRedirect(success_url)
+		except models.ProtectedError:  			
+			messages.add_message(request,messages.WARNING,'info, Existen Empresas que dependen de este Periodo, el estado paso a inactivo.')
+			self.object.estado = False
+			self.object.save()
+			return HttpResponseRedirect(error_url)
+
+class activar_periodo(View):
+	def post(self,request,pk=None):
+		print(request.POST['empresa_id'])
+		empresa_id = request.POST['empresa_id']
+		messages.add_message(request,messages.SUCCESS,'info,Periodo activado')
+		success_url = reverse('evaluaciones:listar_periodos',
+						  kwargs={'pk': empresa_id})
+		periodo_ = request.POST['pk']
+		obj = periodos.objects.get(pk = periodo_)
+		if obj:
+			print(obj.estado)
+			obj.estado = True
+			obj.save()
+			print(obj.estado)		 
+		return HttpResponse(success_url)
+
+class activar_criterio(View):
+	def post(self,request,pk=None):
+		print(request.POST['empresa_id'])
+		empresa_id = request.POST['empresa_id']
+		messages.add_message(request,messages.SUCCESS,'info,Criterio activado')
+		success_url = reverse('evaluaciones:listar_criterios',
+						  kwargs={'pk': empresa_id})
+		criterio_ = request.POST['pk']
+		obj = criterios.objects.get(pk = criterio_)
+		if obj:
+			print(obj.estado)
+			obj.estado = True
+			obj.save()
+			print(obj.estado)		 
 		return HttpResponse(success_url)

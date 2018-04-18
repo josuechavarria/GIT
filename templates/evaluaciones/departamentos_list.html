@@ -74,11 +74,18 @@
                         <td>{{ object.nombre }}</td>
                         <td>{{ object.empresa.nombre}}</td>
                         <td>
-                            <small class="label pull-center bg-red">Inactivo</small>
+                            <a href="#" id="id_{{object.pk}}" name="activar" onclick="modal('{{ object.pk }}')" data-toggle="tooltip" data-placement="top"
+                                title="Activar Departamento">
+                                <small class="label pull-center bg-red">Inactivo</small>
+                            </a>
                         </td>
-                        <td>
-                            <input type="checkbox" id="id_{{object.pk}}" name="activar" onclick="modal('{{ object.pk }}')" class="label-success"
-                                value="activar"> Activar
+                        <td> 
+                             {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}
+                            <a href="{% url 'evaluaciones:crear_departamento' empresa.pk%}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
+                                data-toggle="tooltip" data-placement="top" title="Agregar departamento">
+                                <i class="fa fa-plus"></i>
+                            </a> &nbsp;&nbsp;
+                             {% endif %}
                         </td>
                     </tr>
                     {% endif %}

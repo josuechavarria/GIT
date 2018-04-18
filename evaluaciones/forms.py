@@ -9,7 +9,6 @@ class usuariosForm(ModelForm):
         model = colaboradores
         exclude = ('usuario','usuario_creador', 'fecha_creacion', 'usuario_modificador', 'fecha_modificacion', 'fecha_ult_mod_password')
 
-
 class empresasForm(ModelForm):
     nombre = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
     rtn = forms.CharField(widget=forms.TextInput(attrs={'class':'form-control'}))
@@ -65,22 +64,22 @@ class SucursalesForm(ModelForm):
 class CriteriosForm(ModelForm):
     class Meta:
         model = criterios
-        fields = ('nombre', 'descripcion', 'empresa','objetivo','periodo')
+        fields = ('empresa', 'nombre', 'descripcion','objetivo','periodo')
         widgets = {
-            'empresa': Select(attrs={'class': 'form-control'}),
-            'periodo': Select(attrs={'class': 'form-control'}),
+            'empresa': Select(attrs={'class': 'form-control'}),            
             'nombre': TextInput(attrs={'class': 'form-control'}),
             'descripcion': TextInput(attrs={'class': 'form-control'}),            
             'objetivo': Select(attrs={'class': 'form-control'}),            
         }
+        exclude = ('periodo',)
 class PeriodosForm(ModelForm):
     class Meta:
         model = periodos
-        fields = ('fecha_inico', 'fecha_fin', 'activo','empresa','tiempo')
+        fields = ('empresa','fecha_inico', 'fecha_fin','tiempo', 'activo')
         widgets = {
             'empresa': Select(attrs={'class': 'form-control'}), 
-            'fecha_inico': forms.DateInput(attrs={'class':'datepicker'}),
-            'fecha_fin': forms.DateInput(attrs={'class':'datepicker'}),
+            'fecha_inico': forms.DateInput( format = '%Y-%m-%d',attrs={'class':'datepicker'}),
+            'fecha_fin': forms.DateInput( format = '%Y-%m-%d',attrs={'class':'datepicker'}),
             'activo': CheckboxInput(attrs={'class': 'checkbox'}),                      
             'tiempo': TextInput(attrs={'class': 'form-control'}),
         }
@@ -99,3 +98,16 @@ class objetivosFormEdit(ModelForm):
     class Meta:
         model = objetivos
         fields = ('nombre',)
+
+
+class PerfilForm(ModelForm):
+    CATEGORY_CHOICES = (('', '-----------------'), ('F', 'FEMENINO'), ('M', 'MASCULINO'),)
+    foto =  forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control'}))    
+    sexo = forms.ChoiceField(choices=CATEGORY_CHOICES, widget=forms.Select(
+        attrs={'class': 'form-control'}))
+    fecha_nacimiento = forms.CharField(widget=forms.DateInput( format = '%Y-%m-%d',attrs={'class': 'datepicker'}),required = False)                                      
+    pasa_tiempos = forms.CharField(widget=forms.Textarea(attrs={'class':'form-control'}))
+    class Meta:
+        model = perfil         
+        fields = ('foto','sexo','fecha_nacimiento','pasa_tiempos')        
+        

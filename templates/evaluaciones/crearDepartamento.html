@@ -35,7 +35,7 @@
               <a href="{% url 'evaluaciones:listar_departamento' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar departamentos</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
-            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
+            <form role="form" class="form-horizontal" enctype="multipart/form-data" onsubmit="$('#myModalLoader').modal();$('#id_empresa').removeAttr('disabled');" method="post">
                 <div class="box-body">
                     {% csrf_token %} 
                     {% for field in form %}
@@ -50,10 +50,10 @@
                 <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
                 <div class="box-footer">
                     <div class="col-md-3 col-md-offset-6">
-                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').removeAttr('disabled');" value="SaveNew"><i class="fa fa-save"></i>&nbsp;Guardar y nuevo</button>
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').removeAttr('disabled');" value="SaveNew"><i class="fa fa-save"></i>&nbsp;Guardar y nuevo</button>
                     </div>
                     <div class="col-md-3">
-                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').attr('disabled','disabled')" value="SaveList"><i class="fa fa-send"></i>&nbsp;Guardar y listar</button>
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').attr('disabled','disabled')" value="SaveList"><i class="fa fa-send"></i>&nbsp;Guardar y listar</button>
                     </div>
                 </div>
             </form>

@@ -125,7 +125,7 @@ class periodos(models.Model):
 	fecha_fin = models.DateTimeField()
 	estado = models.BooleanField(default=True)
 	activo = models.NullBooleanField(default=True)
-	tiempo = models.IntegerField(default=3)
+	tiempo = models.IntegerField(default=1, verbose_name='Frecuencia de evaluaciones')
 	def get_year(self):
 		print(self.fecha_inicio.year)
 		return self.fecha_inico.year
@@ -154,12 +154,15 @@ class criterios(models.Model):
 	objetivo = models.ForeignKey(objetivos,on_delete=models.PROTECT)
 	estado = models.BooleanField(default=True)
 
+	def __str__(self):
+		return self.nombre
+
 
 class evaluaciones(models.Model):
 	empresa = models.ForeignKey(empresas)
 	periodo = models.ForeignKey(periodos)
 	puesto = models.ForeignKey(puestos)
-	criterio = models.ForeignKey(criterios)
+	criterio = models.ForeignKey(criterios, on_delete=models.PROTECT)
 	ponderacion = models.DecimalField(max_digits=3, decimal_places=2)
 	porcentaje_meta = models.DecimalField(max_digits=3, decimal_places=2)
 	estado = models.BooleanField(default=True)

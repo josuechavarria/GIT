@@ -4,11 +4,12 @@
 <section class="content-header">
   <h1>
     Configuración
-    <small>{{empresa.nombre}}</small>
+    <small>Criterios</small>
   </h1>
   <ol class="breadcrumb">
     <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
-    <li class="active">Crear sucursal</li>
+    <li class="">Objetivos</li>
+    <li class="active">Actualizar empresa</li>
   </ol>
 </section>      
 {% endblock %}
@@ -17,30 +18,18 @@
     <!-- left column -->
     <div class="col-md-8">
         <!-- general form elements -->
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                      <i class="fa fa-close"></i>
-                    </button>
-                    <p></p>
-                    <strong><i class="fa fa-check"></i> Éxito! {{ message }}</strong> 
-                </div>
-
-            {% endfor %}
-        {% endif %}
         <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">Registrar sucursal</h3>
-              <a href="{% url 'evaluaciones:listar_sucursal' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar sucursales</a>
+              <h3 class="box-title">Actualizar Criterio</h3>
+              <a href="{% url 'evaluaciones:listar_criterios' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar Criterios</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
-            <form role="form" class="form-horizontal" enctype="multipart/form-data" onsubmit="disableSubmit();$('#myModalLoader').modal();$('#id_empresa').removeAttr('disabled');" method="post">
+            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post" onsubmit="$('#myModalLoader').modal();$('#id_empresa').removeAttr('disabled');">
                 <div class="box-body">
                     {% csrf_token %} 
                     {% for field in form %}
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="{{field.name}}"> {{field.label}} </label>
+                        <label class="col-sm-2 control-label" for="id_{{field.name}}"> {{field.label}} </label>
                         <div class="col-sm-10">
                             {{ field }}
                         </div>
@@ -64,7 +53,7 @@
 
 {% block script %}
 <script type="text/javascript">
-$("#id_empresa").val("{{empresa.pk}}");
-$("#id_empresa").attr('disabled','disabled');
+    $("#id_empresa").attr('disabled','disabled');
 </script>
+
 {% endblock %}

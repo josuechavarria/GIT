@@ -72,10 +72,18 @@
                             <td>{{ objetivo.id }}</td>
                             <td>{{ objetivo.nombre }}</td>
                             <td>                            
-                            <small class="label pull-center bg-red">Inactivo</small>
+                            <a href="#" id="id_{{objetivo.pk}}" name="activar" onclick="modal('{{ objetivo.pk }}')" data-toggle="tooltip" data-placement="top"
+                                title="Activar Objetivo">
+                                <small class="label pull-center bg-red">Inactivo</small>
+                            </a>
                             </td>
                             <td>
-                                <input type="checkbox" id="id_{{objetivo.pk}}"  name="activar" onclick="modal('{{ objetivo.pk }}')" class="label-success" value="activar"> Activar
+                                 {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}
+                                <a href="{% url 'evaluaciones:crear_objetivos' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
+                                    data-toggle="tooltip" data-placement="top" title="Agregar objetivo">
+                                    <i class="fa fa-plus text-green"></i>
+                                </a> &nbsp;&nbsp;
+                                {% endif %}                                
                             </td>
                         </tr>
                     {% endif %}

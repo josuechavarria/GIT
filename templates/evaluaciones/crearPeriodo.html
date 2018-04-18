@@ -32,14 +32,15 @@
         <div class="box box-primary">
             <div class="box-header with-border">
               <h3 class="box-title">Registrar periodos</h3>
+              <a href="{% url 'evaluaciones:listar_periodos' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar periodos</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
-            <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
+            <form role="form" id="form_" class="form-horizontal" enctype="multipart/form-data" onsubmit="disableSubmit();$('#myModalLoader').modal();$('#id_empresa').removeAttr('disabled');" method="post">
                 <div class="box-body">
                     {% csrf_token %} 
                     {% for field in form %}
                     <div class="form-group">
-                        <label class="col-sm-2 control-label" for="{{field.name}}"> {{field.label}} </label>
+                        <label class="col-sm-2 control-label" for="{{field.name}}" id="{{field.name}}"> {{field.label}} </label>
                         <div class="col-sm-10">
                             {{ field }}
                         </div>
@@ -49,10 +50,10 @@
                 <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
                 <div class="box-footer">
                     <div class="col-md-3 col-md-offset-6">
-                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').removeAttr('disabled');" value="SaveNew"><i class="fa fa-save"></i>&nbsp;Guardar y nuevo</button>
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').removeAttr('disabled');" value="SaveNew"><i class="fa fa-save"></i>&nbsp;Guardar y nuevo</button>
                     </div>
                     <div class="col-md-3">
-                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#id_empresa').removeAttr('disabled');$('#SaveNew').attr('disabled','disabled')" value="SaveList"><i class="fa fa-send"></i>&nbsp;Guardar y listar</button>
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').attr('disabled','disabled')" value="SaveList"><i class="fa fa-send"></i>&nbsp;Guardar y listar</button>
                     </div>
                 </div>
             </form>
@@ -63,13 +64,19 @@
 
 {% block script %}
 <script type="text/javascript">
+    $('#form_').on('submit', function (e) {
+        var fecha = document.getElementById('id_fecha_inico').value;
+       console.log('Probando')
+       console.log('el valor es: ' + fecha)
+
+    })
 $("#id_empresa").val("{{empresa.pk}}");
 $("#id_empresa").attr('disabled','disabled');
 $( ".datepicker" ).datepicker({
       changeMonth: true,
       changeYear: true,
       yearRange: "1900:2012",
-      Dateformat:'YYYY-MM-DD HH:mm:ss'
+      format:'yyyy-mm-dd'
       // You can put more options here.
     });
 </script>
