@@ -111,3 +111,23 @@ class PerfilForm(ModelForm):
         model = perfil         
         fields = ('foto','sexo','fecha_nacimiento','pasa_tiempos')        
         
+
+class EvaluacionesForm(ModelForm):
+    class Meta:
+        model = evaluaciones
+        fields = ('empresa','periodo', 'puesto','criterio', 'ponderacion','porcentaje_meta','estado')
+        widgets = {
+            'empresa': Select(attrs={'class': 'form-control'}), 
+            'periodo': Select(attrs={'class': 'form-control'}),
+            'puesto':  Select(attrs={'class': 'form-control'}), 
+            'criterio': Select(attrs={'class': 'form-control'}), 
+            'ponderacion': TextInput(attrs={'class': 'form-control'}),
+            'porcentaje': TextInput(attrs={'class': 'form-control'}) 
+        }
+        exclude = ('periodo','criterio', 'ponderacion','porcentaje_meta', 'estado')
+
+
+
+
+
+

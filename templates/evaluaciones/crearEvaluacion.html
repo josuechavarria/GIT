@@ -1,0 +1,238 @@
+{% extends 'evaluaciones/base_empresa.html' %}
+{% load static %}
+{% block pantalla %}
+<section class="content-header">
+  <h1>
+    Configuración
+    <small>{{empresa.nombre}}</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
+    <li class="active">Crear puesto</li>
+  </ol>
+</section>      
+{% endblock %}
+{% block content %}
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-11">
+        <!-- general form elements -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <i class="fa fa-close"></i>
+                    </button>
+                    <p></p>
+                    <strong><i class="fa fa-check"></i>{{ message }}</strong> 
+                </div>
+
+            {% endfor %}
+        {% endif %}
+        <div class="box box-primary">
+            <div class="box-header with-border">
+              <h3 class="box-title">Registrar Evaluacion</h3>
+              <a href="{% url 'evaluaciones:listar_criterios' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar Evaluaciones</a>
+            </div><!-- /.box-header -->
+                <!-- form start -->
+            <form role="form" class="form-horizontal" onsubmit="disableSubmit();$('#myModalLoader').modal();$('#id_empresa').removeAttr('disabled');" enctype="multipart/form-data" method="post">
+                <div class="box-body">
+                    {% csrf_token %} 
+                    {% for field in form %}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="{{field.name}}"> {{field.label}} </label>
+                        <div class="col-sm-10">
+                            {{ field }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Periodo</label>
+                        <div class="col-sm-4">
+                        <input type="text" class="form-control" placeholder="2018" disabled>
+                        </div>
+                        <label class="col-sm-2 control-label">Mes</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" placeholder="Enero" disabled>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="box box-success">
+                        <div class="box-header with-border">
+                            <p><strong><h2 class="box-title">Criterios a Evaluar</h2></strong></p>
+                        </div>
+                        <button class="btn btn-raised btn-success pull-left"  onclick="$('#SaveNew').removeAttr('disabled');" value="SaveNew">
+                            <i class="fa fa-save"></i>&nbsp;Agregar Criterio(s)</button>
+                        
+                        <button class="btn btn-raised btn-danger pull-left" onclick="$('#SaveNew').removeAttr('disabled');" value="SaveNew">
+                            <i class="fa fa-eraser"></i>&nbsp;Eliminar Criterio(s)</button>
+                        <div class="box-body">
+                            <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
+                                <div class="row">
+                                    <div class="col-sm-6"></div>
+                                    <div class="col-sm-6"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table id="example2" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+                                            <thead>
+                                                <tr role="row">
+                                                    <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending"
+                                                        aria-label="Rendering engine: activate to sort column descending">Seleccionar</th>
+                                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1"
+                                                        aria-label="Browser: activate to sort column ascending">Criterio</th>
+                                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1"
+                                                        aria-label="Platform(s): activate to sort column ascending">Descripcion</th>
+                                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1"
+                                                        aria-label="Engine version: activate to sort column ascending">Ponderación</th>                                                    
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr role="row" class="odd">
+                                                    <td class="sorting_1">
+                                                        <div class="col-sm-1">
+                                                            <input type="checkbox" class="checkbox">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        Contacto con Partners                                                        
+                                                    </td>
+                                                    <td>
+
+                                                    </td>
+                                                    <td>
+                                                        <div class="col-sm-1">
+                                                            <input type="text" class="form-control" value="20.0">
+                                                        </div>                                                    
+                                                    </td>
+                                                </tr>                                            
+
+                                                <tr role="row" class="odd">
+                                                    <td class="sorting_1">
+                                                        <div class="col-sm-1">
+                                                            <input type="checkbox" class="checkbox">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        Promedio Cumplimiento de agentes
+                                                    </td>
+                                                    <td>
+                                                        Meta de Afiliación Mensual
+                                                    </td>
+                                                    <td>
+                                                        <div class="col-sm-1">
+                                                            <input type="text" class="form-control" value="40.0">
+                                                        </div>
+                                                    </td>
+                                                </tr>
+
+                                                <tr role="row" class="odd">
+                                                    <td class="sorting_1">
+                                                        <div class="col-sm-1">
+                                                            <input type="checkbox" class="checkbox">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        Gestión de Mercadeo Directa
+                                                    </td>
+                                                    <td>
+                                                
+                                                    </td>
+                                                    <td>
+                                                        <div class="col-sm-1">
+                                                            <input type="text" class="form-control" value="20.0">
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr role="row" class="odd">
+                                                    <td class="sorting_1">
+                                                        <div class="col-sm-1">
+                                                            <input type="checkbox" class="checkbox">
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        Control de Calidad Call Center
+                                                    </td>
+                                                    <td>
+                                                        Documentación 2 llamadas semanales
+                                                    </td>
+                                                    <td>
+                                                        <div class="col-sm-1">
+                                                            <input type="text" class="form-control" value="20.0">
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th rowspan="1" colspan="1">Seleccionar</th>
+                                                    <th rowspan="1" colspan="1">Criterio</th>
+                                                    <th rowspan="1" colspan="1">Descripcion</th>
+                                                    <th rowspan="1" colspan="1">Ponderación</th>                                                    
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-5">
+                                        <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">Showing 1 to 10 of 57 entries</div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+                                            <ul class="pagination">
+                                                <li class="paginate_button previous disabled" id="example2_previous">
+                                                    <a href="#" aria-controls="example2" data-dt-idx="0" tabindex="0">Previous</a>
+                                                </li>
+                                                <li class="paginate_button active">
+                                                    <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">1</a>
+                                                </li>
+                                                <li class="paginate_button ">
+                                                    <a href="#" aria-controls="example2" data-dt-idx="2" tabindex="0">2</a>
+                                                </li>
+                                                <li class="paginate_button ">
+                                                    <a href="#" aria-controls="example2" data-dt-idx="3" tabindex="0">3</a>
+                                                </li>
+                                                <li class="paginate_button ">
+                                                    <a href="#" aria-controls="example2" data-dt-idx="4" tabindex="0">4</a>
+                                                </li>
+                                                <li class="paginate_button ">
+                                                    <a href="#" aria-controls="example2" data-dt-idx="5" tabindex="0">5</a>
+                                                </li>
+                                                <li class="paginate_button ">
+                                                    <a href="#" aria-controls="example2" data-dt-idx="6" tabindex="0">6</a>
+                                                </li>
+                                                <li class="paginate_button next" id="example2_next">
+                                                    <a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0">Next</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+                <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
+                <div class="box-footer">
+                    <div class="col-md-3 col-md-offset-6">
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').removeAttr('disabled');" value="SaveNew"><i class="fa fa-save"></i>&nbsp;Guardar y nuevo</button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').attr('disabled','disabled')" value="SaveList"><i class="fa fa-send"></i>&nbsp;Guardar y listar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock%}
+
+{% block script %}
+<script type="text/javascript">
+$("#id_empresa").val("{{empresa.pk}}");
+$("#id_empresa").attr('disabled','disabled');
+</script>
+{% endblock %}

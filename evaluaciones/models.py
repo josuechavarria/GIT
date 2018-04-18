@@ -157,7 +157,6 @@ class criterios(models.Model):
 	def __str__(self):
 		return self.nombre
 
-
 class evaluaciones(models.Model):
 	empresa = models.ForeignKey(empresas)
 	periodo = models.ForeignKey(periodos)
