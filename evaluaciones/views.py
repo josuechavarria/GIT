@@ -1377,3 +1377,26 @@ class activar_criterio(View):
 			obj.save()
 			print(obj.estado)		 
 		return HttpResponse(success_url)
+
+class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
+	model = evaluaciones
+	form_class = EvaluacionesForm
+	template_name = "evaluaciones/crearevaluacion.html"
+	success_message = "Evaluacion creado satisfactoriamente."
+	form_invalid_message = 'Error al crear la evaluacion por favor revise los datos'
+
+	def get_success_url(self, **kwargs):
+		print(self.request.POST)
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_evaluacion',
+							   args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_evaluacion',
+							   args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
