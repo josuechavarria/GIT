@@ -79,6 +79,8 @@ urlpatterns = [
     url(r'^usuario/actualizar/pass/(?P<pk>\d+)/(?P<id>\d+)/$', views.ExpiredPasswordView.as_view(), name='expired_password'),
     url(r'^roles/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesActualizarView.as_view(), name='actualiza_rol'),
     url(r'^roles/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesEliminarView.as_view(), name='estado_rol'),
+    url(r'^misevaluaciones/ver/(?P<pk>\d+)/$', views.ColaboradorMisEvaluaciones.as_view(), name='misevaluaciones'),
+    url(r'^evaluaciones/listar/(?P<pk>\d+)/$', views.SupervisorEvaluacionesList.as_view(), name='evaluacioneslist'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

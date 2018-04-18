@@ -1377,3 +1377,23 @@ class activar_criterio(View):
 			obj.save()
 			print(obj.estado)		 
 		return HttpResponse(success_url)
+
+class ColaboradorMisEvaluaciones(View):
+	def get(self,request,pk=None):
+		template_name = "evaluaciones/misEvaluaciones.html"
+		objEmpresa = empresas.objects.get(pk=pk)
+		ctx = {'empresa': objEmpresa}
+		return render(request, template_name, ctx)
+
+	def post(self,request,pk=None):
+		pass
+
+class SupervisorEvaluacionesList(View):
+	def get(self,request,pk=None):
+		template_name = "evaluaciones/supervisorEvaluacionesList.html"
+		objEmpresa = empresas.objects.get(pk=pk)
+		ctx = {'empresa': objEmpresa}
+		return render(request, template_name, ctx)
+
+	def post(self,request,pk=None):
+		pass
