@@ -1398,5 +1398,6 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk']).order_by('id')			
+		context['criterios'] = criterios_
 		return context
-
