@@ -80,8 +80,8 @@ urlpatterns = [
     url(r'^roles/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesActualizarView.as_view(), name='actualiza_rol'),
     url(r'^roles/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesEliminarView.as_view(), name='estado_rol'),
     url(r'^evaluaciones/crear/(?P<pk>\d+)/$', views.CrearEvaluacion.as_view(model=evaluaciones), name='crear_evaluacion'),
-    url(r'^evaluaciones/areglo/', views.evaluacion_arreglo.as_view(),
-        name='evaluacion_arreglo'),
+    url(r'^evaluaciones/guardar/', views.guardar_evaluacion.as_view(),
+        name='guardar_evaluacion'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

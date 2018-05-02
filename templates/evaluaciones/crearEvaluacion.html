@@ -36,7 +36,7 @@
               <a href="{% url 'evaluaciones:listar_criterios' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar Evaluaciones</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
-            <form role="form" class="form-horizontal" onsubmit="" enctype="multipart/form-data" method="post">
+            <form role="form" class="form-horizontal" id="form_evaluacion" onsubmit="" enctype="multipart/form-data" method="post">
                 <div class="box-body">
                     {% csrf_token %} 
                     {% for field in form %}
@@ -58,6 +58,7 @@
                         <div class="col-sm-4">
                             <input type="text" class="form-control" placeholder={{periodo.month_inicial}} disabled>
                         </div>
+                        <input type="text" id="periodo_id" value={{periodo.id}} hidden>
                     </div>                    
                     {% endfor %}
                      {% endif %}
@@ -70,7 +71,7 @@
                         <a class="btn btn-app" onclick="modal()">
                             <i class="fa fa-save"></i> Agregar Criterios
                         </a>
-                        <a class="btn btn-app" onclick="modal()">
+                        <a class="btn btn-app" id="quitar_">
                             <i class="fa fa-eraser"></i> Quitar Criterios
                         </a>                                           
                         
@@ -87,37 +88,18 @@
                                                 <tr role="row">
                                                     <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending"
                                                         aria-label="Rendering engine: activate to sort column descending">Seleccionar</th>
-                                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1"
+                                                    <th class="sorting" tabindex="1" aria-controls="example2" rowspan="1" colspan="1"
                                                         aria-label="Browser: activate to sort column ascending">Criterio</th>
-                                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1"
+                                                    <th class="sorting" tabindex="2" aria-controls="example2" rowspan="1" colspan="1"
                                                         aria-label="Platform(s): activate to sort column ascending">Descripcion</th>
-                                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1"
+                                                    <th class="sorting" tabindex="3" aria-controls="example2" rowspan="1" colspan="1"
                                                         aria-label="Engine version: activate to sort column ascending">Ponderación</th>                                                    
+                                                    <th class="sorting" tabindex="3" aria-controls="example2" rowspan="1" colspan="1" 
+                                                    aria-label="Engine version: activate to sort column ascending">Porcentaje Meta</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            {% if criterios %}
-                                            {% for criterio in criterios%}
-                                                <tr role="row" class="odd">
-                                                    <td class="sorting_1">
-                                                        <div class="col-sm-1">
-                                                            <input type="checkbox" class="checkbox">
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        {{ criterio.nombre }}
-                                                    </td>
-                                                    <td>
-                                                       {{ criterio.descripcion}}
-                                                    </td>
-                                                    <td>
-                                                        <div class="col-sm-1">
-                                                            <input type="text" class="form-control" value="20.0">
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
-                                            {% endif  %}
+                                           
                                             </tbody>
                                             <tfoot>
                                                 <tr>
@@ -125,46 +107,12 @@
                                                     <th rowspan="1" colspan="1">Criterio</th>
                                                     <th rowspan="1" colspan="1">Descripcion</th>
                                                     <th rowspan="1" colspan="1">Ponderación</th>                                                    
+                                                    <th rowspan="1" colspan="1">Porcentaje meta</th>
                                                 </tr>
                                             </tfoot>
                                         </table>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-5">
-                                        <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">Showing 1 to 10 of 57 entries</div>
-                                    </div>
-                                    <div class="col-sm-7">
-                                        <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
-                                            <ul class="pagination">
-                                                <li class="paginate_button previous disabled" id="example2_previous">
-                                                    <a href="#" aria-controls="example2" data-dt-idx="0" tabindex="0">Previous</a>
-                                                </li>
-                                                <li class="paginate_button active">
-                                                    <a href="#" aria-controls="example2" data-dt-idx="1" tabindex="0">1</a>
-                                                </li>
-                                                <li class="paginate_button ">
-                                                    <a href="#" aria-controls="example2" data-dt-idx="2" tabindex="0">2</a>
-                                                </li>
-                                                <li class="paginate_button ">
-                                                    <a href="#" aria-controls="example2" data-dt-idx="3" tabindex="0">3</a>
-                                                </li>
-                                                <li class="paginate_button ">
-                                                    <a href="#" aria-controls="example2" data-dt-idx="4" tabindex="0">4</a>
-                                                </li>
-                                                <li class="paginate_button ">
-                                                    <a href="#" aria-controls="example2" data-dt-idx="5" tabindex="0">5</a>
-                                                </li>
-                                                <li class="paginate_button ">
-                                                    <a href="#" aria-controls="example2" data-dt-idx="6" tabindex="0">6</a>
-                                                </li>
-                                                <li class="paginate_button next" id="example2_next">
-                                                    <a href="#" aria-controls="example2" data-dt-idx="7" tabindex="0">Next</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
+                                </div>                  
                             </div>
                         </div>
                         <!-- /.box-body -->
@@ -204,8 +152,9 @@
                             <tbody>
                                 {% if criterios %} {% for criterio in criterios%}
                                 <tr role="row" class="odd">
-                                    <td class="sorting_1" id="{{ criterio.id }}">
-                                       {{ criterio.id }}
+                                   
+                                    <td>                                         
+                                        {{ criterio.id }}
                                     </td>
                                     <td>
                                         {{ criterio.nombre }}
@@ -282,23 +231,36 @@
     //Manipulación da la tabla 
 
     $('#example2 tbody').on( 'click', 'tr', function () {        
-        $(this).toggleClass('selected');
-    } );
-  
+        $(this).toggleClass('selectedin');
+    } );   
+
+    $('#example1 tbody').on('click', 'tr', function () {
+            $(this).toggleClass('selectedout');
+        }); 
+  // Datos en la tabla Modal la tabla 1 , esta sirve de intercambio.
     $('#agregar_').click( function () {
-        var datos = tabla2.rows('.selected').data();
-        var arreglo_nuevos = [];
-        var a = " ";
-        var j = 1;
-        alert( tabla2.rows('.selected').data().length +' row(s) selected');
-        //console.log(datos)
+        var datos = tabla2.rows('.selectedin').data();        
         datos.each(function (value, index) {
             a = value
-            arreglo_nuevos.push(a.toString().split(",", 1))
-        });    
-        alert(arreglo_nuevos)
-        
+            tabla1.row.add([a[0],a[1],a[2], '<input type="number" value="0.00"  required  />', '<input type="number" value="20.00"  required />']).draw().node();
+
+        });
+        //quitar seleccionados y hacer intercambio, regresar al modal
+        tabla2.rows('.selectedin').remove().draw()    
+        // actualizartabla (arreglo_nuevos        
     } );
+
+    // Datos en la tabla principal la tabla 1 , esta sirve de intercambio.
+    $('#quitar_').click(function () {
+        var datos = tabla1.rows('.selectedout').data();
+        datos.each(function (value, index) {
+            a = value
+            tabla2.row.add([a[0], a[1], a[2]]).draw().node();
+        });
+        //quitar seleccionados y hacer intercambio, regresar al modal
+        tabla1.rows('.selectedout').remove().draw()
+        // actualizartabla (arreglo_nuevos      
+    });
 
     function modal(criterio_id) {       
         $('#myModal').modal();
@@ -307,22 +269,64 @@
     var array = [];    
         // actualizartabla(array)
     }
-    function actualizartabla(arreglo) {        
-        console.log('intentaremos guardar');
-              $.ajax({
+
+     var puesto = document.getElementById("id_puesto");
+     var puesto_id = 0;
+     puesto.addEventListener('change',
+            function () {
+                var selectedOption = this.options[puesto.selectedIndex];
+                console.log(selectedOption.value );
+                puesto_id = selectedOption.value;
+            });
+
+  
+    $('#form_evaluacion').on('submit', function (e) {
+        e.preventDefault();               
+        console.log('Guardando')
+        var datos = tabla1.rows().data();
+        var arreglo_nuevos = [];
+        datos.each(function (value, index) {
+            a = value            
+            //arreglo_nuevos.push(a.toString().split(",", 1))
+            arreglo_nuevos.push(a.toString())
+        });
+        for (let index = 0; index < arreglo_nuevos.length; index++) {            
+            const element = arreglo_nuevos[index];
+            const primer_reemplazo = element.replace('<input type="number" value="', '')                  
+            const segundo_reemplazo = primer_reemplazo.replace('"  required  />', '') 
+            const tercer_reemplazo = segundo_reemplazo.replace('<input type="number" value="', '')   
+            arreglo_nuevos[index] = tercer_reemplazo.replace('"  required />', '') 
+            alert(arreglo_nuevos)
+        }
+        alert(arreglo_nuevos)
+        guardar(arreglo_nuevos, puesto_id)
+    })
+      function guardar(arreglo_nuevos, puesto_id) {
+           periodo_id = document.getElementById('periodo_id').value
+           console.log(periodo_id);
+            console.log('intentaremos guardar');
+            console.log(puesto_id)
+            arreglo = []
+            $.ajax({
                 method: "POST",
-                url: "{% url 'evaluaciones:evaluacion_arreglo' %}",
-                data: { array: arreglo, csrfmiddlewaretoken: '{{ csrf_token }}', empresa_id: '{{ empresa.pk }}' }
+                url: "{% url 'evaluaciones:guardar_evaluacion' %}",
+                data: { 
+                    'array[]': arreglo_nuevos,
+                    'puesto_id' : puesto_id, 
+                    csrfmiddlewaretoken: '{{ csrf_token }}', 
+                    empresa_id: '{{ empresa.pk }}',
+                    periodo_id: periodo_id }
             }).done(function (msg) {
                 location.reload();
             });
-        }
+        } 
     
 $("#id_empresa").val("{{empresa.pk}}");
 $("#id_empresa").attr('disabled','disabled');
 </script>
 
 <style>
-    tr.selected{background-color:#ecf0f1}
+    tr.selectedin{background-color:#1dd1a1}
+    tr.selectedout{background-color:#ff6b6b}
    </style>
 {% endblock %}

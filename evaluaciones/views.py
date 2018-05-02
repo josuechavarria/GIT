@@ -1383,10 +1383,10 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	form_class = EvaluacionesForm
 	template_name = "evaluaciones/crearevaluacion.html"
 	success_message = "Evaluacion creado satisfactoriamente."
-	form_invalid_message = 'Error al crear la evaluacion por favor revise los datos'
-
-	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+	form_invalid_message = 'Error al crear la evaluacion por favor revise los datos'	
+	
+	
+	def get_success_url(self, **kwargs):				
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_evaluacion',
 							   args=[self.kwargs['pk']])
@@ -1404,24 +1404,17 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 		context['periodos'] = periodo		
 		return context
 
+class guardar_evaluacion(View):
+	def post(self,request,pk=None):
+		print(request.POST)
+		print(request.POST.getlist('array[]'))
 
-class evaluacion_arreglo(View):
-	def post(self, request, pk=None):
-		print('haciendo post')
-		a_list = [1,2,3,4,5,6]
-		print(a_list)
-		print(request.POST['array'])				
-		empresa_id = request.POST['pk']
-
-		obj = empresas.objects.get(pk=empresa_id)
-		if request.POST['bandera'] == '1':
-			mensaje = 'Desactivada'
-			obj.estado = False
-		else:
-			mensaje = 'Activada'
-			obj.estado = True
-		obj.save()
-		mensaje_ = 'Empresa ' + mensaje + ' con exito.'
-		messages.add_message(request, messages.SUCCESS, mensaje_)
-		success_url = reverse('evaluaciones:crear_evaluacion')
+		for objeto in request.POST.getlist('array[]'):
+			print(objeto[0][0])
+		empresa_id = request.POST['empresa_id']
+		messages.add_message(request,messages.SUCCESS,'info,Evaluación Creada con exito')
+		success_url = reverse('evaluaciones:listar_criterios',
+						  kwargs={'pk': empresa_id})
 		return HttpResponse(success_url)
+
+	
