@@ -32,11 +32,11 @@
 
         <div class="box box-primary">
             <div class="box-header with-border">
-              <h3 class="box-title">Registrar Evaluacion</h3>
+              <h3 class="box-title">Registrar Evaluacion</h3>              
               <a href="{% url 'evaluaciones:listar_criterios' empresa.pk %}" class="btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar Evaluaciones</a>
             </div><!-- /.box-header -->
                 <!-- form start -->
-            <form role="form" class="form-horizontal" onsubmit="disableSubmit();$('#myModalLoader').modal();$('#id_empresa').removeAttr('disabled');" enctype="multipart/form-data" method="post">
+            <form role="form" class="form-horizontal" onsubmit="" enctype="multipart/form-data" method="post">
                 <div class="box-body">
                     {% csrf_token %} 
                     {% for field in form %}
@@ -47,27 +47,33 @@
                         </div>
                     </div>
                     {% endfor %}
+                    {% if periodos %}
+                    {% for periodo in periodos %}
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Periodo</label>
                         <div class="col-sm-4">
-                        <input type="text" class="form-control" placeholder="2018" disabled>
-                        </div>
+                        <input type="text" class="form-control" placeholder={{periodo.year}} disabled>
+                        </div>                        
                         <label class="col-sm-2 control-label">Mes</label>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" placeholder="Enero" disabled>
+                            <input type="text" class="form-control" placeholder={{periodo.month_inicial}} disabled>
                         </div>
-                    </div>
+                    </div>                    
+                    {% endfor %}
+                     {% endif %}
                     <br>
                     <br>
                     <div class="box box-success">
                         <div class="box-header with-border">
                             <p><strong><h2 class="box-title">Criterios a Evaluar</h2></strong></p>
-                        </div>                        
-                        <button class="btn btn-raised btn-success pull-left"  onclick="modal('{{ criterio.id }}')" value="">
-                            <i class="fa fa-save"></i>&nbsp;Agregar Criterio(s)</button>
+                        </div>  
+                        <a class="btn btn-app" onclick="modal()">
+                            <i class="fa fa-save"></i> Agregar Criterios
+                        </a>
+                        <a class="btn btn-app" onclick="modal()">
+                            <i class="fa fa-eraser"></i> Quitar Criterios
+                        </a>                                           
                         
-                        <button class="btn btn-raised btn-danger pull-left" onclick="$('#SaveNew').removeAttr('disabled');" value="SaveNew">
-                            <i class="fa fa-eraser"></i>&nbsp;Eliminar Criterio(s)</button>
                         <div class="box-body">
                             <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
                                 <div class="row">
@@ -76,7 +82,7 @@
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <table id="example2" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+                                        <table id="example1" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
                                             <thead>
                                                 <tr role="row">
                                                     <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending"
@@ -182,20 +188,51 @@
     <div class="modal fade" id="myModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="location.reload();">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h4 class="modal-title">Activar Criterio</h4>
-                </div>
-                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">
-                    <div class="box-body">
-                        <p>Esta seguro que desea activar el Criterio seleccionado?
+                <div class="modal-header">                   
+                    <div class="col-sm-12">
+                        <br>
+                        <br>
+                        <br>
+                        <table id="example2" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+                            <thead>
+                                <tr role="row">
+                                    <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Seleccionar</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Criterio</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Descripcion</th>                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if criterios %} {% for criterio in criterios%}
+                                <tr role="row" class="odd">
+                                    <td class="sorting_1" id="{{ criterio.id }}">
+                                       {{ criterio.id }}
+                                    </td>
+                                    <td>
+                                        {{ criterio.nombre }}
+                                    </td>
+                                    <td>
+                                        {{ criterio.descripcion}}
+                                    </td>
+                                </tr>
+                                {% endfor %} {% endif %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th rowspan="1" colspan="1">Seleccionar</th>
+                                    <th rowspan="1" colspan="1">Criterio</th>
+                                    <th rowspan="1" colspan="1">Descripcion</th>
+                                </tr>
+                            </tfoot>
+                        </table>
                     </div>
+                </div>
+                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">                  
                     <div class="box-footer">
-                        <div class="col-md-3 col-md-offset-6">
-                            <button class="btn btn-raised btn-success pull-left" id="activar_" type="submit" onclick="" value="Confirm">
-                                <i class="fa fa-eraser"></i>&nbsp;Activar</button>
+                        <div class="col-md-3 col-md-offset-6">                          
+                            
+                                <a class="btn btn-app" onclick="criterios()"  id="agregar_">
+                                    <i class="fa fa-save"></i> Agregar Criterios
+                                </a>
                         </div>
                     </div>
                 </form>
@@ -209,15 +246,83 @@
 {% endblock%}
 
 {% block script %}
+<script src="{% static 'evaluaciones/plugins/jQueryUI/jquery-ui.js' %}"></script>
+<script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script type="text/javascript">
-    function modal(criterio_id) {
-        console.log(criterio_id)
+    var tabla1 = $("#example1").DataTable({
+        "language": {
+            "lengthMenu": "Mostrar _MENU_ registros por pagina",
+            "search": "Buscar:",
+            "zeroRecords": "Ningún Registro encontrado",
+            "info": "Mostrando pagina _PAGE_ de _PAGES_",
+            "infoEmpty": "Registros no disponibles",
+            "infoFiltered": "(filtrado de  _MAX_ registros totales)",
+            "paginate": {
+                "previous": "Anterior",
+                "next": "Siguiente"
+            }
+        }
+    });
+
+    var tabla2 = $("#example2").DataTable({
+        "language": {
+            "lengthMenu": "Mostrar _MENU_ registros por pagina",
+            "search": "Buscar:",
+            "zeroRecords": "Ningún Registro encontrado",
+            "info": "Mostrando pagina _PAGE_ de _PAGES_",
+            "infoEmpty": "Registros no disponibles",
+            "infoFiltered": "(filtrado de  _MAX_ registros totales)",
+            "paginate": {
+                "previous": "Anterior",
+                "next": "Siguiente"
+            }
+        }
+    });
+    //Manipulación da la tabla 
+
+    $('#example2 tbody').on( 'click', 'tr', function () {        
+        $(this).toggleClass('selected');
+    } );
+  
+    $('#agregar_').click( function () {
+        var datos = tabla2.rows('.selected').data();
+        var arreglo_nuevos = [];
+        var a = " ";
+        var j = 1;
+        alert( tabla2.rows('.selected').data().length +' row(s) selected');
+        //console.log(datos)
+        datos.each(function (value, index) {
+            a = value
+            arreglo_nuevos.push(a.toString().split(",", 1))
+        });    
+        alert(arreglo_nuevos)
+        
+    } );
+
+    function modal(criterio_id) {       
         $('#myModal').modal();
-        $('#form_modal').on('submit', function (e) {
-            activar(criterio_id);
-        })
     };
+    function criterios(a) {
+    var array = [];    
+        // actualizartabla(array)
+    }
+    function actualizartabla(arreglo) {        
+        console.log('intentaremos guardar');
+              $.ajax({
+                method: "POST",
+                url: "{% url 'evaluaciones:evaluacion_arreglo' %}",
+                data: { array: arreglo, csrfmiddlewaretoken: '{{ csrf_token }}', empresa_id: '{{ empresa.pk }}' }
+            }).done(function (msg) {
+                location.reload();
+            });
+        }
+    
 $("#id_empresa").val("{{empresa.pk}}");
 $("#id_empresa").attr('disabled','disabled');
 </script>
+
+<style>
+    tr.selected{background-color:#ecf0f1}
+   </style>
 {% endblock %}

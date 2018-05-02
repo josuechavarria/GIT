@@ -1398,6 +1398,30 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
-		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk']).order_by('id')			
+		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk']).order_by('id')
+		periodo = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]
 		context['criterios'] = criterios_
+		context['periodos'] = periodo		
 		return context
+
+
+class evaluacion_arreglo(View):
+	def post(self, request, pk=None):
+		print('haciendo post')
+		a_list = [1,2,3,4,5,6]
+		print(a_list)
+		print(request.POST['array'])				
+		empresa_id = request.POST['pk']
+
+		obj = empresas.objects.get(pk=empresa_id)
+		if request.POST['bandera'] == '1':
+			mensaje = 'Desactivada'
+			obj.estado = False
+		else:
+			mensaje = 'Activada'
+			obj.estado = True
+		obj.save()
+		mensaje_ = 'Empresa ' + mensaje + ' con exito.'
+		messages.add_message(request, messages.SUCCESS, mensaje_)
+		success_url = reverse('evaluaciones:crear_evaluacion')
+		return HttpResponse(success_url)
