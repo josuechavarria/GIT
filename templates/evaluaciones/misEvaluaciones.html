@@ -91,6 +91,8 @@
                   </tr>
                 </thead>
                 <tbody>
+                <form id="form_evaluacion" method="POST">
+                  {%csrf_token%}
                 {% regroup criterios by criterio.objetivo as criterios_list %}
                   {% for criterio in criterios_list %}
                    <tr style="background-color: #3C8DBC; color: white; text-align: center;">
@@ -101,7 +103,7 @@
                       <td>{{c.criterio.nombre}}</td>
                       <td>{{c.criterio.descripcion}}</td>
                       <td>{{c.ponderacion}}</td>
-                      <td><input type="text" id="id_porcentaje_{{c.id}}_{{colaborador.pk}}" onKeyUp="CalcularNota({{c.id}},{{colaborador.pk}},'{{c.porcentaje_meta}}','{{c.ponderacion}}',$(this).val())" size="5"></td>
+                      <td><input type="text" id="id_porcentaje_{{c.id}}_{{colaborador.pk}}" name="porcentaje_{{c.id}}_{{colaborador.pk}}" onKeyUp="CalcularNota({{c.id}},{{colaborador.pk}},'{{c.porcentaje_meta}}','{{c.ponderacion}}',$(this).val())" size="5" {% if 'evaluaciones.evaluaciones_ingresar_cualitativos' not in perms and 'cualitativos' in criterio.grouper.nombre|lower %}disabled="disabled"{% else %} required {% endif %} required></td>
                       <td><strong id="id_nota_{{c.id}}_{{colaborador.pk}}">0.00</strong></td>
                     </tr>
                     {% endfor %}
@@ -123,6 +125,7 @@
               <button class="btn btn-primary pull-right" style="margin-right: 5px;" disabled><i class="fa fa-download"></i> Generar excel</button>
             </div>
           </div>
+          </form>
         </section><!-- /.content -->
         <div class="clearfix"></div>
 
