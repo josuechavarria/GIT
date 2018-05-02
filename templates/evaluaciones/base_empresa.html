@@ -285,6 +285,7 @@
               </ul>
             </li>
             {% endif %}
+            {% if 'evaluaciones.evaluaciones_mis_evaluaciones' in perms %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-list"></i> <span>Mis Evaluaciones <small class="label pull-right bg-green">1</small></span> 
@@ -294,6 +295,8 @@
                 <li><a href="{% url 'evaluaciones:listar_criterios' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
               </ul>
             </li>
+            {% endif %}
+            {% if 'evaluaciones.evaluaciones_ingresar_cualitativos' in perms %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-users"></i> <span>Colaboradores <small class="label pull-right bg-blue">7</small></span> 
@@ -302,6 +305,7 @@
                 <li class="active"><a href="{% url 'evaluaciones:evaluacioneslist' pk=empresa.pk %}"><i class="fa fa-circle-o"></i>Evaluaciones disponibles</a> </li>
               </ul>
             </li>
+            {% endif %}
           {% endif %}
           </ul>
         </section>

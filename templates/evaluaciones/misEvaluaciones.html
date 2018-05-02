@@ -54,25 +54,25 @@
             <div class="col-xs-12">
               <h2 class="page-header">
                 <i class="fa fa-star-half-empty"></i> Evaluación del colaborador
-                <p class="pull-right">Período a evaluar: Abril/2018</p>
+                <p class="pull-right">Período a evaluar: {{ periodo.fecha_fin|date:"F/Y" }}</p>
               </h2>
             </div><!-- /.col -->
           </div>
           <!-- info row -->
           <div class="row invoice-info">
             <div class="col-sm-4 invoice-col">
-              Enviada por:
+              Creada por:
               <address>
-                <strong>Carlos Zapata</strong><br>
+                <strong>{{colaborador.nombre_completo}}</strong><br>
                 <br>
                 Puesto<br>
-                <strong>Oficial de desarrollo</strong><br>
+                <strong>{{colaborador.puesto}}</strong><br>
               </address>
             </div><!-- /.col -->
             <div class="col-sm-4 invoice-col">
               Supervisor
               <address>
-                <strong>Roberto Zúniga</strong><br>
+                <strong>{{colaborador.supervisor.nombre_completo}}</strong><br>
               </address>
             </div><!-- /.col -->
           </div><!-- /.row -->
@@ -91,58 +91,24 @@
                   </tr>
                 </thead>
                 <tbody>
+                {% regroup criterios by criterio.objetivo as criterios_list %}
+                  {% for criterio in criterios_list %}
                    <tr style="background-color: #3C8DBC; color: white; text-align: center;">
-                    <td colspan="5"><strong>Aspectos Cualitativos</strong></td>
+                    <td colspan="5"><strong>{{ criterio.grouper }}</strong></td>
                   </tr>
-                  <tr>
-                    <td>Calidad de servicio</td>
-                    <td>De acuerdo a cada puesto</td>
-                    <td>10.00</td>
-                    <td><input type="text" size="5"></td>
-                    <td>10.00</td>
-                  </tr>
-                  <tr>
-                    <td>Puntualidad</td>
-                    <td>Llegadas tarde o ausencias sin previo aviso</td>
-                    <td>10.00</td>
-                    <td><input type="text" size="5"></td>
-                    <td>10.00</td>
-                  </tr>
-                  <tr>
-                    <td>Compañerismo</td>
-                    <td>Nota de acuerdo al clima laboral</td>
-                    <td>10.00</td>
-                    <td><input type="text" size="5"></td>
-                    <td>10.00</td>
-                  </tr>
-                  <tr>
-                    <td>Cumplimiento</td>
-                    <td>Deacuerdo a cada puesto</td>
-                    <td>10.00</td>
-                    <td><input type="text" size="5"></td>
-                    <td>10.00</td>
-                  </tr>
-                  <!-- Cuantitativos -->
-                  <tr style="background-color: #3C8DBC; color: white; text-align: center;">
-                    <td colspan="5"><strong>Aspectos Cuantitativos</strong></td>
-                  </tr>
-                  <tr>
-                    <td>Emisión de pólizas en tiempo</td>
-                    <td>90% emitidas en verde</td>
-                    <td>30.00</td>
-                    <td>100.00</td>
-                    <td>30.00</td>
-                  </tr>
-                  <tr>
-                    <td>Emisión de endosos en tiempo</td>
-                    <td>90% emitidas en verde</td>
-                    <td>30.00</td>
-                    <td>100.00</td>
-                    <td>30.00</td>
-                  </tr>
+                    {% for c in criterio.list %}
+                    <tr>
+                      <td>{{c.criterio.nombre}}</td>
+                      <td>{{c.criterio.descripcion}}</td>
+                      <td>{{c.ponderacion}}</td>
+                      <td><input type="text" id="id_porcentaje_{{c.id}}_{{colaborador.pk}}" onKeyUp="CalcularNota({{c.id}},{{colaborador.pk}},'{{c.porcentaje_meta}}','{{c.ponderacion}}',$(this).val())" size="5"></td>
+                      <td><strong id="id_nota_{{c.id}}_{{colaborador.pk}}">0.00</strong></td>
+                    </tr>
+                    {% endfor %}
+                  {% endfor %}
                   <tr>
                     <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
-                    <td colspan="1">100.00</td>
+                    <td colspan="1"><strong id="id_total_{{colaborador.pk}}">0.00</strong></td>
                   </tr>
                 </tbody>
               </table>
@@ -166,5 +132,34 @@
 <script type="text/javascript">
 $("#id_empresa").val("{{empresa.pk}}");
 $("#id_empresa").attr('disabled','disabled');
+
+function CalcularNota(id1, id2, pm, pon, p){
+  var porcentaje_meta = pm
+  var porcentaje_final = 0.0
+  var ponderacion = pon
+  var nota = 0.0
+  if((p/porcentaje_meta)<1){
+    porcentaje_final = (p/porcentaje_meta)*100
+  }else{
+    porcentaje_final = 100
+  }
+  nota = ponderacion*porcentaje_final/100
+  nota = parseFloat(Math.round(nota*100)/100).toFixed(2)
+  $("#id_nota_"+id1+"_"+id2).html(nota)
+  RecalcularTotal()
+  //alert(ponderacion)
+}
+
+function RecalcularTotal(){
+  var total = 0.0
+  {% regroup criterios by criterio.objetivo as criterios_list %}
+    {% for criterio in criterios_list %}
+      {% for c in criterio.list %}
+        //alert($("#id_nota_{{c.id}}_{{colaborador.pk}}").text())
+        total = parseFloat(total) + parseFloat($("#id_nota_{{c.id}}_{{colaborador.pk}}").text())
+      {% endfor %}
+    {% endfor %}
+  $("#id_total_{{colaborador.pk}}").html(parseFloat(Math.round(total*100)/100).toFixed(2))
+}
 </script>
 {% endblock %}

@@ -1382,7 +1382,13 @@ class ColaboradorMisEvaluaciones(View):
 	def get(self,request,pk=None):
 		template_name = "evaluaciones/misEvaluaciones.html"
 		objEmpresa = empresas.objects.get(pk=pk)
-		ctx = {'empresa': objEmpresa}
+		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objColaborador = colaboradores.objects.get(usuario=request.user)
+		objPeriodo = objEvaluaciones[0].periodo
+		ctx = {'empresa': objEmpresa,
+		'criterios' : objEvaluaciones,
+		'colaborador' : objColaborador,
+		'periodo' : objPeriodo}
 		return render(request, template_name, ctx)
 
 	def post(self,request,pk=None):
