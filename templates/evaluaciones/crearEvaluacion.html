@@ -242,8 +242,7 @@
         var datos = tabla2.rows('.selectedin').data();        
         datos.each(function (value, index) {
             a = value
-            tabla1.row.add([a[0],a[1],a[2], '<input type="number" value="0.00"  required  />', '<input type="number" value="20.00"  required />']).draw().node();
-
+            tabla1.row.add([a[0],a[1],a[2], '<input type="text" id="p'+ a[0]+ '" required  />', '<input type="text"  id="m' + a[0] + '" required />']).draw().node();
         });
         //quitar seleccionados y hacer intercambio, regresar al modal
         tabla2.rows('.selectedin').remove().draw()    
@@ -272,6 +271,7 @@
 
      var puesto = document.getElementById("id_puesto");
      var puesto_id = 0;
+     
      puesto.addEventListener('change',
             function () {
                 var selectedOption = this.options[puesto.selectedIndex];
@@ -280,38 +280,34 @@
             });
 
   
-    $('#form_evaluacion').on('submit', function (e) {
-        e.preventDefault();               
-        console.log('Guardando')
-        var datos = tabla1.rows().data();
+    $('#form_evaluacion').on('submit', function (e) {        
+        e.preventDefault()                
+        var datos = tabla1.rows().data();        
         var arreglo_nuevos = [];
-        datos.each(function (value, index) {
-            a = value            
-            //arreglo_nuevos.push(a.toString().split(",", 1))
-            arreglo_nuevos.push(a.toString())
-        });
-        for (let index = 0; index < arreglo_nuevos.length; index++) {            
-            const element = arreglo_nuevos[index];
-            const primer_reemplazo = element.replace('<input type="number" value="', '')                  
-            const segundo_reemplazo = primer_reemplazo.replace('"  required  />', '') 
-            const tercer_reemplazo = segundo_reemplazo.replace('<input type="number" value="', '')   
-            arreglo_nuevos[index] = tercer_reemplazo.replace('"  required />', '') 
-            alert(arreglo_nuevos)
-        }
-        alert(arreglo_nuevos)
-        guardar(arreglo_nuevos, puesto_id)
+        var ponderaciones = [];
+        var metas = [];
+        //Recorremos la tabla sacando los ids de los criterios y los valores de los inputs.
+        //Generamos 3 arreglos para luego revisar
+        datos.each(function (value, index) {        
+            a = value        
+            var pon = "p" + a.toString().split(",", 1)
+            var met = "m" + a.toString().split(",", 1)
+            arreglo_nuevos.push(a.toString().split(",", 1))           
+            ponderaciones.push(document.getElementById(pon).value)
+            metas.push(document.getElementById(met).value)
+        });                
+        guardar(arreglo_nuevos,ponderaciones,metas, puesto_id)
     })
-      function guardar(arreglo_nuevos, puesto_id) {
-           periodo_id = document.getElementById('periodo_id').value
-           console.log(periodo_id);
-            console.log('intentaremos guardar');
-            console.log(puesto_id)
+      function guardar(ids,ponderaciones,metas, puesto_id) {
+           periodo_id = document.getElementById('periodo_id').value           
             arreglo = []
             $.ajax({
                 method: "POST",
                 url: "{% url 'evaluaciones:guardar_evaluacion' %}",
                 data: { 
-                    'array[]': arreglo_nuevos,
+                    'ids[]': ids,
+                    'ponderaciones[]': ponderaciones,
+                    'metas[]': metas,
                     'puesto_id' : puesto_id, 
                     csrfmiddlewaretoken: '{{ csrf_token }}', 
                     empresa_id: '{{ empresa.pk }}',

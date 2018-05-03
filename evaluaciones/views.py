@@ -1381,8 +1381,7 @@ class activar_criterio(View):
 class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	model = evaluaciones
 	form_class = EvaluacionesForm
-	template_name = "evaluaciones/crearevaluacion.html"
-	success_message = "Evaluacion creado satisfactoriamente."
+	template_name = "evaluaciones/crearevaluacion.html"	
 	form_invalid_message = 'Error al crear la evaluacion por favor revise los datos'	
 	
 	
@@ -1407,14 +1406,32 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 class guardar_evaluacion(View):
 	def post(self,request,pk=None):
 		print(request.POST)
-		print(request.POST.getlist('array[]'))
-
-		for objeto in request.POST.getlist('array[]'):
-			print(objeto[0][0])
+		print(request.POST.getlist('ids[]'))
+		print(request.POST.getlist('ponderaciones[]'))
+		print(request.POST.getlist('metas[]'))
 		empresa_id = request.POST['empresa_id']
-		messages.add_message(request,messages.SUCCESS,'info,Evaluación Creada con exito')
+		periodo_id = request.POST['periodo_id']
+		puesto_id = request.POST['puesto_id']
+		ponderacion = request.POST.getlist('ponderaciones[]')
+		meta = request.POST.getlist('metas[]')
+		contador = 0
+		for objeto in request.POST.getlist('ids[]'):			
+			evaluacion_ = evaluaciones(
+				ponderacion=ponderacion[contador],
+				porcentaje_meta=meta[contador],
+			    criterio_id = objeto,
+				empresa_id = empresa_id,
+				periodo_id = periodo_id,
+				puesto_id = puesto_id)
+			evaluacion_.save()
+			if evaluacion_ :
+				messages.add_message(request,messages.SUCCESS,'info,Evaluación Creada con exito')
+			else:
+				messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
+			print(objeto, ponderacion[contador],meta[contador])			
+			contador= contador+1
+		print(empresa_id,periodo_id,puesto_id)			
+		
 		success_url = reverse('evaluaciones:listar_criterios',
 						  kwargs={'pk': empresa_id})
 		return HttpResponse(success_url)
-
-	
