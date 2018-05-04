@@ -1,0 +1,107 @@
+{% extends 'evaluaciones/base_empresa.html' %}
+{% load static %}
+{% block pantalla %}
+<section class="content-header">
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
+    <li class="active">Evaluaciones recibidas</li>
+  </ol>
+</section>      
+{% endblock %}
+{% block style %}
+<style type="text/css">
+    .text-vertical{
+        -webkit-transform: rotate(90deg);   
+        -moz-transform: rotate(-90deg);
+        -ms-transform: rotate(-90deg);
+        -o-transform: rotate(-90deg);
+        transform: rotate(-90deg);
+    }
+</style>
+{% endblock %}
+{% block content %}
+        <div class="pad margin no-print">
+          <div class="callout callout-info" style="margin-bottom: 0!important;">
+            <h4><i class="fa fa-search"></i> Búsqueda por período</h4>
+            <div class="row">
+            <div class="col-md-3">
+                <label class="col-sm-2 control-label" for="id_anio">Año: </label>
+                <div class="col-sm-10">
+                    <select id="id_anio" class="form-control">
+                        <option value="2018">2018</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="col-sm-2 control-label" for="id_mes">Mes: </label>
+                <div class="col-sm-10">
+                    <select id="id_mes" class="form-control">
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+          </div>
+        </div>
+
+        <!-- Main content -->
+        <section class="invoice">
+          <!-- title row -->
+          <div class="row">
+            <div class="col-xs-12">
+              <h2 class="page-header">
+                <i class="fa fa-star-half-empty"></i> Evaluaciones recibidas
+                <p class="pull-right">Período a evaluar: Abril/2018</p>
+              </h2>
+            </div><!-- /.col -->
+          </div>
+
+          <!-- Table row -->
+          <div class="row">
+            <div class="col-xs-12 table-responsive">
+              <table class="table table-striped">
+                <thead align="center">
+                  <tr>
+                    <th>#</th>
+                    <th>CODIGO COLABORADOR</th>
+                    <th>COLABORADOR</th>
+                    <th>ESTADO</th>
+                    <th>NOTA ACTUAL</th>
+                    <th>ACCIONES</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1</td>
+                    <td>101</td>
+                    <td>Carlos Zapata</td>
+                    <td><p class="label pull-center bg-yellow">INCOMPLETA</p></td>
+                    <td>60%</td>
+                    <td><a href="#">Evaluar</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+
+          <!-- this row will not appear when printing -->
+          <div class="row no-print">
+            <div class="col-xs-12">
+              <a href="invoice-print.html" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Imprimir</a>
+              <button class="btn btn-primary pull-right" style="margin-right: 5px;" disabled><i class="fa fa-download"></i> Generar excel</button>
+            </div>
+          </div>
+        </section><!-- /.content -->
+        <div class="clearfix"></div>
+
+{% endblock%}
+
+{% block script %}
+<script type="text/javascript">
+$("#id_empresa").val("{{empresa.pk}}");
+$("#id_empresa").attr('disabled','disabled');
+</script>
+{% endblock %}

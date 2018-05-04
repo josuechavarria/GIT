@@ -35,7 +35,7 @@
         {% endif %}
         <div class="box">
             <div class="box-header">
-              <h3 class="box-title">Listado de puestos | {{empresa.nombre}}</h3>
+              <h3 class="box-title">Listado de criterios | {{empresa.nombre}}</h3>
             </div><!-- /.box-header -->
             <div class="box-body">
                 <table id="empresas" class="table table-bordered table-striped">
@@ -44,7 +44,6 @@
                             <th>#</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
-                            <th>Empresa</th>
                             <th>Objetivo</th>
                             <th>Estado</th>
                             <th>Periodo</th>
@@ -54,17 +53,16 @@
                     <tbody>
                     {% for criterio in object_list %}
                         <tr>
-                            <td>{{criterio.id}}</td>
-                            <td>{{ criterio.nombre }}</td>
+                            <td>{{forloop.counter}}</td>
+                            <td><a href="{% url 'evaluaciones:actualizar_criterio' pk=criterio.id id=empresa.id %}">{{ criterio.nombre }}</a></td>
                             <td>{{ criterio.descripcion }}</td>
-                            <td>{{ criterio.empresa }}</td>
                             <td>{{ criterio.objetivo }}</td>
                              {% if criterio.estado %}
                             <td>                           
                                 <small class="label pull-center bg-green">Activo</small>
                                                             
                             </td>
-                            <td>{{ criterio.periodo }}</td>
+                            <td>{{ criterio.periodo.fecha_fin|date:"F/Y" }}</td>
                             <td>
                                  {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}
                                 <a href="{% url 'evaluaciones:crear_criterio' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
@@ -89,7 +87,7 @@
                                 </a>
                             
                             </td>
-                            <td>{{ criterio.periodo }}</td>
+                            <td>{{ criterio.periodo.fecha_fin|date:"F/Y" }}</td>
                             <td>
                                 {% if 'evaluaciones.evaluaciones_listasdesplegables' in perms %}
                                 <a href="{% url 'evaluaciones:crear_criterio' pk=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
@@ -108,9 +106,10 @@
                             <th>#</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
-                            <th>Empresa</th>
                             <th>Objetivo</th>
+                            <th>Estado</th>
                             <th>Periodo</th>
+                            <th>Acciones</th>
                         </tr>
                     </tfoot>
                 </table>

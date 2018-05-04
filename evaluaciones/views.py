@@ -25,6 +25,7 @@ from django.template import loader
 from evaluaciones.models import *
 from evaluaciones.forms import *
 from django.conf import settings
+from decimal import *
 
 
 def home(request):
@@ -1377,6 +1378,63 @@ class activar_criterio(View):
 			obj.save()
 			print(obj.estado)		 
 		return HttpResponse(success_url)
+
+class ColaboradorMisEvaluaciones(View):
+	def get(self,request,pk=None):
+		template_name = "evaluaciones/misEvaluaciones.html"
+		objEmpresa = empresas.objects.get(pk=pk)
+		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objColaborador = colaboradores.objects.get(usuario=request.user)
+		objPeriodo = objEvaluaciones[0].periodo
+		ctx = {'empresa': objEmpresa,
+		'criterios' : objEvaluaciones,
+		'colaborador' : objColaborador,
+		'periodo' : objPeriodo}
+		return render(request, template_name, ctx)
+
+	def post(self,request,pk=None):
+		template_name = "evaluaciones/misEvaluaciones.html"
+		objEmpresa = empresas.objects.get(pk=pk)
+		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objEvaluacionesNota = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, criterio__objetivo__nombre__upper__contains="CUÁNTITATIVO").order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objColaborador = colaboradores.objects.get(usuario=request.user)
+		objPeriodo = objEvaluaciones[0].periodo
+		print(request.POST)
+		for x in objEvaluacionesNota:
+			porcentaje = Decimal(request.POST['porcentaje_%s_%s'%(x.pk,objColaborador.pk)])
+			porcentaje_meta = x.porcentaje_meta
+			if (porcentaje/porcentaje_meta)<1:
+				porcentaje_final = (porcentaje/porcentaje_meta)*100
+			else:
+				porcentaje_final = 100
+			nota = x.ponderacion*porcentaje_final/100
+			objEvalColaborador=evaluacion_colaborador(
+				empresa = objEmpresa,
+				periodo = objPeriodo,
+				puesto = x.puesto,
+				evaluacion = x,
+				colaborador = objColaborador,
+				porcentaje = porcentaje,
+				porcentaje_final = porcentaje_final,
+				nota = nota,
+				estado = True
+			)
+		objEvalColaborador.save()
+		ctx = {'empresa': objEmpresa,
+		'criterios' : objEvaluaciones,
+		'colaborador' : objColaborador,
+		'periodo' : objPeriodo}
+		return render(request, template_name, ctx)
+
+class SupervisorEvaluacionesList(View):
+	def get(self,request,pk=None):
+		template_name = "evaluaciones/supervisorEvaluacionesList.html"
+		objEmpresa = empresas.objects.get(pk=pk)
+		ctx = {'empresa': objEmpresa}
+		return render(request, template_name, ctx)
+
+	def post(self,request,pk=None):
+		pass
 
 class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	model = evaluaciones
