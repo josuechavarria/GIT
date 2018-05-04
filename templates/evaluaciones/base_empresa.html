@@ -306,6 +306,23 @@
               </ul>
             </li>
             {% endif %}
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-check-square-o"></i>
+                <span>Evaluaciones</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                <li class="active">
+                  <a href="{% url 'evaluaciones:crear_evaluacion' pk=empresa.pk %}">
+                    <i class="fa fa-circle-o"></i> Crear</a>
+                </li>
+                <li>
+                  <a href="{% url 'evaluaciones:listar_criterios' pk=empresa.pk %}">
+                    <i class="fa fa-circle-o"></i> Listar</a>
+                </li>
+              </ul>
+            </li>
           {% endif %}
           </ul>
         </section>

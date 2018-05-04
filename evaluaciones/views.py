@@ -1435,3 +1435,61 @@ class SupervisorEvaluacionesList(View):
 
 	def post(self,request,pk=None):
 		pass
+
+class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
+	model = evaluaciones
+	form_class = EvaluacionesForm
+	template_name = "evaluaciones/crearevaluacion.html"	
+	form_invalid_message = 'Error al crear la evaluacion por favor revise los datos'	
+	
+	
+	def get_success_url(self, **kwargs):				
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_evaluacion',
+							   args=[self.kwargs['pk']])
+		else:
+			url = reverse_lazy('evaluaciones:listar_evaluacion',
+							   args=[self.kwargs['pk']])
+		return url
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk']).order_by('id')
+		periodo = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]
+		context['criterios'] = criterios_
+		context['periodos'] = periodo		
+		return context
+
+class guardar_evaluacion(View):
+	def post(self,request,pk=None):
+		print(request.POST)
+		print(request.POST.getlist('ids[]'))
+		print(request.POST.getlist('ponderaciones[]'))
+		print(request.POST.getlist('metas[]'))
+		empresa_id = request.POST['empresa_id']
+		periodo_id = request.POST['periodo_id']
+		puesto_id = request.POST['puesto_id']
+		ponderacion = request.POST.getlist('ponderaciones[]')
+		meta = request.POST.getlist('metas[]')
+		contador = 0
+		for objeto in request.POST.getlist('ids[]'):			
+			evaluacion_ = evaluaciones(
+				ponderacion=ponderacion[contador],
+				porcentaje_meta=meta[contador],
+			    criterio_id = objeto,
+				empresa_id = empresa_id,
+				periodo_id = periodo_id,
+				puesto_id = puesto_id)
+			evaluacion_.save()
+			if evaluacion_ :
+				messages.add_message(request,messages.SUCCESS,'info,Evaluación Creada con exito')
+			else:
+				messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
+			print(objeto, ponderacion[contador],meta[contador])			
+			contador= contador+1
+		print(empresa_id,periodo_id,puesto_id)			
+		
+		success_url = reverse('evaluaciones:listar_criterios',
+						  kwargs={'pk': empresa_id})
+		return HttpResponse(success_url)

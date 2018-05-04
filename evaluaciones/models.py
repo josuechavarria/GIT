@@ -2,6 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User, Group
 from django.utils.timezone import now
 from django.db.models import Transform, CharField, TextField
+import locale
+
+
+locale.setlocale(locale.LC_ALL, "")
 # Create your models here.
 
 #django celery
@@ -126,12 +130,22 @@ class periodos(models.Model):
 	estado = models.BooleanField(default=True)
 	activo = models.NullBooleanField(default=True)
 	tiempo = models.IntegerField(default=1, verbose_name='Frecuencia de evaluaciones')
-	def get_year(self):
-		print(self.fecha_inicio.year)
-		return self.fecha_inico.year
+	def year(self):		
+		return self.fecha_inico.strftime('%Y')
 	
+	def year_final(self):		
+		return self.fecha_fin.strftime('%Y')
+
+	def month_inicial(self):		
+		return self.fecha_inico.strftime('%B')
+	
+	def month_final(self):		
+		return self.fecha_fin.strftime('%B')
+
 	def __str__(self):
-		return str(self.pk)
+		return str(self.fecha_inico.year)
+
+	
 	
 
 class objetivos(models.Model):
@@ -155,7 +169,6 @@ class criterios(models.Model):
 
 	def __str__(self):
 		return self.nombre
-
 
 class evaluaciones(models.Model):
 	empresa = models.ForeignKey(empresas)
