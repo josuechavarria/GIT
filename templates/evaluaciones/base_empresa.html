@@ -70,11 +70,11 @@
 
       <header class="main-header">
         <!-- Logo -->
-        <a href="index2.html" class="logo">
+        <a href="{% url 'evaluaciones:principal_empresa' empresa.pk%}" class="logo">
           <!-- mini logo for sidebar mini 50x50 pixels -->
           <span class="logo-mini"><b>GIT</b></span>
           <!-- logo for regular state and mobile devices -->
-          <span class="logo-lg"><b>Administración</b></span>
+          <span class="logo-lg"><b>Evaluaciones</b></span>
         </a>
         <!-- Header Navbar: style can be found in header.less -->
         <nav class="navbar navbar-static-top" role="navigation">
@@ -89,41 +89,26 @@
               <li class="dropdown notifications-menu">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                   <i class="fa fa-bell-o"></i>
-                  <span class="label label-warning">10</span>
+                  <span class="label label-warning">2</span>
                 </a>
                 <ul class="dropdown-menu">
-                  <li class="header">You have 10 notifications</li>
+                  <li class="header">Tienes 2 notificaciones</li>
                   <li>
                     <!-- inner menu: contains the actual data -->
                     <ul class="menu">
                       <li>
                         <a href="#">
-                          <i class="fa fa-users text-aqua"></i> 5 new members joined today
+                          <i class="fa fa-bell-o text-aqua"></i> Evaluación mensual disponible.
                         </a>
                       </li>
                       <li>
                         <a href="#">
-                          <i class="fa fa-warning text-yellow"></i> Very long description here that may not fit into the page and may cause design problems
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <i class="fa fa-users text-red"></i> 5 new members joined
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <i class="fa fa-shopping-cart text-green"></i> 25 sales made
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <i class="fa fa-user text-red"></i> You changed your username
+                          <i class="fa fa-bell-o text-aqua"></i> Carlos Zapata completó su evaluación.
                         </a>
                       </li>
                     </ul>
                   </li>
-                  <li class="footer"><a href="#">View all</a></li>
+                  <li class="footer"><a href="#">Ver Todo</a></li>
                 </ul>
               </li>
               <!-- Tasks: style can be found in dropdown.less -->
@@ -300,6 +285,27 @@
               </ul>
             </li>
             {% endif %}
+            {% if 'evaluaciones.evaluaciones_mis_evaluaciones' in perms %}
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-list"></i> <span>Mis Evaluaciones <small class="label pull-right bg-green">1</small></span> 
+              </a>
+              <ul class="treeview-menu">
+                <li class="active"><a href="{% url 'evaluaciones:misevaluaciones' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> ¡Evaluación disponible!</a> </li>
+                <li><a href="{% url 'evaluaciones:listar_criterios' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
+              </ul>
+            </li>
+            {% endif %}
+            {% if 'evaluaciones.evaluaciones_ingresar_cualitativos' in perms %}
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-users"></i> <span>Colaboradores <small class="label pull-right bg-blue">7</small></span> 
+              </a>
+              <ul class="treeview-menu">
+                <li class="active"><a href="{% url 'evaluaciones:evaluacioneslist' pk=empresa.pk %}"><i class="fa fa-circle-o"></i>Evaluaciones disponibles</a> </li>
+              </ul>
+            </li>
+            {% endif %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-check-square-o"></i>
@@ -348,9 +354,9 @@
       </div><!-- /.content-wrapper -->
       <footer class="main-footer">
         <div class="pull-right hidden-xs">
-          <b>Version</b> 2.3.0
+          <b>Version</b> 1.0.0
         </div>
-        <strong>Copyright &copy; 2014-2015 <a href="http://almsaeedstudio.com">Almsaeed Studio</a>.</strong> All rights reserved.
+        <strong>Copyright &copy; 2018 <a href="http://almsaeedstudio.com">Grupo Inversiones Tecnológicas</a>.</strong> Todos los derechos reservados.
       </footer>
 
       

@@ -1,0 +1,168 @@
+{% extends 'evaluaciones/base_empresa.html' %}
+{% load static %}
+{% block pantalla %}
+<section class="content-header">
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
+    <li class="active">Mis Evaluaciones</li>
+  </ol>
+</section>      
+{% endblock %}
+{% block style %}
+<style type="text/css">
+    .text-vertical{
+        -webkit-transform: rotate(90deg);   
+        -moz-transform: rotate(-90deg);
+        -ms-transform: rotate(-90deg);
+        -o-transform: rotate(-90deg);
+        transform: rotate(-90deg);
+    }
+</style>
+{% endblock %}
+{% block content %}
+       <!-- <div class="pad margin no-print">
+          <div class="callout callout-info" style="margin-bottom: 0!important;">
+            <h4><i class="fa fa-search"></i> Búsqueda por período</h4>
+            <div class="row">
+            <div class="col-md-3">
+                <label class="col-sm-2 control-label" for="id_anio">Año: </label>
+                <div class="col-sm-10">
+                    <select id="id_anio" class="form-control">
+                        <option value="2018">2018</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="col-sm-2 control-label" for="id_mes">Mes: </label>
+                <div class="col-sm-10">
+                    <select id="id_mes" class="form-control">
+                        <option value="01">Enero</option>
+                        <option value="02">Febrero</option>
+                        <option value="03">Marzo</option>
+                        <option value="04">Abril</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+          </div>
+        </div> -->
+
+        <!-- Main content -->
+        <section class="invoice">
+          <!-- title row -->
+          <div class="row">
+            <div class="col-xs-12">
+              <h2 class="page-header">
+                <i class="fa fa-star-half-empty"></i> Evaluación del colaborador
+                <p class="pull-right">Período a evaluar: {{ periodo.fecha_fin|date:"F/Y" }}</p>
+              </h2>
+            </div><!-- /.col -->
+          </div>
+          <!-- info row -->
+          <div class="row invoice-info">
+            <div class="col-sm-4 invoice-col">
+              Creada por:
+              <address>
+                <strong>{{colaborador.nombre_completo}}</strong><br>
+                <br>
+                Puesto<br>
+                <strong>{{colaborador.puesto}}</strong><br>
+              </address>
+            </div><!-- /.col -->
+            <div class="col-sm-4 invoice-col">
+              Supervisor
+              <address>
+                <strong>{{colaborador.supervisor.nombre_completo}}</strong><br>
+              </address>
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+
+          <!-- Table row -->
+          <div class="row">
+            <div class="col-xs-12 table-responsive">
+              <table class="table table-striped">
+                <thead align="center">
+                  <tr>
+                    <th>CRITERIO</th>
+                    <th>DESCRIPCIÓN</th>
+                    <th>PONDERACIÓN</th>
+                    <th>PORCENTAJE</th>
+                    <th>NOTA</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <form id="form_evaluacion" method="POST">
+                  {%csrf_token%}
+                {% regroup criterios by criterio.objetivo as criterios_list %}
+                  {% for criterio in criterios_list %}
+                   <tr style="background-color: #3C8DBC; color: white; text-align: center;">
+                    <td colspan="5"><strong>{{ criterio.grouper }}</strong></td>
+                  </tr>
+                    {% for c in criterio.list %}
+                    <tr>
+                      <td>{{c.criterio.nombre}}</td>
+                      <td>{{c.criterio.descripcion}}</td>
+                      <td>{{c.ponderacion}}</td>
+                      <td><input type="text" id="id_porcentaje_{{c.id}}_{{colaborador.pk}}" name="porcentaje_{{c.id}}_{{colaborador.pk}}" onKeyUp="CalcularNota({{c.id}},{{colaborador.pk}},'{{c.porcentaje_meta}}','{{c.ponderacion}}',$(this).val())" size="5" {% if 'evaluaciones.evaluaciones_ingresar_cualitativos' not in perms and 'cualitativos' in criterio.grouper.nombre|lower %}disabled="disabled"{% else %} required {% endif %} required></td>
+                      <td><strong id="id_nota_{{c.id}}_{{colaborador.pk}}">0.00</strong></td>
+                    </tr>
+                    {% endfor %}
+                  {% endfor %}
+                  <tr>
+                    <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+                    <td colspan="1"><strong id="id_total_{{colaborador.pk}}">0.00</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+
+          <!-- this row will not appear when printing -->
+          <div class="row no-print">
+            <div class="col-xs-12">
+              <a href="invoice-print.html" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Imprimir</a>
+              <button class="btn btn-success pull-right"><i class="fa fa-send"></i> Enviar Evaluación</button>
+              <button class="btn btn-primary pull-right" style="margin-right: 5px;" disabled><i class="fa fa-download"></i> Generar excel</button>
+            </div>
+          </div>
+          </form>
+        </section><!-- /.content -->
+        <div class="clearfix"></div>
+
+{% endblock%}
+
+{% block script %}
+<script type="text/javascript">
+$("#id_empresa").val("{{empresa.pk}}");
+$("#id_empresa").attr('disabled','disabled');
+
+function CalcularNota(id1, id2, pm, pon, p){
+  var porcentaje_meta = pm
+  var porcentaje_final = 0.0
+  var ponderacion = pon
+  var nota = 0.0
+  if((p/porcentaje_meta)<1){
+    porcentaje_final = (p/porcentaje_meta)*100
+  }else{
+    porcentaje_final = 100
+  }
+  nota = ponderacion*porcentaje_final/100
+  nota = parseFloat(Math.round(nota*100)/100).toFixed(2)
+  $("#id_nota_"+id1+"_"+id2).html(nota)
+  RecalcularTotal()
+  //alert(ponderacion)
+}
+
+function RecalcularTotal(){
+  var total = 0.0
+  {% regroup criterios by criterio.objetivo as criterios_list %}
+    {% for criterio in criterios_list %}
+      {% for c in criterio.list %}
+        //alert($("#id_nota_{{c.id}}_{{colaborador.pk}}").text())
+        total = parseFloat(total) + parseFloat($("#id_nota_{{c.id}}_{{colaborador.pk}}").text())
+      {% endfor %}
+    {% endfor %}
+  $("#id_total_{{colaborador.pk}}").html(parseFloat(Math.round(total*100)/100).toFixed(2))
+}
+</script>
+{% endblock %}

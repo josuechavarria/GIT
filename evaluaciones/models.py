@@ -164,7 +164,6 @@ class criterios(models.Model):
 	periodo = models.ForeignKey(periodos,on_delete=models.PROTECT)
 	nombre = models.CharField(max_length=120, unique=True)
 	descripcion = models.TextField()
-	estado = models.BooleanField(default=True)
 	objetivo = models.ForeignKey(objetivos,on_delete=models.PROTECT)
 	estado = models.BooleanField(default=True)
 
@@ -176,8 +175,8 @@ class evaluaciones(models.Model):
 	periodo = models.ForeignKey(periodos)
 	puesto = models.ForeignKey(puestos)
 	criterio = models.ForeignKey(criterios, on_delete=models.PROTECT)
-	ponderacion = models.DecimalField(max_digits=3, decimal_places=2)
-	porcentaje_meta = models.DecimalField(max_digits=3, decimal_places=2)
+	ponderacion = models.DecimalField(max_digits=5, decimal_places=2)
+	porcentaje_meta = models.DecimalField(max_digits=5, decimal_places=2)
 	estado = models.BooleanField(default=True)
 
 	class Meta:
@@ -192,6 +191,8 @@ class evaluaciones(models.Model):
 			("eliminar_usuarios", "Eliminar usuarios"),
 			("eliminar_períodos", "Eliminar períodos"),
 			("eliminar_criterios", "Eliminar criterios"),
+			("evaluaciones_mis_evaluaciones", "Mis evaluaciones"),
+			("evaluaciones_ingresar_cualitativos", "Ingresar nota Criterios Cualitativos")
 		)
 
 
@@ -201,9 +202,9 @@ class evaluacion_colaborador(models.Model):
 	puesto = models.ForeignKey(puestos)
 	evaluacion = models.ForeignKey(evaluaciones)
 	colaborador = models.ForeignKey(colaboradores)
-	porcentaje = models.DecimalField(max_digits=3, decimal_places=2)
-	porcentaje_final = models.DecimalField(max_digits=3, decimal_places=2)
-	nota = models.DecimalField(max_digits=3, decimal_places=2)
+	porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
+	porcentaje_final = models.DecimalField(max_digits=5, decimal_places=2)
+	nota = models.DecimalField(max_digits=5, decimal_places=2)
 	estado = models.BooleanField(default=True)
 
 ## Para la carga de archivos

@@ -54,7 +54,7 @@
                     {% for empresa in object_list %}
                         <tr>
                             <td>{{empresa.id}}</td>
-                            <td>{{ empresa.nombre }}</td>
+                            <td><a href="{% url 'evaluaciones:principal_empresa' empresa.id %}">{{ empresa.nombre }}</a></td>
                             <td>{{ empresa.rtn}}</td>
                             <td>{{ empresa.colaboradores}}/{{ empresa.licencias}}</td>
                             <td>
