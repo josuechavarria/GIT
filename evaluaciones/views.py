@@ -1,6 +1,6 @@
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.views.generic import View, TemplateView, CreateView, ListView, UpdateView, DeleteView
@@ -12,6 +12,7 @@ from braces.views import FormInvalidMessageMixin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from tablib import Dataset
+from django.core import serializers
 
 # Para la automatización de la creación de los periodos
 from celery.schedules import crontab
@@ -1382,9 +1383,8 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	model = evaluaciones
 	form_class = EvaluacionesForm
 	template_name = "evaluaciones/crearevaluacion.html"	
-	form_invalid_message = 'Error al crear la evaluacion por favor revise los datos'	
-	
-	
+	form_invalid_message = 'Error al crear la evaluacion por favor revise los datos'
+		
 	def get_success_url(self, **kwargs):				
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_evaluacion',
@@ -1397,18 +1397,19 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
-		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk']).order_by('id')
 		periodo = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]
-		context['criterios'] = criterios_
+		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk'], periodo_id = periodo).order_by('id')		
+		criterios_usados = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )
+		print('Tamaño criterios usados ', len(criterios_usados))
+		print('Tamaño criterios libres ', len(criterios_))
+		criterios_finales = criterios_.exclude(id = criterios_usados.values_list('criterio_id', flat=True ))
+		print('Tamaño criterios despues de la exclusion ', len(criterios_finales))
+		context['criterios'] = criterios_finales
 		context['periodos'] = periodo		
 		return context
 
 class guardar_evaluacion(View):
-	def post(self,request,pk=None):
-		print(request.POST)
-		print(request.POST.getlist('ids[]'))
-		print(request.POST.getlist('ponderaciones[]'))
-		print(request.POST.getlist('metas[]'))
+	def post(self,request,pk=None):		
 		empresa_id = request.POST['empresa_id']
 		periodo_id = request.POST['periodo_id']
 		puesto_id = request.POST['puesto_id']

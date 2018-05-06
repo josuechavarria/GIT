@@ -73,8 +73,17 @@
                         </a>
                         <a class="btn btn-app" id="quitar_">
                             <i class="fa fa-eraser"></i> Quitar Criterios
-                        </a>                                           
+                        </a>    
                         
+                        <div class="alert alert-error" role="alert" id="alert_error" hidden>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <i class="fa fa-close"></i>
+                            </button>
+                            <p></p>
+                            <strong>
+                                <i class="fa fa-check"></i>Error¡¡¡  la suma de la columna "Ponderación" no es igual a 100.00 </strong>
+                        </div>
+
                         <div class="box-body">
                             <div id="example2_wrapper" class="dataTables_wrapper form-inline dt-bootstrap">
                                 <div class="row">
@@ -87,15 +96,17 @@
                                             <thead>
                                                 <tr role="row">
                                                     <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending"
-                                                        aria-label="Rendering engine: activate to sort column descending">Seleccionar</th>
+                                                        aria-label="Rendering engine: activate to sort column descending">Id</th>
                                                     <th class="sorting" tabindex="1" aria-controls="example2" rowspan="1" colspan="1"
                                                         aria-label="Browser: activate to sort column ascending">Criterio</th>
                                                     <th class="sorting" tabindex="2" aria-controls="example2" rowspan="1" colspan="1"
                                                         aria-label="Platform(s): activate to sort column ascending">Descripcion</th>
                                                     <th class="sorting" tabindex="3" aria-controls="example2" rowspan="1" colspan="1"
-                                                        aria-label="Engine version: activate to sort column ascending">Ponderación</th>                                                    
+                                                        aria-label="Engine version: activate to sort column ascending">Ponderación</th>
+                                                    <th class="sorting" tabindex="3" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Tipo de Objetivo</th>
                                                     <th class="sorting" tabindex="3" aria-controls="example2" rowspan="1" colspan="1" 
                                                     aria-label="Engine version: activate to sort column ascending">Porcentaje Meta</th>
+                                                    <th class="sorting" tabindex="3" aria-controls="example2" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending">Opciones</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -103,11 +114,13 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <th rowspan="1" colspan="1">Seleccionar</th>
+                                                    <th rowspan="1" colspan="1">Id</th>
                                                     <th rowspan="1" colspan="1">Criterio</th>
                                                     <th rowspan="1" colspan="1">Descripcion</th>
+                                                    <th rowspan="1" colspan="1">Tipo de Objetivo</th>
                                                     <th rowspan="1" colspan="1">Ponderación</th>                                                    
                                                     <th rowspan="1" colspan="1">Porcentaje meta</th>
+                                                    <th rowspan="1" colspan="1">Opciones</th>
                                                 </tr>
                                             </tfoot>
                                         </table>
@@ -135,8 +148,16 @@
 <div class="example-modal">
     <div class="modal fade" id="myModal">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content">                
                 <div class="modal-header">                   
+                    <div class="alert alert-error" role="alert" id="alert_errormodal" hidden>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <i class="fa fa-close"></i>
+                        </button>
+                        <p></p>
+                        <strong>
+                            <i class="fa fa-check"></i>Error¡¡¡ seleccione al menos un criterio </strong>
+                    </div>
                     <div class="col-sm-12">
                         <br>
                         <br>
@@ -144,9 +165,11 @@
                         <table id="example2" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
                             <thead>
                                 <tr role="row">
-                                    <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Seleccionar</th>
+                                    <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Id</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Criterio</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Descripcion</th>                                    
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Tipo Objetivo</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Opciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -162,14 +185,24 @@
                                     <td>
                                         {{ criterio.descripcion}}
                                     </td>
+                                    <td>
+                                        {{ criterio.objetivo.nombre }}
+                                    </td>
+                                    <td>
+                                        <p class="seleccionado_" id="icon_{{ criterio.id }}" hidden>
+                                            <i class="fa fa-check-circle"  ></i>
+                                        </p>                                        
+                                    </td>
                                 </tr>
                                 {% endfor %} {% endif %}
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th rowspan="1" colspan="1">Seleccionar</th>
+                                    <th rowspan="1" colspan="1">Id</th>
                                     <th rowspan="1" colspan="1">Criterio</th>
                                     <th rowspan="1" colspan="1">Descripcion</th>
+                                    <th rowspan="1" colspan="1">Tipo Objetivo</th>
+                                    <th rowspan="1" colspan="1">Opciones</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -200,6 +233,12 @@
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script type="text/javascript">
     var tabla1 = $("#example1").DataTable({
+         "columnDefs": [            
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "language": {
             "lengthMenu": "Mostrar _MENU_ registros por pagina",
             "search": "Buscar:",
@@ -214,7 +253,14 @@
         }
     });
 
+    
     var tabla2 = $("#example2").DataTable({
+        "columnDefs": [
+            {
+                "targets": [0],
+                "visible": false
+            }
+        ],
         "language": {
             "lengthMenu": "Mostrar _MENU_ registros por pagina",
             "search": "Buscar:",
@@ -231,22 +277,44 @@
     //Manipulación da la tabla 
 
     $('#example2 tbody').on( 'click', 'tr', function () {        
-        $(this).toggleClass('selectedin');
+        $(this).toggleClass('selectedin');       
+        var elemento = "icon_" + tabla2.row(this).data()[0];
+        var elemento_ = document.getElementById(elemento);        
+        if (elemento_.hidden) {            
+            elemento_.hidden = false;
+        }
+        else {
+            elemento_.hidden = true;
+        }
     } );   
 
     $('#example1 tbody').on('click', 'tr', function () {
-            $(this).toggleClass('selectedout');
-        }); 
+        $(this).toggleClass('selectedout');
+        var elemento = "icon_" + tabla1.row(this).data()[0];
+        var elemento_ = document.getElementById(elemento);
+        if (elemento_.hidden) {
+            elemento_.hidden = false;
+        }
+        else {
+            elemento_.hidden = true;
+        }
+    }); 
   // Datos en la tabla Modal la tabla 1 , esta sirve de intercambio.
     $('#agregar_').click( function () {
-        var datos = tabla2.rows('.selectedin').data();        
-        datos.each(function (value, index) {
-            a = value
-            tabla1.row.add([a[0],a[1],a[2], '<input type="text" id="p'+ a[0]+ '" required  />', '<input type="text"  id="m' + a[0] + '" required />']).draw().node();
-        });
-        //quitar seleccionados y hacer intercambio, regresar al modal
-        tabla2.rows('.selectedin').remove().draw()    
+        var datos = tabla2.rows('.selectedin').data();
+        var error_alert = document.getElementById("alert_errormodal")
+        if(datos.length == 0){            
+            error_alert.hidden = false
+        }else{
+            error_alert.hidden = true
+            datos.each(function (value, index) {
+                a = value
+                tabla1.row.add([a[0], a[1], a[2], a[3], '<input type="text" id="p' + a[0] + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  />', '<input type="text"  id="m' + a[0] + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required />', a[4]]).draw().node();
+            });
+            //quitar seleccionados y hacer intercambio, regresar al modal
+            tabla2.rows('.selectedin').remove().draw()
         // actualizartabla (arreglo_nuevos        
+        }        
     } );
 
     // Datos en la tabla principal la tabla 1 , esta sirve de intercambio.
@@ -254,7 +322,7 @@
         var datos = tabla1.rows('.selectedout').data();
         datos.each(function (value, index) {
             a = value
-            tabla2.row.add([a[0], a[1], a[2]]).draw().node();
+            tabla2.row.add([a[0], a[1], a[2],a[3],a[6]]).draw().node();
         });
         //quitar seleccionados y hacer intercambio, regresar al modal
         tabla1.rows('.selectedout').remove().draw()
@@ -277,10 +345,27 @@
                 var selectedOption = this.options[puesto.selectedIndex];
                 console.log(selectedOption.value );
                 puesto_id = selectedOption.value;
+                console.log("El puesto que selecciono es: " + puesto_id)
             });
+    function recarga_contexto() {
+                $.ajax({
+            type: 'GET',
+            url: "{% url 'evaluaciones:crear_evaluacion' pk=empresa.id  %}",
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                pk: '{{ empresa.pk }}',
+                periodo_id: periodo_id
+            } ,
+            success: function (response) {
+                console.log(response)
+            }
+        });
 
-  
-    $('#form_evaluacion').on('submit', function (e) {        
+        console.log("done here");
+    }
+    
+    $('#form_evaluacion').on('submit', function (e) {  
+        alert_error = document.getElementById('alert_error')
         e.preventDefault()                
         var datos = tabla1.rows().data();        
         var arreglo_nuevos = [];
@@ -288,16 +373,43 @@
         var metas = [];
         //Recorremos la tabla sacando los ids de los criterios y los valores de los inputs.
         //Generamos 3 arreglos para luego revisar
+        centinela = " "
         datos.each(function (value, index) {        
             a = value        
             var pon = "p" + a.toString().split(",", 1)
             var met = "m" + a.toString().split(",", 1)
+            centinela = "p" + a.toString().split(",", 1)
             arreglo_nuevos.push(a.toString().split(",", 1))           
             ponderaciones.push(document.getElementById(pon).value)
             metas.push(document.getElementById(met).value)
-        });                
-        guardar(arreglo_nuevos,ponderaciones,metas, puesto_id)
-    })
+        });   
+        var suma = sumar_array(ponderaciones);     
+        console.log('el valor de la suma es: ' + suma)
+        if(suma != 100){
+            console.log('NÚMERO ERRONEO')
+            document.getElementById(centinela).focus()            
+            alert_error.hidden = false;
+        }else{
+            console.log('falso')
+            alert_error.hidden = true;
+            guardar(arreglo_nuevos,ponderaciones,metas, puesto_id)
+            } 
+    });
+     function sumar_array(letras) {
+         console.log(letras);         
+         var numbers = letras.toString().split(',').map(function (item) {
+             console.log('El item es:' + item)
+             return parseFloat(item);
+         });   
+         console.log(numbers);  
+         sum=0          
+           acum = 0;
+          for (var i = 0; i < numbers.length; i++) {
+             sum += numbers[i]
+         }
+         console.log(sum)                           
+            return sum;
+        }
       function guardar(ids,ponderaciones,metas, puesto_id) {
            periodo_id = document.getElementById('periodo_id').value           
             arreglo = []
@@ -322,6 +434,24 @@ $("#id_empresa").attr('disabled','disabled');
 </script>
 
 <style>
+    input:invalid {
+    border-color: red;
+}
+input,
+input:valid {
+    border-color: #2ecc71;
+}   
+    tr{
+        cursor: pointer;
+    }
+    p.seleccionado_{
+        color: green;
+        text-align: center
+    }
+    p.quitado_{
+        color: green;
+        text-align: center
+    }
     tr.selectedin{
         background-color:#afddd1        
         }
