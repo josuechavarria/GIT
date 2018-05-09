@@ -248,7 +248,7 @@ class CrearUsuarioView(View):
 		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=pk, estado=True)
 		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=pk, estado=True)
 		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=pk, estado=True)
-		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, puesto__nombre__upper='SUPERVISOR', usuario__is_active=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, grupo__name__upper='SUPERVISOR', usuario__is_active=True)
 		template_name = "evaluaciones/crearUsuario.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 
@@ -354,7 +354,7 @@ class ActualizarUsuarioView(View):
 		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=id, estado=True)
 		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=id, estado=True)
 		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=id, estado=True)
-		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=id, puesto__nombre__upper='SUPERVISOR', usuario__is_active=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=id, usuario__is_active=True)
 
 		template_name = "evaluaciones/ActualizaUsuario.html"
 		ctx = {'form':form,
@@ -1385,11 +1385,13 @@ class ColaboradorMisEvaluaciones(View):
 		objEmpresa = empresas.objects.get(pk=pk)
 		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
 		objColaborador = colaboradores.objects.get(usuario=request.user)
+		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=request.user, estado=True)
 		objPeriodo = objEvaluaciones[0].periodo
 		ctx = {'empresa': objEmpresa,
 		'criterios' : objEvaluaciones,
 		'colaborador' : objColaborador,
-		'periodo' : objPeriodo}
+		'periodo' : objPeriodo,
+		'evaluacionColaborador' : objEvalColaborador}
 		return render(request, template_name, ctx)
 
 	def post(self,request,pk=None):
@@ -1408,22 +1410,30 @@ class ColaboradorMisEvaluaciones(View):
 			else:
 				porcentaje_final = 100
 			nota = x.ponderacion*porcentaje_final/100
-			objEvalColaborador=evaluacion_colaborador(
-				empresa = objEmpresa,
-				periodo = objPeriodo,
-				puesto = x.puesto,
-				evaluacion = x,
-				colaborador = objColaborador,
-				porcentaje = porcentaje,
-				porcentaje_final = porcentaje_final,
-				nota = nota,
-				estado = True
-			)
-		objEvalColaborador.save()
+			if evaluacion_colaborador.objects.filter(evaluacion=x).exists():
+				objEvalColaborador = evaluacion_colaborador.objects.get(empresa__pk=pk,evaluacion=x,colaborador=objColaborador,periodo=objPeriodo, estado = True)
+				objEvalColaborador.porcentaje = porcentaje
+				objEvalColaborador.porcentaje_final = porcentaje_final
+				objEvalColaborador.nota = nota
+			else:
+				objEvalColaborador=evaluacion_colaborador(
+					empresa = objEmpresa,
+					periodo = objPeriodo,
+					puesto = x.puesto,
+					evaluacion = x,
+					colaborador = objColaborador,
+					porcentaje = porcentaje,
+					porcentaje_final = porcentaje_final,
+					nota = nota,
+					estado = True
+				)
+			objEvalColaborador.save()
+		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=request.user, estado=True)
 		ctx = {'empresa': objEmpresa,
 		'criterios' : objEvaluaciones,
 		'colaborador' : objColaborador,
-		'periodo' : objPeriodo}
+		'periodo' : objPeriodo,
+		'evaluacionColaborador' : objEvalColaborador}
 		return render(request, template_name, ctx)
 
 class SupervisorEvaluacionesList(View):
@@ -1482,12 +1492,12 @@ class guardar_evaluacion(View):
 				periodo_id = periodo_id,
 				puesto_id = puesto_id)
 			evaluacion_.save()
-			if evaluacion_ :
-				messages.add_message(request,messages.SUCCESS,'info,Evaluación Creada con exito')
-			else:
-				messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
 			print(objeto, ponderacion[contador],meta[contador])			
 			contador= contador+1
+		if contador>0 :
+			messages.add_message(request,messages.SUCCESS,'Info,Evaluación Creada con exito')
+		else:
+			messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
 		print(empresa_id,periodo_id,puesto_id)			
 		
 		success_url = reverse('evaluaciones:listar_criterios',

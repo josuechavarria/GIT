@@ -306,6 +306,7 @@
               </ul>
             </li>
             {% endif %}
+            {% if 'evaluaciones.evaluaciones_crear' in perms %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-check-square-o"></i>
@@ -323,6 +324,7 @@
                 </li>
               </ul>
             </li>
+            {% endif %}
           {% endif %}
           </ul>
         </section>

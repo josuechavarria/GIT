@@ -164,5 +164,9 @@ function RecalcularTotal(){
     {% endfor %}
   $("#id_total_{{colaborador.pk}}").html(parseFloat(Math.round(total*100)/100).toFixed(2))
 }
+{% for e in evaluacionColaborador %}
+    CalcularNota({{e.evaluacion.pk}}, {{e.colaborador.pk}}, {{e.evaluacion.porcentaje_meta}}, {{e.evaluacion.ponderacion}}, {{e.porcentaje}})
+    $("#id_porcentaje_{{e.evaluacion.pk}}_{{e.colaborador.pk}}").val({{e.porcentaje}})
+{% endfor %}
 </script>
 {% endblock %}
