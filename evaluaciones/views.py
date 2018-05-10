@@ -26,6 +26,7 @@ from evaluaciones.models import *
 from evaluaciones.forms import *
 from django.conf import settings
 from decimal import *
+from django.db.models import Q
 
 
 def home(request):
@@ -379,11 +380,22 @@ class ActualizarUsuarioView(View):
 			form.fecha_modificacion = timezone.now()
 			objUser.username = request.POST['email']
 			objUser.email = request.POST['email']
+			objUser.first_name = request.POST['primer_nombre']
+			objUser.last_name = request.POST['primer_apellido']
 			objUser.save()
 			objUser.groups.clear()
 			objUser.groups.add(Group.objects.get(pk=request.POST['grupo']))
 			form.usuario = objUser
 			form.save()
+			#validar si tiene colaboradores a cargo y asignarle permiso de supervisor
+			permission = Permission.objects.get(codename='especiales_es_supervisor')
+			for x in colaboradores.objects.filter(empresa__pk=id, empresa__estado=True):
+				x.usuario.user_permissions.remove(permission)
+
+			for x in colaboradores.objects.filter(empresa__pk=id, empresa__estado=True).exclude(supervisor__isnull=True):
+				x.supervisor.usuario.user_permissions.remove(permission)
+				x.supervisor.usuario.user_permissions.add(permission)
+
 			subject = 'Bienvenido al sistema de evaluación y desempeño'
 			ctx['form'] = usuariosForm()
 			messages.add_message(request,messages.SUCCESS,"Usuario actualizado exitosamente.")
@@ -439,6 +451,7 @@ class IndexEmpresaView(View):
 			bandera =True
 		else: 			
 			print('no hay nada')
+
 		template_name = "evaluaciones/index_empresa.html"
 
 		ctx = {'empresa': empresas.objects.get(pk=pk),

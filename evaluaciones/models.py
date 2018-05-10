@@ -192,7 +192,11 @@ class evaluaciones(models.Model):
 			("eliminar_períodos", "Eliminar períodos"),
 			("eliminar_criterios", "Eliminar criterios"),
 			("evaluaciones_mis_evaluaciones", "Mis evaluaciones"),
-			("evaluaciones_ingresar_cualitativos", "Ingresar nota Criterios Cualitativos")
+			("evaluaciones_ingresar_cualitativos", "Ingresar nota Criterios Cualitativos"),
+			("evaluaciones_ingresar_cuantitativos", "Ingresar nota Criterios Cuantitativos"),
+			("evaluaciones_ingresar_sus_cualitativos", "Ingresar sus Criterios Cualitativos"),
+			("evaluaciones_ingresar_sus_cuantitativos", "Ingresar sus Criterios Cuantitativos"),
+			("especiales_es_supervisor", "Es supervisor")
 		)
 
 
