@@ -199,7 +199,6 @@ class evaluaciones(models.Model):
 			("especiales_es_supervisor", "Es supervisor")
 		)
 
-
 class evaluacion_colaborador(models.Model):
 	empresa = models.ForeignKey(empresas)
 	periodo = models.ForeignKey(periodos)

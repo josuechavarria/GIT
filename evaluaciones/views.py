@@ -26,7 +26,7 @@ from evaluaciones.models import *
 from evaluaciones.forms import *
 from django.conf import settings
 from decimal import *
-from django.db.models import Q
+from django.db.models import Q,Count, Sum, Avg
 
 
 def home(request):
@@ -1453,7 +1453,14 @@ class SupervisorEvaluacionesList(View):
 	def get(self,request,pk=None):
 		template_name = "evaluaciones/supervisorEvaluacionesList.html"
 		objEmpresa = empresas.objects.get(pk=pk)
-		ctx = {'empresa': objEmpresa}
+		data=[]
+		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
+		evalu = evaluacion_colaborador.objects\
+		.filter(empresa__pk=pk, colaborador__supervisor__usuario=request.user, estado=True)\
+		.values('empresa__pk','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
+		ctx = {'empresa': objEmpresa,
+				'evaluaciones': evalu,
+				'totalCriterios' : totalCriterios}
 		return render(request, template_name, ctx)
 
 	def post(self,request,pk=None):
