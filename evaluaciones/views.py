@@ -13,6 +13,8 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from tablib import Dataset
 from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
+import json
 
 # Para la automatización de la creación de los periodos
 from celery.schedules import crontab
@@ -1031,8 +1033,7 @@ class BorrarCriterios(SuccessMessageMixin, DeleteView):
 			return HttpResponseRedirect(error_url)
 # Periodos
 class CrearPeriodos(SuccessMessageMixin, CreateView):
-	model = periodos
-	print('Creando')
+	model = periodos	
 	form_class = PeriodosForm
 	template_name = "evaluaciones/crearPeriodo.html"
 	success_message = "Periodo creado satisfactoriamente."
@@ -1228,8 +1229,7 @@ class activar_departamento(View):
 			print(depa.estado)		 
 		return HttpResponse(success_url)
 
-class activar_puesto(View):
-	print('activando_Puesto')
+class activar_puesto(View):	
 	def post(self,request,pk=None):
 		print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
@@ -1248,7 +1248,6 @@ class activar_puesto(View):
 
 
 class activar_sucursal(View):
-	print('activando sucursal')
 	def post(self,request,pk=None):
 		print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
@@ -1399,11 +1398,8 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		periodo = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]
 		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk'], periodo_id = periodo).order_by('id')		
-		criterios_usados = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )
-		print('Tamaño criterios usados ', len(criterios_usados))
-		print('Tamaño criterios libres ', len(criterios_))
-		criterios_finales = criterios_.exclude(id = criterios_usados.values_list('criterio_id', flat=True ))
-		print('Tamaño criterios despues de la exclusion ', len(criterios_finales))
+		criterios_usados = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )		
+		criterios_finales = criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' ))		
 		context['criterios'] = criterios_finales
 		context['periodos'] = periodo		
 		return context
@@ -1436,3 +1432,71 @@ class guardar_evaluacion(View):
 		success_url = reverse('evaluaciones:listar_criterios',
 						  kwargs={'pk': empresa_id})
 		return HttpResponse(success_url)
+
+
+class ListarEvaluaciones(ListView):
+	def get_queryset(self):
+		return evaluaciones.objects.filter(empresa__pk=self.kwargs['pk'])
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		return context
+
+
+class borrar_evaluaciones(View):
+	def post(self,request,pk=None):		
+		empresa_id = request.POST['empresa_id']
+		periodo_id = request.POST['periodo_id']
+		puesto_id = request.POST['puesto_id']
+		elementos = request.POST.getlist('ids[]')					
+		print(empresa_id,periodo_id,puesto_id)		
+		success_url = reverse('evaluaciones:listar_criterios',
+						  kwargs={'pk': empresa_id})
+		return HttpResponse(success_url)
+
+def actualizar_tabla(request):
+		print(request.POST)
+		empresa_id = request.POST['empresa_id']
+		puesto_id = request.POST['puesto_id']
+		for p in empresas.objects.raw('SELECT * FROM evaluaciones_empresas'):
+			print(p)
+		if puesto_id == '':
+			evaluaciones_ = []
+		else: 
+			evaluaciones_ = list(evaluaciones.objects.filter(
+				empresa__pk=empresa_id, puesto__pk = puesto_id).values(
+					  'criterio_id',
+					  'criterio__nombre',
+					  'empresa__id',
+					  'empresa__nombre',
+					  'criterio__nombre',
+					  'puesto__nombre',
+					  'periodo__fecha_inico',
+					  'periodo__fecha_fin',	
+					  'ponderacion',
+					  'porcentaje_meta'
+					  ))		
+		return HttpResponse(json.dumps(evaluaciones_, cls=DjangoJSONEncoder), content_type="application/json")
+
+def actualizar_tablacriterios(request):
+		print(request.POST)
+		empresa_id = request.POST['empresa_id']
+		puesto_id = request.POST['puesto_id']		
+		if puesto_id == '':
+			evaluaciones_ = []
+		else: 
+			evaluaciones_ = list(evaluaciones.objects.filter(
+				empresa__pk=empresa_id, puesto__pk = puesto_id).values(
+					  'criterio_id',
+					  'criterio__nombre',
+					  'empresa__id',
+					  'empresa__nombre',
+					  'criterio__nombre',
+					  'puesto__nombre',
+					  'periodo__fecha_inico',
+					  'periodo__fecha_fin',	
+					  'ponderacion',
+					  'porcentaje_meta'
+					  ))		
+		return HttpResponse(json.dumps(evaluaciones_, cls=DjangoJSONEncoder), content_type="application/json")
+	

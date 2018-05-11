@@ -73,11 +73,17 @@
                         </a>
                         <a class="btn btn-app" id="quitar_">
                             <i class="fa fa-eraser"></i> Quitar Criterios
-                        </a>    
-                        
+                        </a>
+                        <div class="alert alert-warning" role="alert" id="alert_modallleno" hidden>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">                                
+                            </button>
+                            <p></p>
+                            <strong>
+                                <i class="fa fa-check"></i> Todos los criterios disponibles fueron seleccionados </strong>
+                        </div>                        
+
                         <div class="alert alert-error" role="alert" id="alert_error" hidden>
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <i class="fa fa-close"></i>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">                                
                             </button>
                             <p></p>
                             <strong>
@@ -151,8 +157,7 @@
             <div class="modal-content">                
                 <div class="modal-header">                   
                     <div class="alert alert-error" role="alert" id="alert_errormodal" hidden>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <i class="fa fa-close"></i>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">                            
                         </button>
                         <p></p>
                         <strong>
@@ -172,29 +177,7 @@
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {% if criterios %} {% for criterio in criterios%}
-                                <tr role="row" class="odd">
-                                   
-                                    <td>                                         
-                                        {{ criterio.id }}
-                                    </td>
-                                    <td>
-                                        {{ criterio.nombre }}
-                                    </td>
-                                    <td>
-                                        {{ criterio.descripcion}}
-                                    </td>
-                                    <td>
-                                        {{ criterio.objetivo.nombre }}
-                                    </td>
-                                    <td>
-                                        <p class="seleccionado_" id="icon_{{ criterio.id }}" hidden>
-                                            <i class="fa fa-check-circle"  ></i>
-                                        </p>                                        
-                                    </td>
-                                </tr>
-                                {% endfor %} {% endif %}
+                            <tbody>                               
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -232,6 +215,60 @@
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script type="text/javascript">
+    $(function () {
+             var puesto_id = 0
+            var bquitar_ = document.getElementById("quitar_");
+            var bmodificar_ = document.getElementById("modificar_");
+            var puesto = document.getElementById("id_puesto");
+            puesto.addEventListener('change',
+                function () {
+                    var selectedOption = this.options[puesto.selectedIndex];
+                    puesto_id = selectedOption.value; 
+                     var tabla = $("#example2").DataTable({
+                        "processing": true,
+                        "ajax": {
+                            type: 'post',
+                            "processing": true,
+                            "url": '{% url "evaluaciones:actualizar_tabla" %}',
+                            "data": {
+                                csrfmiddlewaretoken: '{{ csrf_token }}',
+                                empresa_id: '{{ empresa.pk }}',
+                                puesto_id: puesto_id,
+                            },
+                            "dataSrc": ""
+                        },
+                        "columns": [
+                            { "data": "criterio_id" },
+                            { "data": "criterio__nombre" },
+                            { "data": "puesto__nombre" },
+                            { "data": "empresa__nombre" },
+                            { "data": "periodo__fecha_inico" },
+                            { "data": "periodo__fecha_fin" },
+                            { "data": "periodo__fecha_fin" },
+                            { "data": "ponderacion" },
+                            { "data": "porcentaje_meta" },
+                        ],
+                        "language": {
+                            "lengthMenu": "Mostrar _MENU_ registros por pagina",
+                            "search": "Buscar:",
+                            "zeroRecords": "Ningún Registro encontrado",
+                            "info": "Mostrando pagina _PAGE_ de _PAGES_",
+                            "infoEmpty": "Registros no disponibles",
+                            "infoFiltered": "(filtrado de  _MAX_ registros totales)",
+                            "paginate": {
+                                "previous": "Anterior",
+                                "next": "Siguiente"
+                            }
+                        }
+                    });
+                    if (puesto_id != 0) {
+                        tabla.destroy();
+                        tabla.draw();
+                    } else {
+                        tabla.destroy();
+                    }
+                });
+    });
     var tabla1 = $("#example1").DataTable({
          "columnDefs": [            
             {
@@ -313,6 +350,7 @@
             });
             //quitar seleccionados y hacer intercambio, regresar al modal
             tabla2.rows('.selectedin').remove().draw()
+            $('#myModal').modal('hide');
         // actualizartabla (arreglo_nuevos        
         }        
     } );
@@ -326,11 +364,20 @@
         });
         //quitar seleccionados y hacer intercambio, regresar al modal
         tabla1.rows('.selectedout').remove().draw()
+        alert_modallleno.hidden = true;
         // actualizartabla (arreglo_nuevos      
     });
 
-    function modal(criterio_id) {       
-        $('#myModal').modal();
+    function modal(criterio_id) {
+        //var datos = tabla2.rows().data();
+        //if(datos.length != 0){
+            $('#myModal').modal();
+         //   alert_modallleno.hidden = true;
+        //}else{            
+        //    alert_modallleno.hidden = false;
+             console.log('No hay datos')
+        //}
+        
     };
     function criterios(a) {
     var array = [];    
