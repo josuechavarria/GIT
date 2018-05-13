@@ -48,8 +48,28 @@
         </div> -->
 
         <!-- Main content -->
+
         <section class="invoice">
+          {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <i class="fa fa-close"></i>
+                    </button>
+                    <p></p>
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%endif%}{% if message.tags == "error" %}close{%endif%}{% if message.tags == "warning" %}warning{%endif%}">&nbsp;</i>{{ message }}</strong> 
+                </div>
+
+            {% endfor %}
+        {% endif %}
           <!-- title row -->
+          {% if request.user != colaborador.usuario %}
+          <div class="row">
+            <div class="col-xs-12">
+                <a href="{% url 'evaluaciones:evaluacioneslist' pk=empresa.pk %}" class="pull-right btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar evaluaciones</a>
+            </div><!-- /.col -->
+          </div>
+          {% endif %}
           <div class="row">
             <div class="col-xs-12">
               <h2 class="page-header">
@@ -103,7 +123,20 @@
                       <td>{{c.criterio.nombre}}</td>
                       <td>{{c.criterio.descripcion}}</td>
                       <td>{{c.ponderacion}}</td>
-                      <td><input type="text" id="id_porcentaje_{{c.id}}_{{colaborador.pk}}" name="porcentaje_{{c.id}}_{{colaborador.pk}}" onKeyUp="CalcularNota({{c.id}},{{colaborador.pk}},'{{c.porcentaje_meta}}','{{c.ponderacion}}',$(this).val())" size="5" {% if 'evaluaciones.evaluaciones_ingresar_cualitativos' not in perms and 'cualitativos' in criterio.grouper.nombre|lower %}disabled="disabled"{% else %} required {% endif %} required></td>
+                      <td><input type="text" id="id_porcentaje_{{c.id}}_{{colaborador.pk}}" name="porcentaje_{{c.id}}_{{colaborador.pk}}" onKeyUp="CalcularNota({{c.id}},{{colaborador.pk}},'{{c.porcentaje_meta}}','{{c.ponderacion}}',$(this).val())" size="5" 
+                      {% if request.user == colaborador.usuario and 'evaluaciones.evaluaciones_ingresar_cualitativos' not in perms and 'cualitativos' in criterio.grouper.nombre|lower %}
+                        disabled="disabled"
+                      {% endif %}
+                      {% if request.user == colaborador.usuario and 'evaluaciones.evaluaciones_ingresar_cuantitativos' not in perms and 'cuántitativos' in criterio.grouper.nombre|lower %} 
+                        disabled="disabled"
+                      {% endif %} 
+                      {% if request.user != colaborador.usuario and 'evaluaciones.evaluaciones_ingresar_sus_cualitativos' not in perms and 'cualitativos' in criterio.grouper.nombre|lower %}
+                        disabled="disabled"
+                      {% endif %}
+                      {% if request.user != colaborador.usuario and 'evaluaciones.evaluaciones_ingresar_sus_cuantitativos' not in perms and 'cuántitativos' in criterio.grouper.nombre|lower %} 
+                        disabled="disabled"
+                      {% endif %}
+                      required></td>
                       <td><strong id="id_nota_{{c.id}}_{{colaborador.pk}}">0.00</strong></td>
                     </tr>
                     {% endfor %}

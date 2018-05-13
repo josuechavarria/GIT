@@ -291,7 +291,7 @@
                 <i class="fa fa-list"></i> <span>Mis Evaluaciones <small class="label pull-right bg-green">1</small></span> 
               </a>
               <ul class="treeview-menu">
-                <li class="active"><a href="{% url 'evaluaciones:misevaluaciones' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> ¡Evaluación disponible!</a> </li>
+                <li class="active"><a href="{% url 'evaluaciones:misevaluaciones' pk=empresa.pk id=request.user.pk %}"><i class="fa fa-circle-o"></i> ¡Evaluación disponible!</a> </li>
                 <li><a href="{% url 'evaluaciones:listar_criterios' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
               </ul>
             </li>

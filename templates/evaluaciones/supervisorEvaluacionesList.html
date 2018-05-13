@@ -78,7 +78,7 @@
                   <tr>
                     <td>{{forloop.counter}}</td>
                     <td>{{e.colaborador__codigo}}</td>
-                    <td>{{e.colaborador__primer_nombre}} {{e.colaborador__segundo_nombre}}</td>
+                    <td>{{e.colaborador__primer_nombre}} {{e.colaborador__primer_apellido}}</td>
                     <td>{% if totalCriterios == e.TotalNotas %}
                           <p class="label pull-center bg-green">COMPLETA</p></td>
                         {% elif totalCriterios != e.TotalNotas %}
@@ -87,7 +87,7 @@
                           <p class="label pull-center bg-red">SIN DATOS</p></td>
                         {% endif %}
                     <td>{{e.SumaNotas}}%</td>
-                    <td><a href="{% url 'evaluaciones:misevaluaciones' pk=e.empresa__pk %}">Evaluar</a></td>
+                    <td><a href="{% url 'evaluaciones:misevaluaciones' pk=e.empresa__pk id=e.colaborador__usuario %}">Evaluar</a></td>
                   </tr>
                   {% endfor %}
                 </tbody>

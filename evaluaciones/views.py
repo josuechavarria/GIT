@@ -1393,12 +1393,12 @@ class activar_criterio(View):
 		return HttpResponse(success_url)
 
 class ColaboradorMisEvaluaciones(View):
-	def get(self,request,pk=None):
+	def get(self,request,pk=None, id=None):
 		template_name = "evaluaciones/misEvaluaciones.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objColaborador = colaboradores.objects.get(usuario=request.user)
-		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=request.user, estado=True)
+		objColaborador = colaboradores.objects.get(usuario__pk=id)
+		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=objColaborador.usuario, estado=True)
 		objPeriodo = objEvaluaciones[0].periodo
 		ctx = {'empresa': objEmpresa,
 		'criterios' : objEvaluaciones,
@@ -1407,41 +1407,48 @@ class ColaboradorMisEvaluaciones(View):
 		'evaluacionColaborador' : objEvalColaborador}
 		return render(request, template_name, ctx)
 
-	def post(self,request,pk=None):
+	def post(self,request,pk=None, id=None):
 		template_name = "evaluaciones/misEvaluaciones.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objEvaluacionesNota = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, criterio__objetivo__nombre__upper__contains="CUÁNTITATIVO").order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objColaborador = colaboradores.objects.get(usuario=request.user)
+		objEvaluacionesNota = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objColaborador = colaboradores.objects.get(usuario__pk=id)
 		objPeriodo = objEvaluaciones[0].periodo
 		print(request.POST)
 		for x in objEvaluacionesNota:
-			porcentaje = Decimal(request.POST['porcentaje_%s_%s'%(x.pk,objColaborador.pk)])
-			porcentaje_meta = x.porcentaje_meta
-			if (porcentaje/porcentaje_meta)<1:
-				porcentaje_final = (porcentaje/porcentaje_meta)*100
-			else:
-				porcentaje_final = 100
-			nota = x.ponderacion*porcentaje_final/100
-			if evaluacion_colaborador.objects.filter(evaluacion=x).exists():
-				objEvalColaborador = evaluacion_colaborador.objects.get(empresa__pk=pk,evaluacion=x,colaborador=objColaborador,periodo=objPeriodo, estado = True)
-				objEvalColaborador.porcentaje = porcentaje
-				objEvalColaborador.porcentaje_final = porcentaje_final
-				objEvalColaborador.nota = nota
-			else:
-				objEvalColaborador=evaluacion_colaborador(
-					empresa = objEmpresa,
-					periodo = objPeriodo,
-					puesto = x.puesto,
-					evaluacion = x,
-					colaborador = objColaborador,
-					porcentaje = porcentaje,
-					porcentaje_final = porcentaje_final,
-					nota = nota,
-					estado = True
-				)
-			objEvalColaborador.save()
-		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=request.user, estado=True)
+			try:
+				porcentaje = Decimal(request.POST['porcentaje_%s_%s'%(x.pk,objColaborador.pk)])
+				porcentaje_meta = x.porcentaje_meta
+				if (porcentaje/porcentaje_meta)<1:
+					porcentaje_final = (porcentaje/porcentaje_meta)*100
+				else:
+					porcentaje_final = 100
+				nota = x.ponderacion*porcentaje_final/100
+				if evaluacion_colaborador.objects.filter(evaluacion=x).exists():
+					objEvalColaborador = evaluacion_colaborador.objects.get(empresa__pk=pk,evaluacion=x,colaborador=objColaborador,periodo=objPeriodo, estado = True)
+					objEvalColaborador.porcentaje = porcentaje
+					objEvalColaborador.porcentaje_final = porcentaje_final
+					objEvalColaborador.nota = nota
+				else:
+					objEvalColaborador=evaluacion_colaborador(
+						empresa = objEmpresa,
+						periodo = objPeriodo,
+						puesto = x.puesto,
+						evaluacion = x,
+						colaborador = objColaborador,
+						porcentaje = porcentaje,
+						porcentaje_final = porcentaje_final,
+						nota = nota,
+						estado = True
+					)
+				objEvalColaborador.save()
+			except:
+				pass
+		if evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador=objColaborador, estado=True).exists():
+			messages.add_message(request,messages.SUCCESS,"Evaluación guardada exitosamente.")
+		else:
+			messages.add_message(request,messages.ERROR,"La Evaluación no se ha guardado.")
+		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador=objColaborador, estado=True)
 		ctx = {'empresa': objEmpresa,
 		'criterios' : objEvaluaciones,
 		'colaborador' : objColaborador,
@@ -1457,7 +1464,7 @@ class SupervisorEvaluacionesList(View):
 		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
 		evalu = evaluacion_colaborador.objects\
 		.filter(empresa__pk=pk, colaborador__supervisor__usuario=request.user, estado=True)\
-		.values('empresa__pk','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
+		.values('empresa__pk','colaborador__usuario','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
 		ctx = {'empresa': objEmpresa,
 				'evaluaciones': evalu,
 				'totalCriterios' : totalCriterios}
