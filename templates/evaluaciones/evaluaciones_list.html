@@ -42,20 +42,26 @@
         <div class="form-group">
             <form role="form" class="form-horizontal" id="form_evaluacion" onsubmit="" enctype="multipart/form-data" method="">
             <label class="col-sm-1 control-label" for="puesto"> Puesto </label>
-            <div class="col-sm-8">
+            <div class="col-sm-8">                
                 <select name="puesto" required="" id="id_puesto" class="form-control">
                     <option value="" selected="">---------</option>
-        
-                    <option value="30">Supervisor Agentes</option>
-        
-                    <option value="33">Bodega</option>
-        
+                    {% for puesto in puestos %}        
+                    <option value="{{puesto.id}}">{{puesto.nombre}}</option>
+                    {% endfor %}        
                 </select>
             </div>
             </form>
         </div>
         <br><br><br>
         </div>
+
+        {% if periodos %}
+                    {% for periodo in periodos %}
+                    <div class="form-group">                       
+                        <input type="text" id="periodo_id" value={{periodo.year}} hidden>
+                    </div>                    
+                    {% endfor %}
+        {% endif %}
         <div class="box">
             <div class="box-header">
               <h3 class="box-title">Listado de evaluaciones | {{empresa.nombre}}</h3>
@@ -191,6 +197,7 @@
                   ];            
                   var tabla = $("#evaluaciones").DataTable({
                       "processing": true,
+                      "destroy":true,
                       "ajax": {
                           type: 'post',
                           "processing": true,
@@ -261,24 +268,27 @@
           });  
     */
         // Datos en la tabla principal la tabla 1 , esta sirve de intercambio.
-    $('#quitar_').click(function () {
-        console.log('presiono borrar')
+    $('#quitar_').click(function () {        
+        var tabla = $('#evaluaciones').DataTable()
         var datos = tabla.rows().data();
         var tamaño = datos.length;
         var arreglo_eliminar = []
+        console.log(tamaño)
         if(tamaño == 0){
             alert('No existen Evaluaciones en función del puesto seleccionado')
         }else {
             datos.each(function (value, index) {
                 a = value                 
                 arreglo_eliminar.push(a.toString().split(",", 1))                
-            });
-            borrar(datos,puesto_id)
+            });            
+            borrar(arreglo_eliminar,puesto_id)
         }    
         }); 
 
           function borrar(ids, puesto_id) {
-              periodo_id = document.getElementById('periodo_id').value
+            console.log('entro a borrar')
+            periodo_id = document.getElementById('periodo_id').value     
+            console.log(ids)        
               $.ajax({
                   method: "POST",
                   url: "{% url 'evaluaciones:borrar_evaluaciones' %}",
@@ -290,6 +300,7 @@
                       periodo_id: periodo_id
                   }
               }).done(function (msg) {
+                  alert('haciendo')
                   location.reload();
               });
           }  

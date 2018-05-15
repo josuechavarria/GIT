@@ -1436,21 +1436,27 @@ class guardar_evaluacion(View):
 
 
 class ListarEvaluaciones(ListView):
-	def get_queryset(self):
+	def get_queryset(self):				
 		return evaluaciones.objects.filter(empresa__pk=self.kwargs['pk'])
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
+		context['periodos']  = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]		
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		context['puestos'] = puestos.objects.filter(empresa__id=self.kwargs['pk'])
 		return context
 
-
 class borrar_evaluaciones(View):
-	def post(self,request,pk=None):		
+	def post(self,request,pk=None):				
 		empresa_id = request.POST['empresa_id']
 		periodo_id = request.POST['periodo_id']
 		puesto_id = request.POST['puesto_id']
 		elementos = request.POST.getlist('ids[]')					
-		print(empresa_id,periodo_id,puesto_id)		
+		print(empresa_id,periodo_id,puesto_id)
+		if	evaluaciones.objects.filter(empresa__pk=empresa_id, puesto__pk = puesto_id).delete():
+			messages.add_message(request,messages.SUCCESS, 'Exito. Evaluaciones Borradas')
+		else:
+			messages.add_message(request,messages.ERROR, 'Error al borrar las evaluaciones')
+
 		success_url = reverse('evaluaciones:listar_criterios',
 						  kwargs={'pk': empresa_id})
 		return HttpResponse(success_url)
