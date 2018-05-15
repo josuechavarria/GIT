@@ -167,7 +167,7 @@
                         <br>
                         <br>
                         <br>
-                        <table id="example2" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+                        <table id="criterios_table" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
                             <thead>
                                 <tr role="row">
                                     <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Id</th>
@@ -211,42 +211,56 @@
 {% endblock%}
 
 {% block script %}
+
 <script src="{% static 'evaluaciones/plugins/jQueryUI/jquery-ui.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
 <script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
 <script type="text/javascript">
     $(function () {
-             var puesto_id = 0
+            var puesto_id = 0
             var bquitar_ = document.getElementById("quitar_");
             var bmodificar_ = document.getElementById("modificar_");
             var puesto = document.getElementById("id_puesto");
-            puesto.addEventListener('change',
-                function () {
-                    var selectedOption = this.options[puesto.selectedIndex];
+            var contador = 0
+            puesto.addEventListener('change',                   
+                function () {  
+                   if ($.fn.dataTable.isDataTable('#example1')) {
+                        tabla_  = $('#example1').DataTable();
+                        tabla2 = $('#criterios_table').DataTable();
+                        var datos = tabla_.rows().data()
+                        var tamaño = datos.length
+                        if( tamaño != 0 ){                                                                              
+                            tabla_.rows().remove().draw()
+                            }
+                            }
+                    var selectedOption = this.options[puesto.selectedIndex];                    
                     puesto_id = selectedOption.value; 
-                     var tabla = $("#example2").DataTable({
+                    periodo_id = document.getElementById('periodo_id').value                                 
+                    var tabla = $("#criterios_table").DataTable({                          
                         "processing": true,
+                        "destroy": true,
                         "ajax": {
                             type: 'post',
                             "processing": true,
-                            "url": '{% url "evaluaciones:actualizar_tabla" %}',
+                            "url": '{% url "evaluaciones:actualizar_tablacriterios" %}',
                             "data": {
                                 csrfmiddlewaretoken: '{{ csrf_token }}',
                                 empresa_id: '{{ empresa.pk }}',
                                 puesto_id: puesto_id,
+                                periodo_id: periodo_id
                             },
                             "dataSrc": ""
                         },
                         "columns": [
-                            { "data": "criterio_id" },
-                            { "data": "criterio__nombre" },
-                            { "data": "puesto__nombre" },
-                            { "data": "empresa__nombre" },
-                            { "data": "periodo__fecha_inico" },
-                            { "data": "periodo__fecha_fin" },
-                            { "data": "periodo__fecha_fin" },
-                            { "data": "ponderacion" },
-                            { "data": "porcentaje_meta" },
+                            { "data": "id" },
+                            { "data": "nombre" },
+                            { "data": "descripcion" },
+                            { "data": "objetivo__nombre" },                       
+                            { "data": "opciones", 
+                               "render": function (data, type, ssrow, meta) {
+                                   console.log(data)
+                                    return ' <p class="seleccionado_" id="icon_' + ssrow.id + '" hidden><i class="fa fa-check-circle"  ></i></p >';
+                                }},   
                         ],
                         "language": {
                             "lengthMenu": "Mostrar _MENU_ registros por pagina",
@@ -261,62 +275,32 @@
                             }
                         }
                     });
-                    if (puesto_id != 0) {
-                        tabla.destroy();
-                        tabla.draw();
-                    } else {
-                        tabla.destroy();
-                    }
+                 var tabla1 = $("#example1").DataTable({                       
+                       "destroy": true,
+                        "language": {
+                            "lengthMenu": "Mostrar _MENU_ registros por pagina",
+                            "search": "Buscar:",
+                            "zeroRecords": "Ningún Registro encontrado",
+                            "info": "Mostrando pagina _PAGE_ de _PAGES_",
+                            "infoEmpty": "Registros no disponibles",
+                            "infoFiltered": "(filtrado de  _MAX_ registros totales)",
+                            "paginate": {
+                                "previous": "Anterior",
+                                "next": "Siguiente"
+                            }
+                        }
+                    });                  
                 });
     });
-    var tabla1 = $("#example1").DataTable({
-         "columnDefs": [            
-            {
-                "targets": [0],
-                "visible": false
-            }
-        ],
-        "language": {
-            "lengthMenu": "Mostrar _MENU_ registros por pagina",
-            "search": "Buscar:",
-            "zeroRecords": "Ningún Registro encontrado",
-            "info": "Mostrando pagina _PAGE_ de _PAGES_",
-            "infoEmpty": "Registros no disponibles",
-            "infoFiltered": "(filtrado de  _MAX_ registros totales)",
-            "paginate": {
-                "previous": "Anterior",
-                "next": "Siguiente"
-            }
-        }
-    });
+   
+       //Manipulación da la tabla 
 
-    
-    var tabla2 = $("#example2").DataTable({
-        "columnDefs": [
-            {
-                "targets": [0],
-                "visible": false
-            }
-        ],
-        "language": {
-            "lengthMenu": "Mostrar _MENU_ registros por pagina",
-            "search": "Buscar:",
-            "zeroRecords": "Ningún Registro encontrado",
-            "info": "Mostrando pagina _PAGE_ de _PAGES_",
-            "infoEmpty": "Registros no disponibles",
-            "infoFiltered": "(filtrado de  _MAX_ registros totales)",
-            "paginate": {
-                "previous": "Anterior",
-                "next": "Siguiente"
-            }
-        }
-    });
-    //Manipulación da la tabla 
-
-    $('#example2 tbody').on( 'click', 'tr', function () {        
-        $(this).toggleClass('selectedin');       
-        var elemento = "icon_" + tabla2.row(this).data()[0];
-        var elemento_ = document.getElementById(elemento);        
+    $('#criterios_table tbody').on( 'click', 'tr', function () {        
+        var tabla = $("#criterios_table").DataTable();
+        $(this).toggleClass('selectedin');                        
+        var elemento = "icon_" + tabla.row(this).data().id;
+        var elemento_ = document.getElementById(elemento); 
+        console.log(tabla.row(this).data().id)                   
         if (elemento_.hidden) {            
             elemento_.hidden = false;
         }
@@ -326,6 +310,9 @@
     } );   
 
     $('#example1 tbody').on('click', 'tr', function () {
+        var tabla1 = $("#example1").DataTable();
+        console.log('Valores de la tabla:'+  tabla1.row(this).data())
+
         $(this).toggleClass('selectedout');
         var elemento = "icon_" + tabla1.row(this).data()[0];
         var elemento_ = document.getElementById(elemento);
@@ -338,7 +325,10 @@
     }); 
   // Datos en la tabla Modal la tabla 1 , esta sirve de intercambio.
     $('#agregar_').click( function () {
-        var datos = tabla2.rows('.selectedin').data();
+        var tabla = $("#criterios_table").DataTable();
+        var tabla1 = $("#example1").DataTable();
+        var datos = tabla.rows('.selectedin').data();
+        console.log(datos)
         var error_alert = document.getElementById("alert_errormodal")
         if(datos.length == 0){            
             error_alert.hidden = false
@@ -346,10 +336,13 @@
             error_alert.hidden = true
             datos.each(function (value, index) {
                 a = value
-                tabla1.row.add([a[0], a[1], a[2], a[3], '<input type="text" id="p' + a[0] + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  />', '<input type="text"  id="m' + a[0] + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required />', a[4]]).draw().node();
+                console.log('El valor es' + a[0])
+                tabla1.row.add([a.id, a.nombre, a.descripcion, a.objetivo__nombre, '<input type="text" id="p' + a.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  />', '<input type="text"  id="m' + a.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required />', ' <p class="seleccionado_" id="icon_' + a.id + '" hidden><i class="fa fa-check-circle"  ></i></p >']).draw().node();
+
+                
             });
             //quitar seleccionados y hacer intercambio, regresar al modal
-            tabla2.rows('.selectedin').remove().draw()
+            tabla.rows('.selectedin').remove().draw()
             $('#myModal').modal('hide');
         // actualizartabla (arreglo_nuevos        
         }        
@@ -357,15 +350,32 @@
 
     // Datos en la tabla principal la tabla 1 , esta sirve de intercambio.
     $('#quitar_').click(function () {
-        var datos = tabla1.rows('.selectedout').data();
+        var tabla1 = $("#example1").DataTable();
+        var tabla2 = $("#criterios_table").DataTable();
+        var datos = tabla1.rows('.selectedout').data();  
+        console.log(datos)      
         datos.each(function (value, index) {
+            a = value   
+            console.log(a[0])           
+            //tabla2.row.add([a[0], a[1], a[2],a[3], ' <p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check-circle"  ></i></p >']).draw().node();
+            tabla2.rows.add([{
+                "id" : a[0],
+                "nombre" : a[1],
+                "descripcion": a[2],
+                "objetivo__nombre": a[3],
+                "opciones": '<p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check - circle"></i></p >'
+                }]).draw();
+        });
+        var datos_llenos = tabla2.rows().data();  
+         datos_llenos.each(function (value, index) {
             a = value
-            tabla2.row.add([a[0], a[1], a[2],a[3],a[6]]).draw().node();
+            console.log(a)
+          
         });
         //quitar seleccionados y hacer intercambio, regresar al modal
         tabla1.rows('.selectedout').remove().draw()
         alert_modallleno.hidden = true;
-        // actualizartabla (arreglo_nuevos      
+        // actualisartabla (arreglo_nuevos      
     });
 
     function modal(criterio_id) {
@@ -400,8 +410,7 @@
             url: "{% url 'evaluaciones:crear_evaluacion' pk=empresa.id  %}",
             data: {
                 csrfmiddlewaretoken: '{{ csrf_token }}',
-                pk: '{{ empresa.pk }}',
-                periodo_id: periodo_id
+                pk: '{{ empresa.pk }}'               
             } ,
             success: function (response) {
                 console.log(response)
@@ -412,6 +421,8 @@
     }
     
     $('#form_evaluacion').on('submit', function (e) {  
+        var tabla1 = $('#example1').DataTable();
+        // var tabla1 = $("#example1").DataTable();
         alert_error = document.getElementById('alert_error')
         e.preventDefault()                
         var datos = tabla1.rows().data();        

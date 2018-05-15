@@ -185,7 +185,10 @@
         puesto.addEventListener('change',
               function () {
                   var selectedOption = this.options[puesto.selectedIndex];                  
-                  puesto_id = selectedOption.value;                   
+                  puesto_id = selectedOption.value;
+                  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                  ];            
                   var tabla = $("#evaluaciones").DataTable({
                       "processing": true,
                       "ajax": {
@@ -204,9 +207,19 @@
                           { "data": "criterio__nombre" },
                           { "data": "puesto__nombre" },
                           { "data": "empresa__nombre" },
-                          { "data": "periodo__fecha_inico" },
-                          { "data": "periodo__fecha_fin" },
-                          { "data": "periodo__fecha_fin" },
+                          { "data": "periodo__fecha_inico",
+                            render: function (d) {
+                                  return moment(d).format("YYYY");
+                              }
+                             },
+                          { "data": "periodo__fecha_inico",
+                            render: function (d) {
+                                  return monthNames[moment(d).format("M")-1];
+                              } },
+                          { "data": "periodo__fecha_fin",
+                           render: function (d) {
+                                  return monthNames[moment(d).format("M")-1];
+                              }  },
                           { "data": "ponderacion" },
                           { "data": "porcentaje_meta" },                          
                       ],

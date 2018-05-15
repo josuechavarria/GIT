@@ -1405,7 +1405,8 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 		return context
 
 class guardar_evaluacion(View):
-	def post(self,request,pk=None):		
+	def post(self,request,pk=None):	
+		print(request.POST)	
 		empresa_id = request.POST['empresa_id']
 		periodo_id = request.POST['periodo_id']
 		puesto_id = request.POST['puesto_id']
@@ -1481,22 +1482,17 @@ def actualizar_tabla(request):
 def actualizar_tablacriterios(request):
 		print(request.POST)
 		empresa_id = request.POST['empresa_id']
-		puesto_id = request.POST['puesto_id']		
+		puesto_id = request.POST['puesto_id']	
+		periodo_id = request.POST['periodo_id']	
+		
 		if puesto_id == '':
-			evaluaciones_ = []
+			criterios_finales = []
 		else: 
-			evaluaciones_ = list(evaluaciones.objects.filter(
-				empresa__pk=empresa_id, puesto__pk = puesto_id).values(
-					  'criterio_id',
-					  'criterio__nombre',
-					  'empresa__id',
-					  'empresa__nombre',
-					  'criterio__nombre',
-					  'puesto__nombre',
-					  'periodo__fecha_inico',
-					  'periodo__fecha_fin',	
-					  'ponderacion',
-					  'porcentaje_meta'
-					  ))		
-		return HttpResponse(json.dumps(evaluaciones_, cls=DjangoJSONEncoder), content_type="application/json")
+			criterios_ =  criterios.objects.filter(empresa_id =empresa_id, periodo_id = periodo_id).order_by('id')		
+			criterios_usados = evaluaciones.objects.filter(empresa_id = empresa_id, periodo_id = periodo_id, puesto_id = puesto_id)
+			criterios_finales = list(criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' )).values(
+				'id','nombre','descripcion','objetivo__nombre'
+			))
+			
+		return HttpResponse(json.dumps(criterios_finales, cls=DjangoJSONEncoder), content_type="application/json")
 	
