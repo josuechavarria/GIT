@@ -70,6 +70,7 @@
             </div><!-- /.col -->
           </div>
           {% endif %}
+          {% if colaborador %}
           <div class="row">
             <div class="col-xs-12">
               <h2 class="page-header">
@@ -96,7 +97,7 @@
               </address>
             </div><!-- /.col -->
           </div><!-- /.row -->
-
+          {% endif %}
           <!-- Table row -->
           <div class="row">
             <div class="col-xs-12 table-responsive">
@@ -140,6 +141,10 @@
                       <td><strong id="id_nota_{{c.id}}_{{colaborador.pk}}">0.00</strong></td>
                     </tr>
                     {% endfor %}
+                  {% empty %}
+                    <tr style="background-color: #3C8DBC; color: white; text-align: center;">
+                      <td colspan="5"><strong>No hay evaluaciones disponibles</strong></td>
+                    </tr>
                   {% endfor %}
                   <tr>
                     <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
@@ -153,8 +158,8 @@
           <!-- this row will not appear when printing -->
           <div class="row no-print">
             <div class="col-xs-12">
-              <a href="invoice-print.html" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Imprimir</a>
-              <button class="btn btn-success pull-right"><i class="fa fa-send"></i> Enviar Evaluación</button>
+              <a {% if not colaborador %}disabled{%else%}href="invoice-print.html" target="_blank" class="btn btn-default"{% endif %}><i class="fa fa-print"></i> Imprimir</a>
+              <button class="btn btn-success pull-right" {% if not colaborador %}disabled{% endif %}><i class="fa fa-send"></i> Enviar Evaluación</button>
               <button class="btn btn-primary pull-right" style="margin-right: 5px;" disabled><i class="fa fa-download"></i> Generar excel</button>
             </div>
           </div>

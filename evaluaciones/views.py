@@ -1396,15 +1396,19 @@ class ColaboradorMisEvaluaciones(View):
 	def get(self,request,pk=None, id=None):
 		template_name = "evaluaciones/misEvaluaciones.html"
 		objEmpresa = empresas.objects.get(pk=pk)
-		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objColaborador = colaboradores.objects.get(usuario__pk=id)
-		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=objColaborador.usuario, estado=True)
-		objPeriodo = objEvaluaciones[0].periodo
-		ctx = {'empresa': objEmpresa,
-		'criterios' : objEvaluaciones,
-		'colaborador' : objColaborador,
-		'periodo' : objPeriodo,
-		'evaluacionColaborador' : objEvalColaborador}
+		ctx = {'empresa': objEmpresa}
+		try:
+			objColaborador = colaboradores.objects.get(usuario__pk=id)
+			objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, periodo__estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+			objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=objColaborador.usuario, estado=True)
+			objPeriodo = objEvaluaciones[0].periodo
+			ctx = {'empresa': objEmpresa,
+			'criterios' : objEvaluaciones,
+			'colaborador' : objColaborador,
+			'periodo' : objPeriodo,
+			'evaluacionColaborador' : objEvalColaborador}
+		except:
+			pass
 		return render(request, template_name, ctx)
 
 	def post(self,request,pk=None, id=None):
