@@ -285,7 +285,7 @@
               </ul>
             </li>
             {% endif %}
-            {% if 'evaluaciones.evaluaciones_mis_evaluaciones' in perms %}
+            {% if 'evaluaciones.evaluaciones_mis_evaluaciones' in perms and not request.user.is_superuser %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-list"></i> <span>Mis Evaluaciones <small class="label pull-right bg-green">1</small></span> 
@@ -296,7 +296,7 @@
               </ul>
             </li>
             {% endif %}
-            {% if 'evaluaciones.especiales_es_supervisor' in perms %}
+            {% if 'evaluaciones.especiales_es_supervisor' in perms and not request.user.is_superuser %}
             <li class="treeview">
               <a href="#">
                 <i class="fa fa-users"></i> <span>Colaboradores <small class="label pull-right bg-blue">7</small></span> 

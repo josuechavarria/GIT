@@ -1,5 +1,6 @@
 {% extends 'evaluaciones/base_empresa.html' %}
 {% load static %}
+{% load evaluaciones_tags %}
 {% block pantalla %}
 <section class="content-header">
   <ol class="breadcrumb">
@@ -79,9 +80,9 @@
                     <td>{{forloop.counter}}</td>
                     <td>{{e.colaborador__codigo}}</td>
                     <td>{{e.colaborador__primer_nombre}} {{e.colaborador__primer_apellido}}</td>
-                    <td>{% if totalCriterios == e.TotalNotas %}
+                    <td>{% if e.empresa__pk|totalCriterios:e.evaluacion__puesto__pk == e.TotalNotas %}
                           <p class="label pull-center bg-green">COMPLETA</p></td>
-                        {% elif totalCriterios != e.TotalNotas %}
+                        {% elif e.empresa__pk|totalCriterios:e.evaluacion__puesto__pk != e.TotalNotas %}
                           <p class="label pull-center bg-yellow">INCOMPLETA</p></td>
                         {% else %}
                           <p class="label pull-center bg-red">SIN DATOS</p></td>
