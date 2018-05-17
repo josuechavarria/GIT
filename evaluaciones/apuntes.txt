@@ -1,0 +1,12 @@
+ <a href="{% url 'evaluaciones:actualizar_criterio' pk=criterio.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-info"
+                                    data-toggle="tooltip" data-placement="top" title="Editar Criterio">
+                                    <i class="fa fa-edit"></i>
+                                </a> &nbsp;&nbsp; {% endif %} {% if 'evaluaciones.eliminar_listasdesplegables' in perms %}
+                                <a href="{% url 'evaluaciones:borrar_criterios' pk=criterio.id id=empresa.id %}" class="btn-circle btn-circle-xs btn-circle-raised btn-circle-error"
+                                    data-toggle="tooltip" data-placement="top" title="Eliminar criterio">
+                                    <i class="fa fa-trash text-red"></i>
+                                </a>
+
+
+- en la lista de criterios al momento de selecionar o dar click sobre el aparaeceran los botones 
+  para eliminar

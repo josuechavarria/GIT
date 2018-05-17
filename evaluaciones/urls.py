@@ -92,6 +92,9 @@ urlpatterns = [
     url(r'^evaluaciones/actualiza_tablacriterios/', views.actualizar_tablacriterios,
         name='actualizar_tablacriterios'),
     
+    url(r'^evaluaciones/modifica_tablacriterios/', views.modifica_tablacriterios,
+        name='modifica_tablacriterios'),
+    
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

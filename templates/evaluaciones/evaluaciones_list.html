@@ -73,7 +73,7 @@
                 <a class="btn btn-app" id="quitar_" hidden >
                     <i class="fa fa-eraser"></i> Borrar Criterios
                 </a>
-                <a class="btn btn-app" id="modificar_" hidden>
+                <a class="btn btn-app" id="modificar_" href="{% evaluaciones:modifica_tablacriterios %}" hidden>
                     <i class="fa fa-edit"></i> Modificar Criterios
                 </a>
                 <table id="evaluaciones" name="evaluaciones" class="table table-bordered table-striped">
@@ -189,8 +189,8 @@
         var bmodificar_ = document.getElementById("modificar_");
         var puesto = document.getElementById("id_puesto");        
         puesto.addEventListener('change',
-              function () {
-                  var selectedOption = this.options[puesto.selectedIndex];                  
+              function () {                  
+                  var selectedOption = this.options[puesto.selectedIndex];                   
                   puesto_id = selectedOption.value;
                   const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                       "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
@@ -242,13 +242,22 @@
                               "next": "Siguiente"
                           }
                       }
-                  });        
+                  });                          
+                  if (puesto_id == 0) {
+                      var tabla = $('#evaluaciones').DataTable()                      
+                      if(! tabla.data().any())
+                        alert('vacio');
+                        $("#quitar_").hide();
+                  } else {
+                      $("#quitar_").show();
+                  }
                   if(puesto_id != 0){
                       tabla.destroy();
                       tabla.draw();
                   }else{
                       tabla.destroy();
                   }
+                  
         });          
       
                      

@@ -1502,3 +1502,14 @@ def actualizar_tablacriterios(request):
 			
 		return HttpResponse(json.dumps(criterios_finales, cls=DjangoJSONEncoder), content_type="application/json")
 	
+
+
+def  modifica_tablacriterios(request):
+	def get_queryset(self):				
+		return evaluaciones.objects.filter(empresa__pk=self.kwargs['pk'])
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['periodos']  = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]		
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		context['puestos'] = puestos.objects.filter(empresa__id=self.kwargs['pk'])
+		return context
