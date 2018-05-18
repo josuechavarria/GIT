@@ -1,5 +1,6 @@
 {% extends 'evaluaciones/base_empresa.html' %}
 {% load static %}
+{% load evaluaciones_tags %}
 {% block pantalla %}
 <section class="content-header">
   <ol class="breadcrumb">
@@ -20,7 +21,7 @@
 </style>
 {% endblock %}
 {% block content %}
-        <div class="pad margin no-print">
+        <!--<div class="pad margin no-print">
           <div class="callout callout-info" style="margin-bottom: 0!important;">
             <h4><i class="fa fa-search"></i> Búsqueda por período</h4>
             <div class="row">
@@ -45,7 +46,7 @@
             </div>
         </div>
           </div>
-        </div>
+        </div>-->
 
         <!-- Main content -->
         <section class="invoice">
@@ -74,14 +75,22 @@
                   </tr>
                 </thead>
                 <tbody>
+                  {% for e in evaluaciones %}
                   <tr>
-                    <td>1</td>
-                    <td>101</td>
-                    <td>Carlos Zapata</td>
-                    <td><p class="label pull-center bg-yellow">INCOMPLETA</p></td>
-                    <td>60%</td>
-                    <td><a href="#">Evaluar</a></td>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{e.colaborador__codigo}}</td>
+                    <td>{{e.colaborador__primer_nombre}} {{e.colaborador__primer_apellido}}</td>
+                    <td>{% if e.empresa__pk|totalCriterios:e.evaluacion__puesto__pk == e.TotalNotas %}
+                          <p class="label pull-center bg-green">COMPLETA</p></td>
+                        {% elif e.empresa__pk|totalCriterios:e.evaluacion__puesto__pk != e.TotalNotas %}
+                          <p class="label pull-center bg-yellow">INCOMPLETA</p></td>
+                        {% else %}
+                          <p class="label pull-center bg-red">SIN DATOS</p></td>
+                        {% endif %}
+                    <td>{{e.SumaNotas}}%</td>
+                    <td><a href="{% url 'evaluaciones:misevaluaciones' pk=e.empresa__pk id=e.colaborador__usuario %}">Evaluar</a></td>
                   </tr>
+                  {% endfor %}
                 </tbody>
               </table>
             </div><!-- /.col -->

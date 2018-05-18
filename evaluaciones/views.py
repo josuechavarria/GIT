@@ -26,6 +26,8 @@ from evaluaciones.models import *
 from evaluaciones.forms import *
 from django.conf import settings
 from decimal import *
+from django.db.models import Q,Count, Sum, Avg
+from django.db import transaction
 
 
 def home(request):
@@ -248,7 +250,7 @@ class CrearUsuarioView(View):
 		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=pk, estado=True)
 		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=pk, estado=True)
 		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=pk, estado=True)
-		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, puesto__nombre__upper='SUPERVISOR', usuario__is_active=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, grupo__name__upper='SUPERVISOR', usuario__is_active=True)
 		template_name = "evaluaciones/crearUsuario.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 
@@ -354,7 +356,7 @@ class ActualizarUsuarioView(View):
 		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=id, estado=True)
 		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=id, estado=True)
 		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=id, estado=True)
-		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=id, puesto__nombre__upper='SUPERVISOR', usuario__is_active=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=id, usuario__is_active=True)
 
 		template_name = "evaluaciones/ActualizaUsuario.html"
 		ctx = {'form':form,
@@ -379,11 +381,22 @@ class ActualizarUsuarioView(View):
 			form.fecha_modificacion = timezone.now()
 			objUser.username = request.POST['email']
 			objUser.email = request.POST['email']
+			objUser.first_name = request.POST['primer_nombre']
+			objUser.last_name = request.POST['primer_apellido']
 			objUser.save()
 			objUser.groups.clear()
 			objUser.groups.add(Group.objects.get(pk=request.POST['grupo']))
 			form.usuario = objUser
 			form.save()
+			#validar si tiene colaboradores a cargo y asignarle permiso de supervisor
+			permission = Permission.objects.get(codename='especiales_es_supervisor')
+			for x in colaboradores.objects.filter(empresa__pk=id, empresa__estado=True):
+				x.usuario.user_permissions.remove(permission)
+
+			for x in colaboradores.objects.filter(empresa__pk=id, empresa__estado=True).exclude(supervisor__isnull=True):
+				x.supervisor.usuario.user_permissions.remove(permission)
+				x.supervisor.usuario.user_permissions.add(permission)
+
 			subject = 'Bienvenido al sistema de evaluación y desempeño'
 			ctx['form'] = usuariosForm()
 			messages.add_message(request,messages.SUCCESS,"Usuario actualizado exitosamente.")
@@ -439,6 +452,7 @@ class IndexEmpresaView(View):
 			bandera =True
 		else: 			
 			print('no hay nada')
+
 		template_name = "evaluaciones/index_empresa.html"
 
 		ctx = {'empresa': empresas.objects.get(pk=pk),
@@ -1229,7 +1243,6 @@ class activar_departamento(View):
 		return HttpResponse(success_url)
 
 class activar_puesto(View):
-	print('activando_Puesto')
 	def post(self,request,pk=None):
 		print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
@@ -1248,7 +1261,6 @@ class activar_puesto(View):
 
 
 class activar_sucursal(View):
-	print('activando sucursal')
 	def post(self,request,pk=None):
 		print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
@@ -1380,57 +1392,97 @@ class activar_criterio(View):
 		return HttpResponse(success_url)
 
 class ColaboradorMisEvaluaciones(View):
-	def get(self,request,pk=None):
+	def get(self,request,pk=None, id=None):
 		template_name = "evaluaciones/misEvaluaciones.html"
 		objEmpresa = empresas.objects.get(pk=pk)
-		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objColaborador = colaboradores.objects.get(usuario=request.user)
-		objPeriodo = objEvaluaciones[0].periodo
-		ctx = {'empresa': objEmpresa,
-		'criterios' : objEvaluaciones,
-		'colaborador' : objColaborador,
-		'periodo' : objPeriodo}
+		ctx = {'empresa': objEmpresa}
+		try:
+			objColaborador = colaboradores.objects.get(usuario__pk=id)
+			objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, periodo__estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+			objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=objColaborador.usuario, estado=True)
+			objPeriodo = objEvaluaciones[0].periodo
+			ctx = {'empresa': objEmpresa,
+			'criterios' : objEvaluaciones,
+			'colaborador' : objColaborador,
+			'periodo' : objPeriodo,
+			'evaluacionColaborador' : objEvalColaborador}
+		except:
+			pass
 		return render(request, template_name, ctx)
 
-	def post(self,request,pk=None):
+	@transaction.atomic
+	def post(self,request,pk=None, id=None):
 		template_name = "evaluaciones/misEvaluaciones.html"
+		error = False
 		objEmpresa = empresas.objects.get(pk=pk)
-		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objEvaluacionesNota = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, criterio__objetivo__nombre__upper__contains="CUÁNTITATIVO").order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objColaborador = colaboradores.objects.get(usuario=request.user)
+		objColaborador = colaboradores.objects.get(usuario__pk=id)
+		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, periodo__estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objEvaluacionesNota = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, periodo__estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
 		objPeriodo = objEvaluaciones[0].periodo
 		print(request.POST)
-		for x in objEvaluacionesNota:
-			porcentaje = Decimal(request.POST['porcentaje_%s_%s'%(x.pk,objColaborador.pk)])
-			porcentaje_meta = x.porcentaje_meta
-			if (porcentaje/porcentaje_meta)<1:
-				porcentaje_final = (porcentaje/porcentaje_meta)*100
-			else:
-				porcentaje_final = 100
-			nota = x.ponderacion*porcentaje_final/100
-			objEvalColaborador=evaluacion_colaborador(
-				empresa = objEmpresa,
-				periodo = objPeriodo,
-				puesto = x.puesto,
-				evaluacion = x,
-				colaborador = objColaborador,
-				porcentaje = porcentaje,
-				porcentaje_final = porcentaje_final,
-				nota = nota,
-				estado = True
-			)
-		objEvalColaborador.save()
+		try:
+			sid = transaction.savepoint()
+			for x in objEvaluacionesNota:
+				if 'porcentaje_%s_%s'%(x.pk,objColaborador.pk) in request.POST:
+					porcentaje = Decimal(request.POST['porcentaje_%s_%s'%(x.pk,objColaborador.pk)])
+					porcentaje_meta = x.porcentaje_meta
+					if (porcentaje/porcentaje_meta)<1:
+						porcentaje_final = (porcentaje/porcentaje_meta)*100
+					else:
+						porcentaje_final = 100
+					nota = x.ponderacion*porcentaje_final/100
+					if evaluacion_colaborador.objects.filter(evaluacion=x).exists():
+						objEvalColaborador = evaluacion_colaborador.objects.get(empresa__pk=pk,evaluacion=x,colaborador=objColaborador,periodo=objPeriodo, estado = True)
+						objEvalColaborador.porcentaje = porcentaje
+						objEvalColaborador.porcentaje_final = porcentaje_final
+						objEvalColaborador.nota = nota
+					else:
+						objEvalColaborador=evaluacion_colaborador(
+							empresa = objEmpresa,
+							periodo = objPeriodo,
+							puesto = x.puesto,
+							evaluacion = x,
+							colaborador = objColaborador,
+							porcentaje = porcentaje,
+							porcentaje_final = porcentaje_final,
+							nota = nota,
+							estado = True
+						)
+					if request.user.has_perm('evaluaciones.especiales_es_supervisor') and request.user.pk != id:
+						objEvalColaborador.supervisor = objColaborador.supervisor
+						objEvalColaborador.fecha_supervisor = timezone.now()
+					else:
+						objEvalColaborador.fecha_colaborador = timezone.now()
+					objEvalColaborador.save()
+			transaction.savepoint_commit(sid)
+		except:
+			error = True
+			transaction.savepoint_rollback(sid)
+		
+		if error == False:
+			messages.add_message(request,messages.SUCCESS,"Evaluación guardada exitosamente.")
+		else:
+			messages.add_message(request,messages.ERROR,"La Evaluación no se ha guardado.")
+		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador=objColaborador, estado=True)
 		ctx = {'empresa': objEmpresa,
 		'criterios' : objEvaluaciones,
 		'colaborador' : objColaborador,
-		'periodo' : objPeriodo}
+		'periodo' : objPeriodo,
+		'evaluacionColaborador' : objEvalColaborador}
 		return render(request, template_name, ctx)
 
 class SupervisorEvaluacionesList(View):
 	def get(self,request,pk=None):
 		template_name = "evaluaciones/supervisorEvaluacionesList.html"
 		objEmpresa = empresas.objects.get(pk=pk)
-		ctx = {'empresa': objEmpresa}
+		data=[]
+		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
+		evalu = evaluacion_colaborador.objects\
+		.filter(empresa__pk=pk, colaborador__supervisor__usuario=request.user, estado=True)\
+		.values('empresa__pk','evaluacion__puesto__pk','colaborador__usuario','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
+		ctx = {'empresa': objEmpresa,
+				'evaluaciones': evalu,
+				'totalCriterios' : totalCriterios}
 		return render(request, template_name, ctx)
 
 	def post(self,request,pk=None):
@@ -1482,12 +1534,12 @@ class guardar_evaluacion(View):
 				periodo_id = periodo_id,
 				puesto_id = puesto_id)
 			evaluacion_.save()
-			if evaluacion_ :
-				messages.add_message(request,messages.SUCCESS,'info,Evaluación Creada con exito')
-			else:
-				messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
 			print(objeto, ponderacion[contador],meta[contador])			
 			contador= contador+1
+		if contador>0 :
+			messages.add_message(request,messages.SUCCESS,'Info,Evaluación Creada con exito')
+		else:
+			messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
 		print(empresa_id,periodo_id,puesto_id)			
 		
 		success_url = reverse('evaluaciones:listar_criterios',

@@ -48,8 +48,29 @@
         </div> -->
 
         <!-- Main content -->
+
         <section class="invoice">
+          {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <i class="fa fa-close"></i>
+                    </button>
+                    <p></p>
+                    <strong><i class="fa fa-{% if message.tags == "success" %}check{%endif%}{% if message.tags == "error" %}close{%endif%}{% if message.tags == "warning" %}warning{%endif%}">&nbsp;</i>{{ message }}</strong> 
+                </div>
+
+            {% endfor %}
+        {% endif %}
           <!-- title row -->
+          {% if request.user != colaborador.usuario %}
+          <div class="row">
+            <div class="col-xs-12">
+                <a href="{% url 'evaluaciones:evaluacioneslist' pk=empresa.pk %}" class="pull-right btn btn-sm btn-raised btn-default pull-right"><i class="fa fa-list">&nbsp;</i> Listar evaluaciones</a>
+            </div><!-- /.col -->
+          </div>
+          {% endif %}
+          {% if colaborador %}
           <div class="row">
             <div class="col-xs-12">
               <h2 class="page-header">
@@ -76,7 +97,7 @@
               </address>
             </div><!-- /.col -->
           </div><!-- /.row -->
-
+          {% endif %}
           <!-- Table row -->
           <div class="row">
             <div class="col-xs-12 table-responsive">
@@ -103,10 +124,27 @@
                       <td>{{c.criterio.nombre}}</td>
                       <td>{{c.criterio.descripcion}}</td>
                       <td>{{c.ponderacion}}</td>
-                      <td><input type="text" id="id_porcentaje_{{c.id}}_{{colaborador.pk}}" name="porcentaje_{{c.id}}_{{colaborador.pk}}" onKeyUp="CalcularNota({{c.id}},{{colaborador.pk}},'{{c.porcentaje_meta}}','{{c.ponderacion}}',$(this).val())" size="5" {% if 'evaluaciones.evaluaciones_ingresar_cualitativos' not in perms and 'cualitativos' in criterio.grouper.nombre|lower %}disabled="disabled"{% else %} required {% endif %} required></td>
+                      <td><input type="text" id="id_porcentaje_{{c.id}}_{{colaborador.pk}}" name="porcentaje_{{c.id}}_{{colaborador.pk}}" onKeyUp="CalcularNota({{c.id}},{{colaborador.pk}},'{{c.porcentaje_meta}}','{{c.ponderacion}}',$(this).val())" size="5" 
+                      {% if request.user == colaborador.usuario and 'evaluaciones.evaluaciones_ingresar_cualitativos' not in perms and 'cualitativos' in criterio.grouper.nombre|lower %}
+                        disabled="disabled"
+                      {% endif %}
+                      {% if request.user == colaborador.usuario and 'evaluaciones.evaluaciones_ingresar_cuantitativos' not in perms and 'cuántitativos' in criterio.grouper.nombre|lower %} 
+                        disabled="disabled"
+                      {% endif %} 
+                      {% if request.user != colaborador.usuario and 'evaluaciones.evaluaciones_ingresar_sus_cualitativos' not in perms and 'cualitativos' in criterio.grouper.nombre|lower %}
+                        disabled="disabled"
+                      {% endif %}
+                      {% if request.user != colaborador.usuario and 'evaluaciones.evaluaciones_ingresar_sus_cuantitativos' not in perms and 'cuántitativos' in criterio.grouper.nombre|lower %} 
+                        disabled="disabled"
+                      {% endif %}
+                      required></td>
                       <td><strong id="id_nota_{{c.id}}_{{colaborador.pk}}">0.00</strong></td>
                     </tr>
                     {% endfor %}
+                  {% empty %}
+                    <tr style="background-color: #3C8DBC; color: white; text-align: center;">
+                      <td colspan="5"><strong>No hay evaluaciones disponibles</strong></td>
+                    </tr>
                   {% endfor %}
                   <tr>
                     <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
@@ -120,8 +158,8 @@
           <!-- this row will not appear when printing -->
           <div class="row no-print">
             <div class="col-xs-12">
-              <a href="invoice-print.html" target="_blank" class="btn btn-default"><i class="fa fa-print"></i> Imprimir</a>
-              <button class="btn btn-success pull-right"><i class="fa fa-send"></i> Enviar Evaluación</button>
+              <a {% if not colaborador %}disabled{%else%}href="invoice-print.html" target="_blank" class="btn btn-default"{% endif %}><i class="fa fa-print"></i> Imprimir</a>
+              <button class="btn btn-success pull-right" {% if not colaborador %}disabled{% endif %}><i class="fa fa-send"></i> Enviar Evaluación</button>
               <button class="btn btn-primary pull-right" style="margin-right: 5px;" disabled><i class="fa fa-download"></i> Generar excel</button>
             </div>
           </div>
@@ -164,5 +202,9 @@ function RecalcularTotal(){
     {% endfor %}
   $("#id_total_{{colaborador.pk}}").html(parseFloat(Math.round(total*100)/100).toFixed(2))
 }
+{% for e in evaluacionColaborador %}
+    CalcularNota({{e.evaluacion.pk}}, {{e.colaborador.pk}}, {{e.evaluacion.porcentaje_meta}}, {{e.evaluacion.ponderacion}}, {{e.porcentaje}})
+    $("#id_porcentaje_{{e.evaluacion.pk}}_{{e.colaborador.pk}}").val({{e.porcentaje}})
+{% endfor %}
 </script>
 {% endblock %}

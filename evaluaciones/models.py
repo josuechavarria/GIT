@@ -77,7 +77,7 @@ class sucursales(models.Model):
 class colaboradores(models.Model):
 	"""docstring for colaborador"""
 	empresa = models.ForeignKey(empresas)
-	usuario = models.ForeignKey(User, unique=True)
+	usuario = models.OneToOneField(User)
 	codigo = models.CharField(max_length=50, verbose_name = "Código colaborador")
 	primer_nombre = models.CharField(max_length=30)
 	segundo_nombre = models.CharField(max_length=30, null=True, blank=True, default=None)
@@ -192,9 +192,12 @@ class evaluaciones(models.Model):
 			("eliminar_períodos", "Eliminar períodos"),
 			("eliminar_criterios", "Eliminar criterios"),
 			("evaluaciones_mis_evaluaciones", "Mis evaluaciones"),
-			("evaluaciones_ingresar_cualitativos", "Ingresar nota Criterios Cualitativos")
+			("evaluaciones_ingresar_cualitativos", "Ingresar nota Criterios Cualitativos"),
+			("evaluaciones_ingresar_cuantitativos", "Ingresar nota Criterios Cuantitativos"),
+			("evaluaciones_ingresar_sus_cualitativos", "Ingresar sus Criterios Cualitativos"),
+			("evaluaciones_ingresar_sus_cuantitativos", "Ingresar sus Criterios Cuantitativos"),
+			("especiales_es_supervisor", "Es supervisor")
 		)
-
 
 class evaluacion_colaborador(models.Model):
 	empresa = models.ForeignKey(empresas)
@@ -205,6 +208,16 @@ class evaluacion_colaborador(models.Model):
 	porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
 	porcentaje_final = models.DecimalField(max_digits=5, decimal_places=2)
 	nota = models.DecimalField(max_digits=5, decimal_places=2)
+	estado = models.BooleanField(default=True)
+	supervisor = models.ForeignKey(colaboradores,null=True, blank=True, default=None,related_name='supervisor_eval_colab')
+	fecha_supervisor = models.DateTimeField(null=True, blank=True, default=None)
+	fecha_colaborador = models.DateTimeField(null=True, blank=True, default=None)
+
+class notificaciones(models.Model):
+	usuario = models.ForeignKey(User)
+	texto = models.CharField(max_length=60)
+	url = models.URLField(max_length=200)
+	fecha = models.DateField(default=now)
 	estado = models.BooleanField(default=True)
 
 ## Para la carga de archivos
