@@ -1511,9 +1511,15 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 		periodo = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]
 		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk'], periodo_id = periodo).order_by('id')		
 		criterios_usados = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )		
-		criterios_finales = criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' ))		
+		evaluaciones_hechas = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )
+		print(evaluaciones_hechas)		
+		criterios_finales = criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' ))
+		puestos_ = puestos.objects.all()			
+		puestos_finales = puestos_.exclude(id__in =  evaluaciones_hechas.values_list('puesto_id' ))
+		print(puestos_finales)
 		context['criterios'] = criterios_finales
-		context['periodos'] = periodo		
+		context['periodos'] = periodo	
+		context['puestos'] = puestos_finales
 		return context
 
 class guardar_evaluacion(View):
