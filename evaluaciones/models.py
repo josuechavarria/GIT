@@ -38,6 +38,9 @@ class empresas(models.Model):
 	estado = models.BooleanField(default=True)
 	def __str__(self):
 		return self.nombre
+	
+	def nombre_(self):
+		return self.nombre
 
 class puestos(models.Model):
 	"""docstring for puestos"""
@@ -133,13 +136,13 @@ class periodos(models.Model):
 	def year(self):		
 		return self.fecha_inico.strftime('%Y')
 	
-	def year_final(self):		
+	def anio(self):		
 		return self.fecha_fin.strftime('%Y')
 
-	def month_inicial(self):		
+	def mesini(self):		
 		return self.fecha_inico.strftime('%B')
 	
-	def month_final(self):		
+	def mesfina(self):		
 		return self.fecha_fin.strftime('%B')
 
 	def __str__(self):
@@ -168,6 +171,9 @@ class criterios(models.Model):
 	estado = models.BooleanField(default=True)
 
 	def __str__(self):
+		return self.nombre
+
+	def natural_key(self):
 		return self.nombre
 
 class evaluaciones(models.Model):

@@ -84,6 +84,17 @@ urlpatterns = [
     url(r'^evaluaciones/crear/(?P<pk>\d+)/$', views.CrearEvaluacion.as_view(model=evaluaciones), name='crear_evaluacion'),
     url(r'^evaluaciones/guardar/', views.guardar_evaluacion.as_view(),
         name='guardar_evaluacion'),
+    url(r'^evaluaciones/listar/(?P<pk>\d+)/$',
+        views.ListarEvaluaciones.as_view(), name='listar_evaluaciones'),    
+    url(r'^evaluaciones/borrar/', views.borrar_evaluaciones.as_view(), name='borrar_evaluaciones'),
+    url(r'^evaluaciones/actualiza_tabla/', views.actualizar_tabla,name='actualizar_tabla'),    
+    url(r'^evaluaciones/actualiza_tablacriterios/', views.actualizar_tablacriterios,name='actualizar_tablacriterios'),
+    url(r'^evaluaciones/listar_modificar/(?P<pk>\d+)/$',views.ListarEvaluaciones_modificar.as_view(), name='listar_evaluaciones_modificar'),
+
+
+
+    
+
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

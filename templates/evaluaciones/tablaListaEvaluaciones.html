@@ -1,0 +1,13 @@
+ {% for evaluacion in object_list %}
+<tr>
+    <td>{{evaluacion.id}}</td>
+    <td>{{ evaluacion.criterio }}</td>
+    <td>{{ evaluacion.puesto }}</td>
+    <td>{{ evaluacion.empresa }}</td>
+    <td>{{ evaluacion.periodo.year }}</td>
+    <td>{{ evaluacion.periodo.month_inicial }}</td>
+    <td>{{ evaluacion.periodo.month_final }}</td>
+    <td>{{ evaluacion.ponderacion }}</td>
+    <td>{{ evaluacion.porcentaje_meta }}</td>
+</tr>
+{% endfor %}
