@@ -1519,17 +1519,16 @@ class borrar_evaluaciones(View):
 						  kwargs={'pk': empresa_id})
 		return HttpResponse(success_url)
 
-def actualizar_tabla(request):
-		print(request.POST)
+def actualizar_tabla(request):		
 		empresa_id = request.POST['empresa_id']
 		puesto_id = request.POST['puesto_id']
 		for p in empresas.objects.raw('SELECT * FROM evaluaciones_empresas'):
-			print(p)
-		if puesto_id == '':
-			evaluaciones_ = []
-		else: 
-			evaluaciones_ = list(evaluaciones.objects.filter(
-				empresa__pk=empresa_id, puesto__pk = puesto_id).values(
+
+			if puesto_id == '':
+				evaluaciones_ = []
+			else: 
+				evaluaciones_ = list(evaluaciones.objects.filter(
+					empresa__pk=empresa_id, puesto__pk = puesto_id).values(
 					  'criterio_id',
 					  'criterio__nombre',
 					  'empresa__id',
@@ -1544,11 +1543,10 @@ def actualizar_tabla(request):
 		return HttpResponse(json.dumps(evaluaciones_, cls=DjangoJSONEncoder), content_type="application/json")
 
 def actualizar_tablacriterios(request):
-		print(request.POST)
+		print('actualizando tabla criterios')
 		empresa_id = request.POST['empresa_id']
 		puesto_id = request.POST['puesto_id']	
-		periodo_id = request.POST['periodo_id']	
-		
+		periodo_id = request.POST['periodo_id']			
 		if puesto_id == '':
 			criterios_finales = []
 		else: 
@@ -1556,7 +1554,16 @@ def actualizar_tablacriterios(request):
 			criterios_usados = evaluaciones.objects.filter(empresa_id = empresa_id, periodo_id = periodo_id, puesto_id = puesto_id)
 			criterios_finales = list(criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' )).values(
 				'id','nombre','descripcion','objetivo__nombre'
-			))
-			
+			))			
 		return HttpResponse(json.dumps(criterios_finales, cls=DjangoJSONEncoder), content_type="application/json")
 	
+class ListarEvaluaciones_modificar(ListView):
+	template_name = 'evaluaciones/evaluaciones_list_modificar.html'
+	def get_queryset(self):				
+		return evaluaciones.objects.filter(empresa__pk=self.kwargs['pk'])
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['periodos']  = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]		
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
+		context['puestos'] = puestos.objects.filter(empresa__id=self.kwargs['pk'])
+		return context
