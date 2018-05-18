@@ -1,0 +1,387 @@
+{% extends 'evaluaciones/base_empresa.html'%}
+{% load static %}
+{% block style %}
+<!-- DataTables -->
+    <link rel="stylesheet" href="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.css' %}">
+{% endblock %}
+{% block pantalla %}
+<section class="content-header">
+  <h1>
+    Configuración
+    <small>{{empresa.nombre}}</small>
+  </h1>
+  <ol class="breadcrumb">
+    <li><a href="#"><i class="fa fa-home"></i> Inicio</a></li>
+    <li class="active">Listar Evaluaciones</li>
+  </ol>
+</section>      
+{% endblock %}
+{% block content %}
+    <section class="ms-component-section">
+<div class="row">
+    <!-- left column -->
+    <div class="col-md-15">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-light alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <i class="fa fa-close"></i>
+                    </button>
+                    <p></p>
+                    <strong><i class="fa fa-check"></i> Éxito! {{ message }}</strong> 
+                </div>
+            {% endfor %}
+        {% endif %}        
+        <div class="box">            
+            <div class="box-header">
+                <br>
+                <p>
+                    <strong>Seleccione el puesto para poder revisar los criterios de evaluación que desea modificar</strong>
+                </p>                
+            </div>            
+        <div class="form-group">
+            <form role="form" class="form-horizontal" id="form_evaluacion" onsubmit="" enctype="multipart/form-data" method="">
+            <label class="col-sm-1 control-label" for="puesto"> Puesto </label>
+            <div class="col-sm-8">                
+                <select name="puesto" required="" id="id_puesto" class="form-control">
+                    <option value="" selected="">---------</option>
+                    {% for puesto in puestos %}        
+                    <option value="{{puesto.id}}">{{puesto.nombre}}</option>
+                    {% endfor %}        
+                </select>
+            </div>
+            </form>
+        </div>
+        <br><br><br>
+        </div>
+
+        {% if periodos %}
+                    {% for periodo in periodos %}
+                    <div class="form-group">                       
+                        <input type="text" id="periodo_id" value={{periodo.year}} hidden>
+                    </div>                    
+                    {% endfor %}
+        {% endif %}
+        <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">Listado de evaluaciones | {{empresa.nombre}}</h3>
+            </div><!-- /.box-header -->
+            <div class="box-body">                
+                <a class="btn btn-app" onclick="modal()">
+                    <i class="fa fa-save"></i> Agregar Criterios
+                </a>
+                <a class="btn btn-app" id="quitar_">
+                    <i class="fa fa-eraser"></i> Quitar Criterios
+                </a>
+                <a class="btn btn-app" id="modificar_" href="{%  url 'evaluaciones:listar_evaluaciones' pk=empresa.pk %}" hidden>
+                    <i class="fa fa-list"></i> Listar Criterios
+                </a>
+                <table id="evaluaciones" name="evaluaciones" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Criterio</th>
+                            <th>Puesto</th>
+                            <th>Empresa</th>
+                            <th>Periodo (Año) </th>
+                            <th>Periodo (Mes-Inicial) </th>
+                            <th>Periodo (Mes-Final) </th>
+                            <th>Ponderación</th>
+                            <th>Porcentaje Meta</th>              
+                        </tr>
+                    </thead>
+                    <tbody>                  
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                        <th>#</th>
+                        <th>Criterio</th>
+                        <th>Puesto</th>
+                        <th>Empresa</th>
+                        <th>Periodo (Año) </th>
+                        <th>Periodo (Mes-Inicial) </th>
+                        <th>Periodo (Mes-Final) </th>
+                        <th>Ponderación</th>
+                        <th>Porcentaje Meta</th>                        
+                        </tr>
+                    </tfoot>
+                </table>
+            </div><!-- /.box-body -->
+        </div><!-- /.box -->
+    </div>
+</div>
+</section>
+<div class="example-modal">
+    <div class="modal fade" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">                
+                <div class="modal-header">                   
+                    <div class="alert alert-error" role="alert" id="alert_errormodal" hidden>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">                            
+                        </button>
+                        <p></p>
+                        <strong>
+                            <i class="fa fa-check"></i>Error¡¡¡ seleccione al menos un criterio </strong>
+                    </div>
+                    <div class="col-sm-12">
+                        <br>
+                        <br>
+                        <br>
+                        <table id="criterios_table" name="criterios_table" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+                            <thead>
+                                <tr role="row">
+                                    <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Id</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Criterio</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Descripcion</th>                                    
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Tipo Objetivo</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Opciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>                               
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th rowspan="1" colspan="1">Id</th>
+                                    <th rowspan="1" colspan="1">Criterio</th>
+                                    <th rowspan="1" colspan="1">Descripcion</th>
+                                    <th rowspan="1" colspan="1">Tipo Objetivo</th>
+                                    <th rowspan="1" colspan="1">Opciones</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">                  
+                    <div class="box-footer">
+                        <div class="col-md-3 col-md-offset-6">                          
+                            
+                                <a class="btn btn-app" onclick="criterios()"  id="agregar_">
+                                    <i class="fa fa-save"></i> Agregar Criterios
+                                </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+</div>
+{% endblock %}
+{% block script %}
+<script src="{% static 'evaluaciones/plugins/jQueryUI/jquery-ui.js' %}"></script>
+<script src="{% static 'evaluaciones/plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'evaluaciones/plugins/datatables/dataTables.bootstrap.min.js' %}"></script>
+<script type="text/javascript">
+     function modal(criterio_id) {            
+            $('#myModal').modal();
+            $('#form_modal').on('submit', function (e) {
+                activar(criterio_id);
+            })
+        };      
+      $(function () {
+        var puesto_id = 0
+        var bquitar_ = document.getElementById("quitar_");
+        var bmodificar_ = document.getElementById("modificar_");
+        var puesto = document.getElementById("id_puesto");        
+        puesto.addEventListener('change',
+              function () {                  
+                  var selectedOption = this.options[puesto.selectedIndex];                   
+                  puesto_id = selectedOption.value;
+                  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                  ];            
+                  var tabla = $("#evaluaciones").DataTable({
+                      "processing": true,
+                      "destroy":true,
+                      "ajax": {
+                          type: 'post',
+                          "processing": true,
+                          "url": '{% url "evaluaciones:actualizar_tabla" %}',
+                          "data": {
+                              csrfmiddlewaretoken: '{{ csrf_token }}',
+                              empresa_id: '{{ empresa.pk }}',
+                              puesto_id: puesto_id,
+                          },
+                          "dataSrc": ""
+                      },
+                      "columns": [
+                          { "data": "criterio_id" },
+                          { "data": "criterio__nombre" },
+                          { "data": "puesto__nombre" },
+                          { "data": "empresa__nombre" },
+                          { "data": "periodo__fecha_inico",
+                            render: function (d) {
+                                  return moment(d).format("YYYY");
+                              }
+                             },
+                          { "data": "periodo__fecha_inico",
+                            render: function (d) {
+                                  return monthNames[moment(d).format("M")-1];
+                              } },
+                          { "data": "periodo__fecha_fin",
+                           render: function (d) {
+                                  return monthNames[moment(d).format("M")-1];
+                              }  },
+                          { "data": "ponderacion",
+                            render: function (data, type, ssrow, meta) { 
+                                    return '<input type="text" id="p' + ssrow.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  value="'+ data + '"/>'                                    
+                                }},                          
+                          { "data": "porcentaje_meta" ,
+                            render: function (data, type, ssrow, meta) { 
+                                    return '<input type="text"  id="m' + ssrow.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required value="'+ data + '" />'
+                                }},
+                            ],
+                      "language": {
+                          "lengthMenu": "Mostrar _MENU_ registros por pagina",
+                          "search": "Buscar:",
+                          "zeroRecords": "Ningún Registro encontrado",
+                          "info": "Mostrando pagina _PAGE_ de _PAGES_",
+                          "infoEmpty": "Registros no disponibles",
+                          "infoFiltered": "(filtrado de  _MAX_ registros totales)",
+                          "paginate": {
+                              "previous": "Anterior",
+                              "next": "Siguiente"
+                          }
+                      }
+                  });
+                  
+                  var tabla_ = $("#criterios_table").DataTable({                         
+                        "processing": true,
+                        "destroy": true,                        
+                        "ajax": {
+                            type: 'post',
+                            "processing": true,
+                            "url": '{% url "evaluaciones:actualizar_tablacriterios" %}',
+                            "data": {
+                                csrfmiddlewaretoken: '{{ csrf_token }}',
+                                empresa_id: '{{ empresa.pk }}',
+                                puesto_id: puesto_id,
+                                periodo_id: periodo_id
+                            },
+                            "dataSrc": ""
+                        },
+                        "columns": [
+                            { "data": "id" },
+                            { "data": "nombre" },
+                            { "data": "descripcion" },
+                            { "data": "objetivo__nombre" },                       
+                            { "data": "opciones", 
+                               "render": function (data, type, ssrow, meta) {
+                                   console.log(data)
+                                    return ' <p class="seleccionado_" id="icon_' + ssrow.id + '" hidden><i class="fa fa-check-circle"  ></i></p >';
+                                }},   
+                        ],
+                        "language": {
+                            "lengthMenu": "Mostrar _MENU_ registros por pagina",
+                            "search": "Buscar:",
+                            "zeroRecords": "Ningún Registro encontrado",
+                            "info": "Mostrando pagina _PAGE_ de _PAGES_",
+                            "infoEmpty": "Registros no disponibles",
+                            "infoFiltered": "(filtrado de  _MAX_ registros totales)",
+                            "paginate": {
+                                "previous": "Anterior",
+                                "next": "Siguiente"
+                            }
+                        }
+                    });
+                                              
+                  if (puesto_id == 0) {
+                      var tabla = $('#evaluaciones').DataTable()                      
+                      if(! tabla.data().any())
+                        alert('vacio');
+                        $("#quitar_").hide();
+                  } else {
+                      $("#quitar_").show();
+                  }
+                  if(puesto_id != 0){
+                      tabla.destroy();
+                      tabla.draw();
+                  }else{
+                      tabla.destroy();
+                  }
+                  
+        });          
+      
+                     
+        /*
+        $('#evaluaciones tbody').on('click', 'tr', function () {                       
+              $(this).toggleClass('selectedin'); 
+                var elemento = "icon_" + tabla.row(this).data()[0];
+                var elemento_ = document.getElementById(elemento);
+                console.log(elemento)
+                console.log(elemento_)
+                if (elemento_.hidden) {
+                    elemento_.hidden = false;
+                    }
+                else {
+                elemento_.hidden = true;
+                }                          
+          });  
+    */
+        // Datos en la tabla principal la tabla 1 , esta sirve de intercambio.
+    $('#quitar_').click(function () {        
+        var tabla = $('#evaluaciones').DataTable()
+        var datos = tabla.rows().data();
+        var tamaño = datos.length;
+        var arreglo_eliminar = []
+        console.log(tamaño)
+        if(tamaño == 0){
+            alert('No existen Evaluaciones en función del puesto seleccionado')
+        }else {
+            datos.each(function (value, index) {
+                a = value                 
+                arreglo_eliminar.push(a.toString().split(",", 1))                
+            });            
+            borrar(arreglo_eliminar,puesto_id)
+        }    
+        }); 
+
+          function borrar(ids, puesto_id) {
+            console.log('entro a borrar')
+            periodo_id = document.getElementById('periodo_id').value     
+            console.log(ids)        
+              $.ajax({
+                  method: "POST",
+                  url: "{% url 'evaluaciones:borrar_evaluaciones' %}",
+                  data: {
+                      'ids[]': ids,                      
+                      'puesto_id': puesto_id,
+                      csrfmiddlewaretoken: '{{ csrf_token }}',
+                      empresa_id: '{{ empresa.pk }}',
+                      periodo_id: periodo_id
+                  }
+              }).done(function (msg) {
+                  alert('haciendo')
+                  location.reload();
+              });
+          }  
+    });
+    </script>
+
+<style>
+    input:invalid {
+    border-color: red;
+}
+input,
+input:valid {
+    border-color: #2ecc71;
+}   
+    tr{
+        cursor: pointer;
+    }
+    p.seleccionado_{
+        color: green;
+        text-align: center
+    }
+    p.quitado_{
+        color: green;
+        text-align: center
+    }
+    tr.selectedin{
+        background-color:#afddd1        
+        }
+    tr.selectedout{background-color:#a39797c0}
+   </style>
+{% endblock %}
