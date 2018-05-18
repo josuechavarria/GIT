@@ -111,13 +111,14 @@
     </div>
 </div>
 </section>
+
 <div class="example-modal">
     <div class="modal fade" id="myModal">
         <div class="modal-dialog">
-            <div class="modal-content">                
-                <div class="modal-header">                   
+            <div class="modal-content">
+                <div class="modal-header">
                     <div class="alert alert-error" role="alert" id="alert_errormodal" hidden>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">                            
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         </button>
                         <p></p>
                         <strong>
@@ -127,17 +128,17 @@
                         <br>
                         <br>
                         <br>
-                        <table id="criterios_table" name="criterios_table" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+                        <table id="criterios_table" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
                             <thead>
                                 <tr role="row">
                                     <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Id</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Criterio</th>
-                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Descripcion</th>                                    
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Descripcion</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Tipo Objetivo</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody>                               
+                            <tbody>
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -151,13 +152,13 @@
                         </table>
                     </div>
                 </div>
-                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">                  
+                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">
                     <div class="box-footer">
-                        <div class="col-md-3 col-md-offset-6">                          
-                            
-                                <a class="btn btn-app" onclick="criterios()"  id="agregar_">
-                                    <i class="fa fa-save"></i> Agregar Criterios
-                                </a>
+                        <div class="col-md-3 col-md-offset-6">
+
+                            <a class="btn btn-app" onclick="criterios()" id="agregar_">
+                                <i class="fa fa-save"></i> Agregar Criterios
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -272,7 +273,7 @@
                                    console.log(data)
                                     return ' <p class="seleccionado_" id="icon_' + ssrow.id + '" hidden><i class="fa fa-check-circle"  ></i></p >';
                                 }},   
-                        ],
+                        ],                        
                         "language": {
                             "lengthMenu": "Mostrar _MENU_ registros por pagina",
                             "search": "Buscar:",
