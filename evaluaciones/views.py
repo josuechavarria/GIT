@@ -1608,12 +1608,14 @@ def actualizar_tablacriterios(request):
 		puesto_id = request.POST['puesto_id']	
 		periodo_id = request.POST['periodo_id']			
 		if puesto_id == '':
+			print('puesto_id vacio' + periodo_id)
 			criterios_finales = []
 		else: 
+			print('al parecer hay algo')
 			criterios_ =  criterios.objects.filter(empresa_id =empresa_id, periodo_id = periodo_id).order_by('id')		
 			criterios_usados = evaluaciones.objects.filter(empresa_id = empresa_id, periodo_id = periodo_id, puesto_id = puesto_id)
 			criterios_finales = list(criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' )).values(
-				'id','nombre','descripcion','objetivo__nombre'
+				'id','nombre','descripcion','objetivo__nombre','periodo__fecha_fin','periodo__fecha_inico','empresa__nombre'
 			))			
 		return HttpResponse(json.dumps(criterios_finales, cls=DjangoJSONEncoder), content_type="application/json")
 	
@@ -1627,3 +1629,34 @@ class ListarEvaluaciones_modificar(ListView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		context['puestos'] = puestos.objects.filter(empresa__id=self.kwargs['pk'])
 		return context
+
+class modificar_evaluacion(View):
+	def post(self,request,pk=None):	
+		print(request.POST)	
+		empresa_id = request.POST['empresa_id']
+		periodo_id = request.POST['periodo_id']
+		puesto_id = request.POST['puesto_id']
+		ponderacion = request.POST.getlist('ponderaciones[]')
+		meta = request.POST.getlist('metas[]')
+		contador = 0
+		for objeto in request.POST.getlist('ids[]'):			
+			obj,created = evaluaciones.objects.update_or_create(
+				ponderacion=ponderacion[contador],
+				porcentaje_meta=meta[contador],
+			    criterio_id = objeto,
+				empresa_id = empresa_id,
+				periodo_id = periodo_id,
+				puesto_id = puesto_id,
+				defaults=updated_values
+			)			
+			print(objeto, ponderacion[contador],meta[contador])			
+			contador= contador+1
+		if contador>0 :
+			messages.add_message(request,messages.SUCCESS,'Info,Evaluación Creada con exito')
+		else:
+			messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
+		print(empresa_id,periodo_id,puesto_id)			
+		
+		success_url = reverse('evaluaciones:listar_criterios',
+						  kwargs={'pk': empresa_id})
+		return HttpResponse(success_url)
