@@ -90,7 +90,7 @@ urlpatterns = [
     url(r'^evaluaciones/actualiza_tabla/', views.actualizar_tabla,name='actualizar_tabla'),    
     url(r'^evaluaciones/actualiza_tablacriterios/', views.actualizar_tablacriterios,name='actualizar_tablacriterios'),
     url(r'^evaluaciones/listar_modificar/(?P<pk>\d+)/$',views.ListarEvaluaciones_modificar.as_view(), name='listar_evaluaciones_modificar'),
-
+    url(r'^evaluaciones/notificar/refresh/(?P<pk>\d+)/(?P<id>\d+)$', views.NotificacionesRefresh.as_view(), name='notificacion_refresh'),
 
 
     

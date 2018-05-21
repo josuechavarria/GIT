@@ -19,3 +19,12 @@ def addcss(field, args):
 @register.filter(name='totalCriterios')
 def getTotalCriterios(empresa_id, puesto_id):
     return evaluaciones.objects.filter(empresa__pk=empresa_id,puesto__pk=puesto_id,estado=True,periodo__estado=True).count()
+
+@register.filter(name='evaluacionDisponible')
+def getevaluacionDisponible(empresa_id, usuario_id):
+	objColaborador = colaboradores.objects.get(usuario__pk=usuario_id)
+	return 1 if evaluaciones.objects.filter(empresa__pk=empresa_id,puesto=objColaborador.puesto,estado=True,periodo__estado=True).count()>0 else 0
+
+@register.filter(name='evaluacionColaboradores')
+def getevaluacionColaboradores(empresa_id, usuario_id):
+	return evaluacion_colaborador.objects.filter(empresa__pk=empresa_id, colaborador__supervisor__usuario__pk=usuario_id, estado=True).distinct('colaborador').count()

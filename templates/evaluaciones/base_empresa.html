@@ -7,6 +7,8 @@
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     {% load static %}
+    {% load evaluaciones_tags %}
+
     <!-- Bootstrap 3.3.5 -->
     <link rel="stylesheet" href="{% static 'evaluaciones/bootstrap/css/bootstrap.min.css' %}">
         <!-- jQuery 2.1.4 -->
@@ -86,30 +88,8 @@
             <ul class="nav navbar-nav">
               <!-- Messages: style can be found in dropdown.less-->
               <!-- Notifications: style can be found in dropdown.less -->
-              <li class="dropdown notifications-menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                  <i class="fa fa-bell-o"></i>
-                  <span class="label label-warning">2</span>
-                </a>
-                <ul class="dropdown-menu">
-                  <li class="header">Tienes 2 notificaciones</li>
-                  <li>
-                    <!-- inner menu: contains the actual data -->
-                    <ul class="menu">
-                      <li>
-                        <a href="#">
-                          <i class="fa fa-bell-o text-aqua"></i> Evaluación mensual disponible.
-                        </a>
-                      </li>
-                      <li>
-                        <a href="#">
-                          <i class="fa fa-bell-o text-aqua"></i> Carlos Zapata completó su evaluación.
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                  <li class="footer"><a href="#">Ver Todo</a></li>
-                </ul>
+              <li class="dropdown notifications-menu" id="id_notifty">
+                
               </li>
               <!-- Tasks: style can be found in dropdown.less -->
               <!-- User Account: style can be found in dropdown.less -->
@@ -288,10 +268,12 @@
             {% if 'evaluaciones.evaluaciones_mis_evaluaciones' in perms and not request.user.is_superuser %}
             <li class="treeview">
               <a href="#">
-                <i class="fa fa-list"></i> <span>Mis Evaluaciones <small class="label pull-right bg-green">1</small></span> 
+                <i class="fa fa-list"></i> <span>Mis Evaluaciones <small class="label pull-right bg-green">{{empresa.pk|evaluacionDisponible:request.user.pk}}</small></span> 
               </a>
               <ul class="treeview-menu">
+                {% if empresa.pk|evaluacionDisponible:request.user.pk == 1 %}
                 <li class="active"><a href="{% url 'evaluaciones:misevaluaciones' pk=empresa.pk id=request.user.pk %}"><i class="fa fa-circle-o"></i> ¡Evaluación disponible!</a> </li>
+                {% endif %}
                 <li><a href="{% url 'evaluaciones:listar_criterios' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
               </ul>
             </li>
@@ -299,7 +281,7 @@
             {% if 'evaluaciones.especiales_es_supervisor' in perms and not request.user.is_superuser %}
             <li class="treeview">
               <a href="#">
-                <i class="fa fa-users"></i> <span>Colaboradores <small class="label pull-right bg-blue">7</small></span> 
+                <i class="fa fa-users"></i> <span>Colaboradores <small class="label pull-right bg-blue">{{empresa.pk|evaluacionColaboradores:request.user.pk}}</small></span> 
               </a>
               <ul class="treeview-menu">
                 <li class="active"><a href="{% url 'evaluaciones:evaluacioneslist' pk=empresa.pk %}"><i class="fa fa-circle-o"></i>Evaluaciones disponibles</a> </li>
@@ -401,7 +383,27 @@
   <script type="text/javascript">
     $( document ).ready(function() {
         $("#myModalLoader").modal('hide')
+        $.ajax({
+          method: "POST",
+          url: "{% url 'evaluaciones:notificacion_refresh' pk=empresa.pk id=request.user.pk %}",
+          data: {csrfmiddlewaretoken: '{{ csrf_token }}'}
+        })
+          .done(function(msg) {
+            //alert( "Data Saved: " + msg );
+            $("#id_notifty").html(msg);
+          });
     });
+    function notificacionRefresh(id){
+      $.ajax({
+        method: "POST",
+        url: "{% url 'evaluaciones:notificacion_refresh' pk=empresa.pk id=request.user.pk %}",
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}', id_notificacion: id}
+      })
+        .done(function(msg) {
+          //alert( "Data Saved: " + msg );
+          $("#id_notifty").html(msg);
+        });
+    }
     function disableSubmit(){
       $(':input[type="submit"]').prop('disabled', true);
     }
