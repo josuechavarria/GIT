@@ -1493,7 +1493,7 @@ class SupervisorEvaluacionesList(View):
 class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	model = evaluaciones
 	form_class = EvaluacionesForm
-	template_name = "evaluaciones/crearevaluacion.html"	
+	template_name = "evaluaciones/crearEvaluacion.html"	
 	form_invalid_message = 'Error al crear la evaluacion por favor revise los datos'
 		
 	def get_success_url(self, **kwargs):				
@@ -1514,7 +1514,7 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 		evaluaciones_hechas = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )
 		print(evaluaciones_hechas)		
 		criterios_finales = criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' ))
-		puestos_ = puestos.objects.all()			
+		puestos_ = puestos.objects.filter(empresa_id = self.kwargs['pk'])			
 		puestos_finales = puestos_.exclude(id__in =  evaluaciones_hechas.values_list('puesto_id' ))
 		print(puestos_finales)
 		context['criterios'] = criterios_finales
