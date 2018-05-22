@@ -186,6 +186,8 @@ class evaluaciones(models.Model):
 	estado = models.BooleanField(default=True)
 
 	class Meta:
+
+		#unique_together = ('empresa','periodo','puesto','criterio',)
 		permissions = (
 			("evaluaciones_roles", "Configurar Roles y permisos"),
 			("evaluaciones_listasdesplegables", "Configurar listas de selección"),
