@@ -222,11 +222,10 @@ class evaluacion_colaborador(models.Model):
 	fecha_colaborador = models.DateTimeField(null=True, blank=True, default=None)
 
 class notificaciones(models.Model):
-	empresa = models.ForeignKey(empresas, default=None)
 	usuario = models.ForeignKey(User)
 	texto = models.CharField(max_length=60)
-	url = models.CharField(max_length=200)
-	fecha = models.DateTimeField(default=now)
+	url = models.URLField(max_length=200)
+	fecha = models.DateField(default=now)
 	estado = models.BooleanField(default=True)
 
 ## Para la carga de archivos
