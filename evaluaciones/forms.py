@@ -122,9 +122,9 @@ class EvaluacionesForm(ModelForm):
             'puesto':  Select(attrs={'class': 'form-control'}), 
             'criterio': Select(attrs={'class': 'form-control'}), 
             'ponderacion': TextInput(attrs={'class': 'form-control'}),
-            'porcentaje': TextInput(attrs={'class': 'form-control'}) 
+            'porcentaje': TextInput(attrs={'class': 'form-control'})
         }
-        exclude = ('periodo','criterio', 'ponderacion','porcentaje_meta', 'estado')
+        exclude = ('periodo','criterio', 'ponderacion','porcentaje_meta', 'estado', 'puesto')
 
 
 

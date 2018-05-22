@@ -50,19 +50,27 @@
                     {% endfor %}        
                 </select>
             </div>
-            </form>
-        </div>
+          </div>
         <br><br><br>
         </div>
 
         {% if periodos %}
                     {% for periodo in periodos %}
                     <div class="form-group">                       
-                        <input type="text" id="periodo_id" value={{periodo.year}} hidden>
+                        <input type="text" id="periodo_id" value={{periodo.pk}} hidden>
                     </div>                    
                     {% endfor %}
         {% endif %}
-        <div class="box">
+
+        <div class="alert alert-error" role="alert" id="alert_error" hidden>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            </button>
+            <p></p>
+            <strong>
+                <i class="fa fa-check"></i>Error¡¡¡ la suma de la columna "Ponderación" no es igual a 100.00 </strong>
+        </div>
+
+        <div class="box">            
             <div class="box-header">
               <h3 class="box-title">Listado de evaluaciones | {{empresa.nombre}}</h3>
             </div><!-- /.box-header -->
@@ -87,7 +95,8 @@
                             <th>Periodo (Mes-Inicial) </th>
                             <th>Periodo (Mes-Final) </th>
                             <th>Ponderación</th>
-                            <th>Porcentaje Meta</th>              
+                            <th>Porcentaje Meta</th>
+                            <th>Opciones</th>
                         </tr>
                     </thead>
                     <tbody>                  
@@ -102,22 +111,33 @@
                         <th>Periodo (Mes-Inicial) </th>
                         <th>Periodo (Mes-Final) </th>
                         <th>Ponderación</th>
-                        <th>Porcentaje Meta</th>                        
+                        <th>Porcentaje Meta</th> 
+                        <th>Opciones</th>
                         </tr>
                     </tfoot>
                 </table>
             </div><!-- /.box-body -->
         </div><!-- /.box -->
     </div>
-</div>
+    <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
+    <div class="box-footer">
+        <div class="col-md-3 col-md-offset-6">
+            <button class="btn btn-raised btn-primary pull-left" type="submit" onclick="$('#SaveNew').removeAttr('disabled');" value="SaveNew">
+                <i class="fa fa-edit"></i>&nbsp;Modificar</button>
+        </div>
+    </div>
+    </div>
+</form>
+
 </section>
+
 <div class="example-modal">
     <div class="modal fade" id="myModal">
         <div class="modal-dialog">
-            <div class="modal-content">                
-                <div class="modal-header">                   
+            <div class="modal-content">
+                <div class="modal-header">
                     <div class="alert alert-error" role="alert" id="alert_errormodal" hidden>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">                            
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         </button>
                         <p></p>
                         <strong>
@@ -127,37 +147,45 @@
                         <br>
                         <br>
                         <br>
-                        <table id="criterios_table" name="criterios_table" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
+                        <table id="criterios_table" class="table table-bordered table-hover dataTable" role="grid" aria-describedby="example2_info">
                             <thead>
                                 <tr role="row">
                                     <th class="sorting_asc" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Rendering engine: activate to sort column descending">Id</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Criterio</th>
-                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Descripcion</th>                                    
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Empresa</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Descripcion</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Tipo Objetivo</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Periodo</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Fecha de Inicio</th>
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Fecha Fin</th>                                    
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Opciones</th>
                                 </tr>
                             </thead>
-                            <tbody>                               
+                            <tbody>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <th rowspan="1" colspan="1">Id</th>
                                     <th rowspan="1" colspan="1">Criterio</th>
+                                    <th rowspan="1" colspan="1">Empresa</th>
                                     <th rowspan="1" colspan="1">Descripcion</th>
                                     <th rowspan="1" colspan="1">Tipo Objetivo</th>
+                                    <th rowspan="1" colspan="1">Periodo</th>
+                                    <th rowspan="1" colspan="1">Fecha Inicio</th>
+                                    <th rowspan="1" colspan="1">Fecha Fin</th>                                   
                                     <th rowspan="1" colspan="1">Opciones</th>
                                 </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
-                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">                  
+                <form action="" role="form" form id="form_modal" class="form-horizontal" enctype="multipart/form-data">
                     <div class="box-footer">
-                        <div class="col-md-3 col-md-offset-6">                          
-                            
-                                <a class="btn btn-app" onclick="criterios()"  id="agregar_">
-                                    <i class="fa fa-save"></i> Agregar Criterios
-                                </a>
+                        <div class="col-md-3 col-md-offset-6">
+
+                            <a class="btn btn-app" id="agregar_">
+                                <i class="fa fa-save"></i> Agregar Criterios
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -186,15 +214,17 @@
         var bmodificar_ = document.getElementById("modificar_");
         var puesto = document.getElementById("id_puesto");        
         puesto.addEventListener('change',
-              function () {                  
-                  var selectedOption = this.options[puesto.selectedIndex];                   
+              function () { 
+                  periodo_id = document.getElementById('periodo_id').value                    
+                  var selectedOption = this.options[puesto.selectedIndex];
+                  var seletedText = selectedOption.text                  
                   puesto_id = selectedOption.value;
                   const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
                       "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
                   ];            
-                  var tabla = $("#evaluaciones").DataTable({
+                  var tabla = $("#evaluaciones").DataTable({                      
                       "processing": true,
-                      "destroy":true,
+                      "destroy":true,                     
                       "ajax": {
                           type: 'post',
                           "processing": true,
@@ -226,12 +256,19 @@
                               }  },
                           { "data": "ponderacion",
                             render: function (data, type, ssrow, meta) { 
-                                    return '<input type="text" id="p' + ssrow.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  value="'+ data + '"/>'                                    
+                                    return '<input type="text" id="p' + ssrow.criterio_id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  value="'+ data + '"/>'                                    
                                 }},                          
                           { "data": "porcentaje_meta" ,
                             render: function (data, type, ssrow, meta) { 
-                                    return '<input type="text"  id="m' + ssrow.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required value="'+ data + '" />'
-                                }},
+                                    return '<input type="text"  id="m' + ssrow.criterio_id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required value="'+ data + '" />'
+                                }},  
+                            {
+                              "data": "opciones",
+                              "render": function (data, type, ssrow, meta) {
+                                  console.log(ssrow)
+                                  return ' <p class="seleccionado_" id="icon_' + ssrow.criterio_id + '" hidden><i class="fa fa-check-circle"  ></i></p >';
+                              }
+                          },                       
                             ],
                       "language": {
                           "lengthMenu": "Mostrar _MENU_ registros por pagina",
@@ -249,7 +286,23 @@
                   
                   var tabla_ = $("#criterios_table").DataTable({                         
                         "processing": true,
-                        "destroy": true,                        
+                        "destroy": true,
+                          "columnDefs": [
+                          {
+                              "targets": [2],
+                              "visible": false,                             
+                          },
+                          {
+                              "targets": [7],  
+                              "visible": false,                           
+                          },
+                        
+                              {
+                                  "targets": [6],
+                                  "visible": false,
+                              },
+                          
+                      ],
                         "ajax": {
                             type: 'post',
                             "processing": true,
@@ -265,14 +318,32 @@
                         "columns": [
                             { "data": "id" },
                             { "data": "nombre" },
+                            { "data": "empresa__nombre" },
                             { "data": "descripcion" },
-                            { "data": "objetivo__nombre" },                       
-                            { "data": "opciones", 
-                               "render": function (data, type, ssrow, meta) {
-                                   console.log(data)
+                            { "data": "objetivo__nombre" },  
+                            {
+                                "data": "periodo__fecha_inico",
+                                render: function (d) {
+                                    return moment(d).format("YYYY");
+                                }
+                            },
+                            {
+                                "data": "periodo__fecha_inico",
+                                render: function (d) {
+                                    return monthNames[moment(d).format("M") - 1];
+                                }
+                            },
+                            {
+                                "data": "periodo__fecha_fin",
+                                render: function (d) {
+                                    return monthNames[moment(d).format("M") - 1];
+                                }
+                            },                     
+                            { "data": "opciones",
+                               "render": function (data, type, ssrow, meta) {                                   
                                     return ' <p class="seleccionado_" id="icon_' + ssrow.id + '" hidden><i class="fa fa-check-circle"  ></i></p >';
                                 }},   
-                        ],
+                        ],                        
                         "language": {
                             "lengthMenu": "Mostrar _MENU_ registros por pagina",
                             "search": "Buscar:",
@@ -287,7 +358,7 @@
                         }
                     });
                                               
-                  if (puesto_id == 0) {
+                  if (puesto_id === 0) {
                       var tabla = $('#evaluaciones').DataTable()                      
                       if(! tabla.data().any())
                         alert('vacio');
@@ -304,60 +375,174 @@
                   
         });          
       
-                     
-        /*
-        $('#evaluaciones tbody').on('click', 'tr', function () {                       
-              $(this).toggleClass('selectedin'); 
-                var elemento = "icon_" + tabla.row(this).data()[0];
-                var elemento_ = document.getElementById(elemento);
-                console.log(elemento)
-                console.log(elemento_)
-                if (elemento_.hidden) {
-                    elemento_.hidden = false;
-                    }
-                else {
-                elemento_.hidden = true;
-                }                          
-          });  
-    */
-        // Datos en la tabla principal la tabla 1 , esta sirve de intercambio.
-    $('#quitar_').click(function () {        
-        var tabla = $('#evaluaciones').DataTable()
-        var datos = tabla.rows().data();
-        var tamaño = datos.length;
-        var arreglo_eliminar = []
-        console.log(tamaño)
-        if(tamaño == 0){
-            alert('No existen Evaluaciones en función del puesto seleccionado')
-        }else {
-            datos.each(function (value, index) {
-                a = value                 
-                arreglo_eliminar.push(a.toString().split(",", 1))                
-            });            
-            borrar(arreglo_eliminar,puesto_id)
-        }    
-        }); 
+      $('#criterios_table tbody').on('click', 'tr', function () {
+              var tabla = $("#criterios_table").DataTable();
+              $(this).toggleClass('selectedin');
+              var elemento = "icon_" + tabla.row(this).data().id;
+              var elemento_ = document.getElementById(elemento);
+              console.log(tabla.row(this).data().id)
+              if (elemento_.hidden) {
+                  elemento_.hidden = false;
+              }
+              else {
+                  elemento_.hidden = true;
+              }
+          });
 
-          function borrar(ids, puesto_id) {
-            console.log('entro a borrar')
-            periodo_id = document.getElementById('periodo_id').value     
-            console.log(ids)        
-              $.ajax({
-                  method: "POST",
-                  url: "{% url 'evaluaciones:borrar_evaluaciones' %}",
-                  data: {
-                      'ids[]': ids,                      
-                      'puesto_id': puesto_id,
-                      csrfmiddlewaretoken: '{{ csrf_token }}',
-                      empresa_id: '{{ empresa.pk }}',
-                      periodo_id: periodo_id
-                  }
-              }).done(function (msg) {
-                  alert('haciendo')
-                  location.reload();
+          $('#evaluaciones tbody').on('click', 'tr', function () {
+              var tabla1 = $("#evaluaciones").DataTable();
+              console.log('Valores de la tabla:' + tabla1.row(this).data())
+
+              $(this).toggleClass('selectedout');
+              var elemento = "icon_" + tabla1.row(this).data()[0];
+              var elemento_ = document.getElementById(elemento);
+              if (elemento_.hidden) {
+                  elemento_.hidden = false;
+              }
+              else {
+                  elemento_.hidden = true;
+              }
+          }); 
+ // Datos en la tabla Modal la tabla 1 , esta sirve de intercambio.
+          $('#agregar_').click(function () {
+              var tabla = $("#criterios_table").DataTable();
+              var tabla1 = $("#evaluaciones").DataTable();
+              var datos = tabla.rows('.selectedin').data();
+               const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+              ];              
+              var error_alert = document.getElementById("alert_errormodal")
+              if (datos.length == 0) {
+                  error_alert.hidden = false
+              } else {
+                  error_alert.hidden = true
+                  datos.each(function (value, index) {
+                      a = value   
+                      fecha = new Date(a.periodo__fecha_inico)
+                      fecha2 = new Date(a.periodo__fecha_fin)
+                      anio = fecha.getFullYear();
+                      month1 = monthNames[fecha.getMonth()]; 
+                      month2 = monthNames[fecha2.getMonth()];                       
+                      tabla1.row.add([a.id, 
+                                     a.nombre,
+                                     a.empresa__nombre,
+                                     a.empresa__nombre, 
+                                     anio, 
+                                     month1,
+                                     month2,
+                                     '<input type="text" id="p' + a.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  />', '<input type="text"  id="m' + a.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required />', ' <p class="seleccionado_" id="icon_' + a.id + '" hidden><i class="fa fa-check-circle"  ></i></p >']).draw().node();
+
+
+                  });
+                  //quitar seleccionados y hacer intercambio, regresar al modal
+                  tabla.rows('.selectedin').remove().draw()
+                  $('#myModal').modal('hide');
+                  // actualizartabla (arreglo_nuevos        
+              }
+          });
+
+          // Datos en la tabla principal la tabla 1 , esta sirve de intercambio.
+          $('#quitar_').click(function () {
+              var tabla1 = $("#evaluaciones").DataTable();
+              var tabla2 = $("#criterios_table").DataTable();
+              var datos = tabla1.rows('.selectedout').data();
+              console.log('quitando')
+              datos.each(function (value, index) {
+                  a = value
+                  console.log(a[0])
+                  //tabla2.row.add([a[0], a[1], a[2],a[3], ' <p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check-circle"  ></i></p >']).draw().node();
+                  tabla2.rows.add([{
+                      "id": a[0],
+                      "nombre": a[1],
+                      "descripcion": a[2],
+                      "objetivo__nombre": a[3],
+                      "opciones": '<p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check - circle"></i></p >'
+                  }]).draw();
               });
-          }  
+              var datos_llenos = tabla2.rows().data();
+              datos_llenos.each(function (value, index) {
+                  a = value
+                  console.log(a)
+
+              });
+              //quitar seleccionados y hacer intercambio, regresar al modal
+              tabla1.rows('.selectedout').remove().draw()
+              //alert_modallleno.hidden = true;
+              // actualisartabla (arreglo_nuevos      
+          });
+
+     
     });
+       
+        $('#form_evaluacion').on('submit', function (e) {
+            alert('intentando guardar')
+            var tabla1 = $('#evaluaciones').DataTable();
+            var puesto_id = document.getElementById('id_puesto').value     
+            console.log('el puesto es:'+puesto_id   ) 
+            alert_error = document.getElementById('alert_error')
+            e.preventDefault()
+            var datos = tabla1.rows().data();
+            var arreglo_nuevos = [];
+            var ponderaciones = [];
+            var metas = [];
+            //Recorremos la tabla sacando los ids de los criterios y los valores de los inputs.
+            //Generamos 3 arreglos para luego revisar
+            centinela = " "
+            datos.each(function (value, index) {
+                a = value
+                var pon = "p" + a.toString().split(",", 1)
+                var met = "m" + a.toString().split(",", 1)
+                centinela = "p" + a.toString().split(",", 1)
+                arreglo_nuevos.push(a.toString().split(",", 1))
+                ponderaciones.push(document.getElementById(pon).value)
+                metas.push(document.getElementById(met).value)
+            });
+            var suma = sumar_array(ponderaciones);
+            console.log('el valor de la suma es: ' + suma)
+            if (suma != 100) {
+                console.log('NÚMERO ERRONEO')
+                document.getElementById(centinela).focus()
+                alert_error.hidden = false;
+            } else {
+                console.log('falso')
+                alert_error.hidden = true;
+                guardar(arreglo_nuevos, ponderaciones, metas, puesto_id)
+            }
+        });
+        function sumar_array(letras) {
+            console.log(letras);
+            var numbers = letras.toString().split(',').map(function (item) {
+                console.log('El item es:' + item)
+                return parseFloat(item);
+            });
+            console.log(numbers);
+            sum = 0
+            acum = 0;
+            for (var i = 0; i < numbers.length; i++) {
+                sum += numbers[i]
+            }
+            console.log(sum)
+            return sum;
+        }
+        function guardar(ids, ponderaciones, metas, puesto_id) {
+            periodo_id = document.getElementById('periodo_id').value
+            arreglo = []
+            $.ajax({
+                method: "POST",
+                url: "{% url 'evaluaciones:guardar_evaluacion' %}",
+                data: {
+                    'ids[]': ids,
+                    'ponderaciones[]': ponderaciones,
+                    'metas[]': metas,
+                    'puesto_id': puesto_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    empresa_id: '{{ empresa.pk }}',
+                    periodo_id: periodo_id
+                }
+            }).done(function (msg) {
+                location.reload();
+            });
+        } 
     </script>
 
 <style>
@@ -382,6 +567,5 @@ input:valid {
     tr.selectedin{
         background-color:#afddd1        
         }
-    tr.selectedout{background-color:#a39797c0}
    </style>
 {% endblock %}

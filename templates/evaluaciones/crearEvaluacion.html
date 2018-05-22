@@ -50,6 +50,16 @@
                     {% if periodos %}
                     {% for periodo in periodos %}
                     <div class="form-group">
+                        <label class="col-sm-2 control-label" for="puesto"> Puesto </label>
+                        <div class="col-sm-10">
+                            <select name="puesto" required="" id="id_puesto" class="form-control">
+                                <option value="" selected="">---------</option>
+                                {% for puesto in puestos %}
+                                <option value="{{puesto.id}}">{{puesto.nombre}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <br><br><br>
                         <label class="col-sm-2 control-label">Periodo</label>
                         <div class="col-sm-4">
                         <input type="text" class="form-control" placeholder={{periodo.year}} disabled>
@@ -513,6 +523,5 @@ input:valid {
     tr.selectedin{
         background-color:#afddd1        
         }
-    tr.selectedout{background-color:#a39797c0}
-   </style>
+    </style>
 {% endblock %}
