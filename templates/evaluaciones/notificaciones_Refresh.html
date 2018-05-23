@@ -1,0 +1,27 @@
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+  <i class="fa fa-bell-o"></i>
+  <span class="label label-warning">{{total}}</span>
+</a>
+<ul class="dropdown-menu" style="width: 350px;">
+  <li class="header">Tienes {{total}} notificacion(es)</li>
+  <li>
+    <!-- inner menu: contains the actual data -->
+    <ul class="menu">
+      {% for n in notificaciones %}
+      <li>
+        <a href="{{n.url}}" title="{{n.texto}}" class="col-sm-11">
+          <i class="fa fa-bell-o text-aqua"></i> {{n.texto}} &nbsp;
+        </a>
+        <a class="text-red col-sm-1" href="#" OnClick="javascript:notificacionRefresh({{n.pk}})" data-toggle="tooltip" data-placement="bottom"  title="Quitar esta notificación"><i class="fa fa-close"></i></a>
+      </li>
+      <li>
+      {% empty %}
+        <a href="#">
+          <i class="fa fa-bell-o text-aqua"></i> No tienes notificaciones
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </li>
+  <li class="footer"><a href="#"></a></li>
+</ul>
