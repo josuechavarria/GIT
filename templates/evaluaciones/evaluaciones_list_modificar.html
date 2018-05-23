@@ -89,8 +89,9 @@
                         <tr>
                             <th>#</th>
                             <th>Criterio</th>
+                            <th>Descripcion</th>
                             <th>Puesto</th>
-                            <th>Empresa</th>
+                            <th>Empresa</th>                            
                             <th>Periodo (Año) </th>
                             <th>Periodo (Mes-Inicial) </th>
                             <th>Periodo (Mes-Final) </th>
@@ -105,8 +106,9 @@
                         <tr>
                         <th>#</th>
                         <th>Criterio</th>
+                        <th>Descripcion</th>
                         <th>Puesto</th>
-                        <th>Empresa</th>
+                        <th>Empresa</th>                        
                         <th>Periodo (Año) </th>
                         <th>Periodo (Mes-Inicial) </th>
                         <th>Periodo (Mes-Final) </th>
@@ -239,8 +241,9 @@
                       "columns": [
                           { "data": "criterio_id" },
                           { "data": "criterio__nombre" },
+                          { "data": "criterio__descripcion" },
                           { "data": "puesto__nombre" },
-                          { "data": "empresa__nombre" },
+                          { "data": "empresa__nombre" },                                                    
                           { "data": "periodo__fecha_inico",
                             render: function (d) {
                                   return moment(d).format("YYYY");
@@ -360,8 +363,7 @@
                                               
                   if (puesto_id === 0) {
                       var tabla = $('#evaluaciones').DataTable()                      
-                      if(! tabla.data().any())
-                        alert('vacio');
+                      if(! tabla.data().any())                        
                         $("#quitar_").hide();
                   } else {
                       $("#quitar_").show();
@@ -423,10 +425,11 @@
                       anio = fecha.getFullYear();
                       month1 = monthNames[fecha.getMonth()]; 
                       month2 = monthNames[fecha2.getMonth()];                       
-                      tabla1.row.add([a.id, 
+                      tabla1.row.add([
+                                     a.id, 
                                      a.nombre,
                                      a.empresa__nombre,
-                                     a.empresa__nombre, 
+                                     a.descripcion, 
                                      anio, 
                                      month1,
                                      month2,
@@ -445,24 +448,25 @@
           $('#quitar_').click(function () {
               var tabla1 = $("#evaluaciones").DataTable();
               var tabla2 = $("#criterios_table").DataTable();
-              var datos = tabla1.rows('.selectedout').data();
-              console.log('quitando')
+              var datos = tabla1.rows('.selectedout').data();              
               datos.each(function (value, index) {
                   a = value
-                  console.log(a[0])
+                  alert(a[6])            
                   //tabla2.row.add([a[0], a[1], a[2],a[3], ' <p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check-circle"  ></i></p >']).draw().node();
                   tabla2.rows.add([{
                       "id": a[0],
                       "nombre": a[1],
+                      "empresa__nombre": a[4],
                       "descripcion": a[2],
-                      "objetivo__nombre": a[3],
+                      "objetivo__nombre": a[4],
+                      "periodo__fecha_inico":  a[6],
+                      "periodo__fecha_fin" : a[7],
                       "opciones": '<p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check - circle"></i></p >'
                   }]).draw();
               });
               var datos_llenos = tabla2.rows().data();
               datos_llenos.each(function (value, index) {
-                  a = value
-                  console.log(a)
+                  a = value                  
 
               });
               //quitar seleccionados y hacer intercambio, regresar al modal
@@ -474,11 +478,9 @@
      
     });
        
-        $('#form_evaluacion').on('submit', function (e) {
-            alert('intentando guardar')
+        $('#form_evaluacion').on('submit', function (e) {            
             var tabla1 = $('#evaluaciones').DataTable();
-            var puesto_id = document.getElementById('id_puesto').value     
-            console.log('el puesto es:'+puesto_id   ) 
+            var puesto_id = document.getElementById('id_puesto').value                 
             alert_error = document.getElementById('alert_error')
             e.preventDefault()
             var datos = tabla1.rows().data();
@@ -497,22 +499,17 @@
                 ponderaciones.push(document.getElementById(pon).value)
                 metas.push(document.getElementById(met).value)
             });
-            var suma = sumar_array(ponderaciones);
-            console.log('el valor de la suma es: ' + suma)
-            if (suma != 100) {
-                console.log('NÚMERO ERRONEO')
+            var suma = sumar_array(ponderaciones);            
+            if (suma != 100) {                
                 document.getElementById(centinela).focus()
                 alert_error.hidden = false;
-            } else {
-                console.log('falso')
+            } else {                
                 alert_error.hidden = true;
                 modificar(arreglo_nuevos, ponderaciones, metas, puesto_id)
             }
         });
-        function sumar_array(letras) {
-            console.log(letras);
-            var numbers = letras.toString().split(',').map(function (item) {
-                console.log('El item es:' + item)
+        function sumar_array(letras) {            
+            var numbers = letras.toString().split(',').map(function (item) {                
                 return parseFloat(item);
             });
             console.log(numbers);
@@ -520,8 +517,7 @@
             acum = 0;
             for (var i = 0; i < numbers.length; i++) {
                 sum += numbers[i]
-            }
-            console.log(sum)
+            }            
             return sum;
         }
         function modificar(ids, ponderaciones, metas, puesto_id) {

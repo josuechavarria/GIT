@@ -211,7 +211,7 @@ class evaluacion_colaborador(models.Model):
 	empresa = models.ForeignKey(empresas)
 	periodo = models.ForeignKey(periodos)
 	puesto = models.ForeignKey(puestos)
-	evaluacion = models.ForeignKey(evaluaciones)
+	evaluacion = models.ForeignKey(evaluaciones, on_delete=models.PROTECT)
 	colaborador = models.ForeignKey(colaboradores)
 	porcentaje = models.DecimalField(max_digits=5, decimal_places=2)
 	porcentaje_final = models.DecimalField(max_digits=5, decimal_places=2)

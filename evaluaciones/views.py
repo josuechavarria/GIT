@@ -1593,7 +1593,7 @@ def actualizar_tabla(request):
 					  'criterio__nombre',
 					  'empresa__id',
 					  'empresa__nombre',
-					  'criterio__nombre',
+					  'criterio__descripcion',
 					  'puesto__nombre',
 					  'periodo__fecha_inico',
 					  'periodo__fecha_fin',	
@@ -1623,11 +1623,15 @@ class ListarEvaluaciones_modificar(ListView):
 	template_name = 'evaluaciones/evaluaciones_list_modificar.html'
 	def get_queryset(self):				
 		return evaluaciones.objects.filter(empresa__pk=self.kwargs['pk'])
-	def get_context_data(self, **kwargs):
+	def get_context_data(self, **kwargs):		
 		context = super().get_context_data(**kwargs)
+		periodo = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]
+		evaluaciones_hechas = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )
+		puestos_ = puestos.objects.filter(empresa_id = self.kwargs['pk'])			
+		puestos_finales = puestos_.filter(id__in =  evaluaciones_hechas.values_list('puesto_id' ))
 		context['periodos']  = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]		
-		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
-		context['puestos'] = puestos.objects.filter(empresa__id=self.kwargs['pk'])
+		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])		
+		context['puestos'] = puestos_finales
 		return context
 
 class modificar_evaluacion(View):
@@ -1638,6 +1642,7 @@ class modificar_evaluacion(View):
 		puesto_id = request.POST['puesto_id']
 		ponderacion = request.POST.getlist('ponderaciones[]')
 		meta = request.POST.getlist('metas[]')
+		print('las lista es: ' , request.POST.getlist('ids[]'))
 		contador = 0		 
 		for objeto in request.POST.getlist('ids[]'):
 				obj,created = evaluaciones.objects.update_or_create(
@@ -1649,12 +1654,23 @@ class modificar_evaluacion(View):
 				'ponderacion' : ponderacion[contador],
 				'porcentaje_meta' : meta[contador],
 				}
-				)			
+				)
 				contador= contador+1
+		eva = evaluaciones.objects.filter(
+			empresa_id = empresa_id,
+			periodo_id = periodo_id,
+			puesto_id = puesto_id
+			 )					
+		eva_borrar = eva.exclude( criterio_id__in = request.POST.getlist('ids[]'))
+		try:
+			eva_borrar.delete()
+			messages.add_message(request,messages.SUCCESS,'Exito, Objetivo borrado exitosamente')			
+		except models.ProtectedError:  			
+			messages.add_message(request,messages.WARNING,'info, Existen Colaboradores Ligados a este criterio puesto.')					
 		if contador>0 :
-			messages.add_message(request,messages.SUCCESS,'Info,Evaluación Creada con exito')
+			messages.add_message(request,messages.SUCCESS,'Exito,Evaluación Actualizada con exito')
 		else:
-			messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
+			messages.add_message(request,messages.ERROR,'Error,no se pudo modificar la evaluación')
 		print(empresa_id,periodo_id,puesto_id)			
 		
 		success_url = reverse('evaluaciones:listar_criterios',
