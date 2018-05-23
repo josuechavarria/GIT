@@ -27,4 +27,5 @@ def getevaluacionDisponible(empresa_id, usuario_id):
 
 @register.filter(name='evaluacionColaboradores')
 def getevaluacionColaboradores(empresa_id, usuario_id):
-	return evaluacion_colaborador.objects.filter(empresa__pk=empresa_id, colaborador__supervisor__usuario__pk=usuario_id, estado=True).distinct('colaborador').count()
+	return evaluacion_colaborador.objects.filter(empresa__pk=empresa_id, colaborador__supervisor__usuario__pk=usuario_id, estado=True,periodo__estado=True).distinct('colaborador').count()
+#cambio

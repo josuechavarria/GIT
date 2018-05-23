@@ -274,7 +274,7 @@
                 {% if empresa.pk|evaluacionDisponible:request.user.pk == 1 %}
                 <li class="active"><a href="{% url 'evaluaciones:misevaluaciones' pk=empresa.pk id=request.user.pk %}"><i class="fa fa-circle-o"></i> ¡Evaluación disponible!</a> </li>
                 {% endif %}
-                <li><a href="{% url 'evaluaciones:listar_criterios' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
+                <li><a href="{% url 'evaluaciones:evaluaciones_historial' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
               </ul>
             </li>
             {% endif %}
@@ -283,8 +283,12 @@
               <a href="#">
                 <i class="fa fa-users"></i> <span>Colaboradores <small class="label pull-right bg-blue">{{empresa.pk|evaluacionColaboradores:request.user.pk}}</small></span> 
               </a>
+              
               <ul class="treeview-menu">
+                {% if empresa.pk|evaluacionColaboradores:request.user.pk > 0 %}
                 <li class="active"><a href="{% url 'evaluaciones:evaluacioneslist' pk=empresa.pk %}"><i class="fa fa-circle-o"></i>Evaluaciones disponibles</a> </li>
+                {% endif %}
+                <li><a href="{% url 'evaluaciones:evaluaciones_historial' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
               </ul>
             </li>
             {% endif %}
