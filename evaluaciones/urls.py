@@ -81,6 +81,7 @@ urlpatterns = [
     url(r'^roles/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.RolesEliminarView.as_view(), name='estado_rol'),
     url(r'^misevaluaciones/ver/(?P<pk>\d+)/(?P<id>\d+)$', views.ColaboradorMisEvaluaciones.as_view(), name='misevaluaciones'),
     url(r'^evaluaciones/listar/(?P<pk>\d+)/$', views.SupervisorEvaluacionesList.as_view(), name='evaluacioneslist'),
+    url(r'^evaluaciones/listar/historial/(?P<pk>\d+)/$', views.EvaluacionesHistorial.as_view(), name='evaluaciones_historial'),
     url(r'^evaluaciones/crear/(?P<pk>\d+)/$', views.CrearEvaluacion.as_view(model=evaluaciones), name='crear_evaluacion'),
     url(r'^evaluaciones/guardar/', views.guardar_evaluacion.as_view(),
         name='guardar_evaluacion'),
