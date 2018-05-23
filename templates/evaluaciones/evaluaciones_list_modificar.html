@@ -506,7 +506,7 @@
             } else {
                 console.log('falso')
                 alert_error.hidden = true;
-                guardar(arreglo_nuevos, ponderaciones, metas, puesto_id)
+                modificar(arreglo_nuevos, ponderaciones, metas, puesto_id)
             }
         });
         function sumar_array(letras) {
@@ -524,12 +524,12 @@
             console.log(sum)
             return sum;
         }
-        function guardar(ids, ponderaciones, metas, puesto_id) {
+        function modificar(ids, ponderaciones, metas, puesto_id) {
             periodo_id = document.getElementById('periodo_id').value
             arreglo = []
             $.ajax({
                 method: "POST",
-                url: "{% url 'evaluaciones:guardar_evaluacion' %}",
+                url: "{% url 'evaluaciones:modificar_evaluacion' %}",
                 data: {
                     'ids[]': ids,
                     'ponderaciones[]': ponderaciones,
