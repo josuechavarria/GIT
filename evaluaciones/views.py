@@ -1642,8 +1642,13 @@ class modificar_evaluacion(View):
 		puesto_id = request.POST['puesto_id']
 		ponderacion = request.POST.getlist('ponderaciones[]')
 		meta = request.POST.getlist('metas[]')
+<<<<<<< HEAD
 		print('las lista es: ' , request.POST.getlist('ids[]'))
 		contador = 0		 
+=======
+		contador = 0
+		# Excluir 
+>>>>>>> 31bb3722b0b8ae0de5837fc0c3fc48c76443b299
 		for objeto in request.POST.getlist('ids[]'):
 				obj,created = evaluaciones.objects.update_or_create(
 				criterio_id = objeto,
