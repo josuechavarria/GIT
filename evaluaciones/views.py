@@ -1666,7 +1666,7 @@ class modificar_evaluacion(View):
 			eva_borrar.delete()
 			messages.add_message(request,messages.SUCCESS,'Exito, Objetivo borrado exitosamente')			
 		except models.ProtectedError:  			
-			messages.add_message(request,messages.WARNING,'info, Existen Colaboradores Ligados a este criterio puesto.')					
+			messages.add_message(request,messages.WARNING,'info, Existen Colaboradores Ligados a el elemento que desea borrar.')					
 		if contador>0 :
 			messages.add_message(request,messages.SUCCESS,'Exito,Evaluación Actualizada con exito')
 		else:

@@ -28,7 +28,7 @@
                       <i class="fa fa-close"></i>
                     </button>
                     <p></p>
-                    <strong><i class="fa fa-check"></i> Éxito! {{ message }}</strong> 
+                    <strong><i class="fa fa-check"></i> {{ message }}</strong> 
                 </div>
             {% endfor %}
         {% endif %}        
@@ -259,16 +259,15 @@
                               }  },
                           { "data": "ponderacion",
                             render: function (data, type, ssrow, meta) { 
-                                    return '<input type="text" id="p' + ssrow.criterio_id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  value="'+ data + '"/>'                                    
+                                    return '<input type="text" id="p' + ssrow.criterio_id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  value="'+ data + '"onclick="oculta('+ssrow.criterio_id+')"/>'                                    
                                 }},                          
                           { "data": "porcentaje_meta" ,
                             render: function (data, type, ssrow, meta) { 
-                                    return '<input type="text"  id="m' + ssrow.criterio_id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required value="'+ data + '" />'
+                                    return '<input type="text"  id="m' + ssrow.criterio_id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required value="'+ data + '"onclick="oculta(' + ssrow.criterio_id + ')"/>'
                                 }},  
                             {
                               "data": "opciones",
-                              "render": function (data, type, ssrow, meta) {
-                                  console.log(ssrow)
+                              "render": function (data, type, ssrow, meta) {                                  
                                   return ' <p class="seleccionado_" id="icon_' + ssrow.criterio_id + '" hidden><i class="fa fa-check-circle"  ></i></p >';
                               }
                           },                       
@@ -381,8 +380,7 @@
               var tabla = $("#criterios_table").DataTable();
               $(this).toggleClass('selectedin');
               var elemento = "icon_" + tabla.row(this).data().id;
-              var elemento_ = document.getElementById(elemento);
-              console.log(tabla.row(this).data().id)
+              var elemento_ = document.getElementById(elemento);              
               if (elemento_.hidden) {
                   elemento_.hidden = false;
               }
@@ -392,9 +390,7 @@
           });
 
           $('#evaluaciones tbody').on('click', 'tr', function () {
-              var tabla1 = $("#evaluaciones").DataTable();
-              console.log('Valores de la tabla:' + tabla1.row(this).data())
-
+              var tabla1 = $("#evaluaciones").DataTable();         
               $(this).toggleClass('selectedout');
               var elemento = "icon_" + tabla1.row(this).data()[0];
               var elemento_ = document.getElementById(elemento);
@@ -511,14 +507,16 @@
         function sumar_array(letras) {            
             var numbers = letras.toString().split(',').map(function (item) {                
                 return parseFloat(item);
-            });
-            console.log(numbers);
+            });            
             sum = 0
             acum = 0;
             for (var i = 0; i < numbers.length; i++) {
                 sum += numbers[i]
             }            
             return sum;
+        }
+        function oculta(id) {
+                
         }
         function modificar(ids, ponderaciones, metas, puesto_id) {
             periodo_id = document.getElementById('periodo_id').value
