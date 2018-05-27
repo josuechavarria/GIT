@@ -1244,7 +1244,7 @@ class activar_departamento(View):
 			print(depa.estado)		 
 		return HttpResponse(success_url)
 
-class activar_puesto(View):	
+class activar_puesto(View):
 	def post(self,request,pk=None):
 		print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
@@ -1456,6 +1456,16 @@ class ColaboradorMisEvaluaciones(View):
 					else:
 						objEvalColaborador.fecha_colaborador = timezone.now()
 					objEvalColaborador.save()
+			if request.user.has_perm('evaluaciones.especiales_es_supervisor') and request.user.pk != id:
+				pass
+			else:
+				EnviarNotificaciones(
+						objEmpresa,
+						objColaborador.supervisor.usuario,
+						None,
+						'%s %s completó su evaluación.' % (objColaborador.primer_nombre, objColaborador.primer_apellido),
+						reverse_lazy('evaluaciones:misevaluaciones',kwargs={'pk': pk,'id': objColaborador.usuario.pk})
+					)
 			transaction.savepoint_commit(sid)
 		except:
 			error = True
@@ -1473,6 +1483,42 @@ class ColaboradorMisEvaluaciones(View):
 		'evaluacionColaborador' : objEvalColaborador}
 		return render(request, template_name, ctx)
 
+def EnviarNotificaciones(empresa=None, usuario=None, puesto=None, texto=None, url=None):
+	if usuario is not None:
+		objNoticiacion = notificaciones(
+				empresa = empresa,
+				usuario = usuario,
+				texto = texto,
+				url = url,
+				fecha = timezone.now(),
+				estado = True
+			)
+		objNoticiacion.save()
+	else:
+		for x in colaborador.objects.filter(puesto__pk=puesto, usuario__is_active=True):
+			objNoticiacion = notificaciones(
+				empresa = x.empresa,
+				usuario = x.usuario,
+				texto = texto,
+				url = url,
+				fecha = timezone.now(),
+				estado = True
+			)
+			objNoticiacion.save()
+
+class NotificacionesRefresh(View):
+	def post(self, request, pk=None, id=None):
+		if 'id_notificacion' in request.POST:
+			notificaciones.objects.filter(pk=request.POST['id_notificacion']).delete()
+		html_message = loader.render_to_string(
+			'evaluaciones/notificaciones_Refresh.html',
+				{
+					'notificaciones': notificaciones.objects.filter(empresa__pk=pk, usuario__pk=id, estado=True),
+					'total':  notificaciones.objects.filter(empresa__pk=pk, usuario__pk=id, estado=True).count()
+				}
+			)
+		return HttpResponse(html_message)
+
 class SupervisorEvaluacionesList(View):
 	def get(self,request,pk=None):
 		template_name = "evaluaciones/supervisorEvaluacionesList.html"
@@ -1489,6 +1535,38 @@ class SupervisorEvaluacionesList(View):
 
 	def post(self,request,pk=None):
 		pass
+
+class EvaluacionesHistorial(View):
+	def get(self,request,pk=None):
+		template_name = "evaluaciones/EvaluacionesHistorial.html"
+		objEmpresa = empresas.objects.get(pk=pk)
+		data=[]
+		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
+		evalu = evaluacion_colaborador.objects\
+		.filter(empresa__pk=pk, colaborador__supervisor__usuario=request.user, estado=True)\
+		.values('empresa__pk','evaluacion__puesto__pk','colaborador__usuario','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
+		ctx = {'empresa': objEmpresa,
+				'evaluaciones': evalu,
+				'totalCriterios' : totalCriterios}
+		return render(request, template_name, ctx)
+
+	def post(self,request,pk=None):
+		objEmpresa = empresas.objects.get(pk=pk)
+		data=[]
+		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
+		evalu = evaluacion_colaborador.objects\
+		.filter(empresa__pk=pk, colaborador__usuario=request.user, periodo__pk=request.POST['id_periodo'])\
+		.values('empresa__pk','evaluacion__puesto__pk','colaborador__usuario','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
+
+		html_message = loader.render_to_string(
+			'evaluaciones/evaluacionesHistorialRefresh.html',
+				{
+					'empresa': objEmpresa,
+					'evaluaciones': evalu,
+					'totalCriterios' : totalCriterios
+				}
+			)
+		return HttpResponse(html_message)
 
 class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	model = evaluaciones
