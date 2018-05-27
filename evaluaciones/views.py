@@ -1541,13 +1541,15 @@ class EvaluacionesHistorial(View):
 		template_name = "evaluaciones/EvaluacionesHistorial.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 		data=[]
+		objPeriodos = periodos.objects.filter(empresa=objEmpresa, estado=False)
 		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
 		evalu = evaluacion_colaborador.objects\
-		.filter(empresa__pk=pk, colaborador__supervisor__usuario=request.user, estado=True)\
+		.filter(empresa__pk=pk, colaborador__usuario=request.user, estado=True)\
 		.values('empresa__pk','evaluacion__puesto__pk','colaborador__usuario','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
 		ctx = {'empresa': objEmpresa,
 				'evaluaciones': evalu,
-				'totalCriterios' : totalCriterios}
+				'totalCriterios' : totalCriterios,
+				'periodos' : objPeriodos}
 		return render(request, template_name, ctx)
 
 	def post(self,request,pk=None):
@@ -1560,6 +1562,27 @@ class EvaluacionesHistorial(View):
 
 		html_message = loader.render_to_string(
 			'evaluaciones/evaluacionesHistorialRefresh.html',
+				{
+					'empresa': objEmpresa,
+					'evaluaciones': evalu,
+					'totalCriterios' : totalCriterios
+				}
+			)
+		return HttpResponse(html_message)
+
+class EvaluacionesHistorialDetalle(View):
+	def get(self,request,pk=None):
+		pass
+
+	def post(self,request,pk=None):
+		objEmpresa = empresas.objects.get(pk=pk)
+		data=[]
+		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
+		evalu = evaluacion_colaborador.objects\
+		.filter(empresa__pk=pk, colaborador__usuario=request.user, periodo__pk=request.POST['id_periodo'])
+
+		html_message = loader.render_to_string(
+			'evaluaciones/evaluacionesHistorialDetalle.html',
 				{
 					'empresa': objEmpresa,
 					'evaluaciones': evalu,

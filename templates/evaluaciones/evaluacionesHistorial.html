@@ -30,7 +30,9 @@
                 <div class="col-sm-9">
                     <select id="id_anio" class="form-control" OnChange="historialRefresh($(this).val());">
                         <option value="-1">-----------</option>
-                        <option value="1">Abril/2018</option>
+                        {% for p in periodos%}
+                        <option value="{{p.pk}}">{{ p.fecha_fin|date:"F/Y" }}</option>
+                        {% endfor %}
                     </select>
                 </div>
             </div>
@@ -82,6 +84,8 @@
                 </tbody>
               </table>
             </div><!-- /.col -->
+            <div id="id_modal_detalle">
+            </div>
           </div><!-- /.row -->
 
           <!-- this row will not appear when printing -->
@@ -112,6 +116,22 @@ function historialRefresh(id){
         .fail(function(msg) {
           //alert( "Data Saved: " + msg );
           $("#id_table_refresh").html("");
+        });
+    }
+function historialDetalleRefresh(id){
+  $.ajax({
+        method: "POST",
+        url: "{% url 'evaluaciones:evaluaciones_historial_detalle' pk=empresa.pk %}",
+        data: {csrfmiddlewaretoken: '{{ csrf_token }}', id_periodo: id}
+      })
+        .done(function(msg) {
+          //alert( "Data Saved: " + msg );
+          $("#id_modal_detalle").html(msg);
+          $('#myModal2').modal();
+        })
+        .fail(function(msg) {
+          //alert( "Data Saved: " + msg );
+          $("#id_modal_detalle").html("");
         });
     }
 </script>
