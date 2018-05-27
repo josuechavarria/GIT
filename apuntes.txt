@@ -1,0 +1,19 @@
+- Filtro de puestos erroneos.  X
+- Corrección de la tabla en la creación. X
+- Eliminación de criterios.
+- Eliminación de los criterios solo pasaran a inactivos.
+-- Solo mostrar el mensaje q no se puede borrar, validar todo.
+evaluacion (evaluaciones_colaborador).
+-- Modificar evaluaciones, borrar solo en el caso que sea necesario.
+
+
+-- Fecha de inicio + 3 meses sin importar dias habiles.
+-- Fecha de inicio y fecha fin.
+-- Frecuencia de evaluaciones.
+-- Desactivar los periodos que existan y solo dejar activos el nuevo.
+--- Creación del nuevo perido, cierre de la evaluacion.
+--- periodos inactivos y evaluaciones inactivas de ese periodo.
+
+
+- La lista de modificar solo mostrara los que tengan creada al menos un criterio_puesto en el 
+  select de los puestos.
