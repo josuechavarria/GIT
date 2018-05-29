@@ -413,9 +413,10 @@
               if (datos.length == 0) {
                   error_alert.hidden = false
               } else {
+                  var puesto_id = document.getElementById('id_puesto').value                  
                   error_alert.hidden = true
                   datos.each(function (value, index) {
-                      a = value   
+                      a = value                      
                       fecha = new Date(a.periodo__fecha_inico)
                       fecha2 = new Date(a.periodo__fecha_fin)
                       anio = fecha.getFullYear();
@@ -424,8 +425,9 @@
                       tabla1.row.add([
                                      a.id, 
                                      a.nombre,
-                                     a.empresa__nombre,
                                      a.descripcion, 
+                                     puesto_id,
+                                     a.empresa__nombre,                                     
                                      anio, 
                                      month1,
                                      month2,
@@ -443,22 +445,42 @@
           // Datos en la tabla principal la tabla 1 , esta sirve de intercambio.
           $('#quitar_').click(function () {
               var tabla1 = $("#evaluaciones").DataTable();
+              const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+                ];         
               var tabla2 = $("#criterios_table").DataTable();
               var datos = tabla1.rows('.selectedout').data();              
-              datos.each(function (value, index) {
-                  a = value
-                  alert(a[6])            
+              datos.each(function (value, index) {                  
+                  a = value                  
+                  fecha = new Date(a.periodo__fecha_inico)
+                  fecha2 = new Date(a.periodo__fecha_fin)
+                  anio = fecha.getFullYear();
+                  month1 = monthNames[fecha.getMonth()];
+                  month2 = monthNames[fecha2.getMonth()]; 
+                  console.log(a)
                   //tabla2.row.add([a[0], a[1], a[2],a[3], ' <p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check-circle"  ></i></p >']).draw().node();
-                  tabla2.rows.add([{
+
+                  /* tabla2.rows.add([{
                       "id": a[0],
                       "nombre": a[1],
                       "empresa__nombre": a[4],
                       "descripcion": a[2],
                       "objetivo__nombre": a[4],
-                      "periodo__fecha_inico":  a[6],
+                      "periodo__fecha_inico":  a[5],
                       "periodo__fecha_fin" : a[7],
                       "opciones": '<p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check - circle"></i></p >'
                   }]).draw();
+                  */
+                      tabla2.row.add([
+                      a[0],
+                      a.nombre,
+                      a.descripcion,
+                      puesto_id,
+                      a.empresa__nombre,
+                      anio,
+                      month1,
+                      month2,
+                      '<p class="seleccionado_" id="icon_' + a.id + '" hidden><i class="fa fa-check - circle"></i></p >']).draw().node();
               });
               var datos_llenos = tabla2.rows().data();
               datos_llenos.each(function (value, index) {
