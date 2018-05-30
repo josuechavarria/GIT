@@ -24,7 +24,7 @@
             <p class="label pull-center bg-red">SIN DATOS</p></td>
           {% endif %}
       <td>{{e.SumaNotas}}%</td>
-      <td><a href="#" OnClick="historialDetalleRefresh($('#id_anio').val())">Detalle</a></td>
+      <td><a href="#" OnClick="historialDetalleRefresh($('#id_anio').val(),{{e.colaborador__pk}})">Detalle</a></td>
     </tr>
     {% empty %}
     <tr>

@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'evaluaciones'
+    'evaluaciones',
+    'activity_log' 
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'activity_log.middleware.ActivityLogMiddleware' ,
 ]
 
 ROOT_URLCONF = 'GIT.urls'
@@ -71,6 +73,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'GIT.wsgi.application'
 
+# For writing log to another DB
+
+DATABASE_ROUTERS = ['activity_log.router.DatabaseAppsRouter']
+DATABASE_APPS_MAPPING = {'activity_log': 'logs'}
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
@@ -79,6 +85,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'git',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'localhost',
+        'PORT': '5432'
+    },
+    'logs': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'logs',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
@@ -116,6 +130,25 @@ USE_I18N = True
 USE_L10N = False
 
 USE_TZ = True
+
+# Activity log
+ACTIVITYLOG_AUTOCREATE_DB = True
+
+# Actualizar la última actividad datetime en el perfil del usuario. Necesita actualizaciones para el modelo de usuario. 
+ACTIVITYLOG_LAST_ACTIVITY  =  False
+
+# Solo se registrarán estos métodos 
+ACTIVITYLOG_METHODS  = ('POST', 'GET')
+
+# Lista de estados de respuesta, que se registraron. Por defecto, todo registrado. 
+# No usar con ACTIVITYLOG_EXCLUDE_STATUSES 
+ACTIVITYLOG_STATUSES  = (200,400)
+
+# Lista de estados de respuesta, que ignora. No utilizar con ACTIVITYLOG_STATUSES 
+# ACTIVITYLOG_EXCLUDE_STATUSES = (302,)
+
+# Subcadenas de URL, que ignora 
+ACTIVITYLOG_EXCLUDE_URLS  = ( '/admin/activity_log/activitylog' ,)
 
 
 # Static files (CSS, JavaScript, Images)

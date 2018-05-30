@@ -106,7 +106,7 @@ $("#id_empresa").attr('disabled','disabled');
 function historialRefresh(id){
   $.ajax({
         method: "POST",
-        url: "{% url 'evaluaciones:evaluaciones_historial' pk=empresa.pk %}",
+        url: "{% url 'evaluaciones:evaluaciones_historial_supervisor' pk=empresa.pk %}",
         data: {csrfmiddlewaretoken: '{{ csrf_token }}', id_periodo: id}
       })
         .done(function(msg) {

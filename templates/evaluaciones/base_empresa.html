@@ -288,7 +288,7 @@
                 {% if empresa.pk|evaluacionColaboradores:request.user.pk > 0 %}
                 <li class="active"><a href="{% url 'evaluaciones:evaluacioneslist' pk=empresa.pk %}"><i class="fa fa-circle-o"></i>Evaluaciones disponibles</a> </li>
                 {% endif %}
-                <li><a href="{% url 'evaluaciones:evaluaciones_historial' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
+                <li><a href="{% url 'evaluaciones:evaluaciones_historial_supervisor' pk=empresa.pk %}"><i class="fa fa-circle-o"></i> Historial</a></li>
               </ul>
             </li>
             {% endif %}
