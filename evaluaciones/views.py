@@ -248,6 +248,53 @@ class ExpiredPasswordView(View):
 		}
 		return render(request, template_name, ctx)
 
+class PerfilChangePasswordView(View):
+	def get(self, request, pk=None, id=None):
+		pass
+   
+	def post(self, request, pk=None, id=None):
+		template_name = "evaluaciones/ExpiredPassword.html"
+		objColaborador = colaboradores.objects.get(usuario__pk=pk)
+		objUser = objColaborador.usuario
+		oldPass = request.POST['old_password']
+		newPass = request.POST['password']
+		newRepeatPass = request.POST['password_repeat']
+		mensaje = ""
+
+		html_message = loader.render_to_string(
+		'evaluaciones/email_resetNotificacion.html',
+			{
+				'empresa': objColaborador.empresa.nombre,
+				'name':  objColaborador.primer_nombre,
+				'usuario' : objColaborador.usuario.username,
+				'fecha' : timezone.now(),
+				'action_url' : 'hola'
+			}
+		)
+		subject = 'Cambio de contraseña'
+		user = authenticate(username=objColaborador.usuario.username, password=oldPass)
+		if user is not None:
+			if newPass==newRepeatPass:
+				objUser.set_password(newPass.strip())
+				objColaborador.fecha_ult_mod_password = timezone.now()
+				objColaborador.password_caducado = False
+				objUser.save()
+				objColaborador.save()
+				if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objColaborador.usuario.email], fail_silently=False, html_message=html_message):
+					mensaje = 'Contraseña actualizada exitosamente. Pero no se pudo enviar el correo de confirmación.'
+				else:
+					mensaje = 'Contraseña actualizada exitosamente.'
+			else:
+				mensaje = 'Error al actualizar la contraseña, validación de nueva clave falló.'
+		else:
+			mensaje = 'Error al actualizar la contraseña, contraseña actual incorrecta.'
+		ctx = {
+		'empresa' : empresas.objects.get(pk=id),
+		'username': objColaborador.usuario.username
+		}
+		return HttpResponse(mensaje)
+
+
 class CrearUsuarioView(View):	
 	def get(self, request, pk=None):
 		form = usuariosForm()

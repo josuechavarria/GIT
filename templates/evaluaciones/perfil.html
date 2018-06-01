@@ -106,6 +106,9 @@
                             <a href="#settings" data-toggle="tab">Registro Inicial</a>
                         </li>
                         {% endif %}
+                        <li>
+                            <a href="#tabpassword" data-toggle="tab">Cambiar contraseña</a>
+                        </li>
                                                
                     </ul>
                     <div class="tab-content">  
@@ -120,58 +123,55 @@
                         </div>
                         
                         {% endfor %} {% endif %}
-                        <!-- /.tab-pane -->
-                        <div class="tab-pane" id="timeline">
-                            <!-- The timeline -->
-                            
-                        </div>
+                        
                         <!-- /.tab-pane -->
                         {% if bandera == 1 %}
                         <div class="active tab-pane" id="modify">
                         <form role="form" class="form-horizontal" enctype="multipart/form-data" method="post">
                             <div class="box-body">
                              {% csrf_token %}                            
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="id_{{form.foto.name}}"> {{form.foto.label}} </label>
-                                <div class="col-sm-10">                                    
-                                    {{ form.foto|addcss:"class:form-control" }} {% if form.foto.errors %}                                    
-                                    <div class="text-red">{{form.foto.errors}}</div>
-                                    {% endif %}
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="id_{{form.foto.name}}"> {{form.foto.label}} </label>
+                                    <div class="col-sm-10">                                    
+                                        {{ form.foto|addcss:"class:form-control" }} {% if form.foto.errors %}                                    
+                                        <div class="text-red">{{form.foto.errors}}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>                            
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="id_{{form.sexo.name}}"> {{form.sexo.label}} </label>
+                                    <div class="col-sm-10">
+                                        {{ form.sexo|addcss:"class:form-control" }} {% if form.sexo.errors %}
+                                        <div class="text-red">{{form.sexo.errors}}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            </div>                            
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="id_{{form.sexo.name}}"> {{form.sexo.label}} </label>
-                                <div class="col-sm-10">
-                                    {{ form.sexo|addcss:"class:form-control" }} {% if form.sexo.errors %}
-                                    <div class="text-red">{{form.sexo.errors}}</div>
-                                    {% endif %}
-                                </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="id_{{form.fecha_nacimiento.name}}"> {{form.fecha_nacimiento.label}} </label>
-                                <div class="col-sm-10">
-                                    {{ form.fecha_nacimiento|addcss:"class:datepicker" }} {% if form.fecha_nacimiento.errors %}
-                                    <div class="text-red">{{form.fecha_nacimiento.errors}}</div>
-                                    {% endif %}
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="id_{{form.fecha_nacimiento.name}}"> {{form.fecha_nacimiento.label}} </label>
+                                    <div class="col-sm-10">
+                                        {{ form.fecha_nacimiento|addcss:"class:datepicker" }} {% if form.fecha_nacimiento.errors %}
+                                        <div class="text-red">{{form.fecha_nacimiento.errors}}</div>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label class="col-sm-2 control-label" for="id_{{form.pasa_tiempos.name}}"> {{form.pasa_tiempos.label}} </label>
-                                <div class="col-sm-10">
-                                    {{ form.pasa_tiempos|addcss:"class:form-control" }} {% if form.pasa_tiempos.errors %}
-                                    <div class="text-red">{{form.pasa_tiempos.errors}}</div>
-                                    {% endif %}
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="id_{{form.pasa_tiempos.name}}"> {{form.pasa_tiempos.label}} </label>
+                                    <div class="col-sm-10">
+                                        {{ form.pasa_tiempos|addcss:"class:form-control" }} {% if form.pasa_tiempos.errors %}
+                                        <div class="text-red">{{form.pasa_tiempos.errors}}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>                            
+                                    
+                                                            
+                                <div class="box-footer">
+                                    <div class="col-md-3 col-md-offset-6 col-xs-12">
+                                        <button class="btn btn-raised btn-primary pull-left" type="submit" name="Actualizar"  value="Actualizar">
+                                            <i class="fa fa-refresh"></i>&nbsp;Actualizar</button>
+                                    </div>                               
                                 </div>
-                            </div>                            
-                                
-                                                        
-                            <div class="box-footer">
-                                <div class="col-md-3 col-md-offset-6 col-xs-12">
-                                    <button class="btn btn-raised btn-primary pull-left" type="submit" name="Actualizar"  value="Actualizar">
-                                        <i class="fa fa-refresh"></i>&nbsp;Actualizar</button>
-                                </div>                               
                             </div>
                         </form>
                         </div>                        
@@ -180,6 +180,9 @@
                             {% include "evaluaciones/crearPerfil.html" %}
                         </div>
                         {% endif %}
+                        <div class="tab-pane" id="tabpassword">
+                            {% include "evaluaciones/PerfilCambiarPassword.html" %}
+                        </div>
                         <!-- /.tab-pane -->
                     </div>
                     <!-- /.tab-content -->
@@ -187,6 +190,7 @@
                 <!-- /.nav-tabs-custom -->
             </div>
             <!-- /.col -->
+        </div>
             <div class="box">
                 <div class="box-header with-border">
                     <h3 class="box-title">información de Usuario <i class="fa fa-user"></i></h3>
@@ -202,19 +206,13 @@
                 <div class="box-body">
                     <strong> Ultimo Inicio de Sesión: </strong> <p>{{user.last_login}}</p>
                 </div>
-                <!-- /.box-body -->
                 <div class="box-footer">
                     <strong> Ultimo Cambio de Contraseña: </strong> <p>{{colaborador.fecha_ult_mod_password}}</p>
                 </div>
-                <!-- /.box-footer-->
             </div>
             <!-- /.box -->
             </section>
-            <!-- /.content -->
-            </div>
-            <!-- /.content-wrapper --
-        </div>
-        <!-- /.row -->
+
 {% endblock %}
 
  {% block script %}

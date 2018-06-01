@@ -70,7 +70,7 @@ urlpatterns = [
     url(r'^departamentos/activo/', views.activar_departamento.as_view(),
         name='activar_departamento'),
     url(r'^usuario/crear/(?P<pk>\d+)/$', views.CrearUsuarioView.as_view(), name='crear_usuario'),
-    url(r'^usuario/perfil/(?P<pk>\d+)/(?P<id>\d+)/$', views.Perfil_.as_view(), name='perfil_'),
+    url(r'^usuario/perfil/(?P<pk>\d+)/(?P<id>\d+)/$', login_required(views.Perfil_.as_view()), name='perfil_'),
     url(r'^usuario/listar/(?P<pk>\d+)/$', views.ListarUsuarioView.as_view(), name='listar_usuario'),
     url(r'^usuario/actualizar/(?P<pk>\d+)/(?P<id>\d+)/$', views.ActualizarUsuarioView.as_view(), name='actualiza_usuario'),
     url(r'^usuario/eliminar/(?P<pk>\d+)/(?P<id>\d+)/$', views.EstadoUsuarioView.as_view(), name='estado_usuario'),
@@ -95,10 +95,7 @@ urlpatterns = [
     url(r'^evaluaciones/actualizar/tablacriterios/', views.actualizar_tablacriterios,name='actualizar_tablacriterios'),
     url(r'^evaluaciones/modificar/(?P<pk>\d+)/$',views.ListarEvaluaciones_modificar.as_view(), name='listar_evaluaciones_modificar'),
     url(r'^evaluaciones/modificar/guardar',views.modificar_evaluacion.as_view(), name='modificar_evaluacion'),
-
-
-
-    
+    url(r'^usuario/perfil/actualizar/pass/(?P<pk>\d+)/(?P<id>\d+)/$', login_required(views.PerfilChangePasswordView.as_view()), name='change_password'),
 
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
