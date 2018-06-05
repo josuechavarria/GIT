@@ -74,7 +74,7 @@
                     <th>COLABORADOR</th>
                     <th>ESTADO</th>
                     <th>NOTA ACTUAL</th>
-                    <th>ACCIONES</th>
+                    {% if 'evaluaciones.especiales_es_supervisor' in perms %}<th>ACCIONES</th>{%endif%}
                   </tr>
                 </thead>
                 <tbody>
@@ -133,6 +133,33 @@ function historialDetalleRefresh(id, colaborador){
           //alert( "Data Saved: " + msg );
           $("#id_modal_detalle").html("");
         });
+    }
+
+function AbrirModal(estado, url, nombre, periodo, colaborador){
+        estado2 = estado == 'Activo' ? 0 : 1;
+        estado = estado == 'Activo' ? 'Inactivará' : 'Activará';
+        //alert('Se actualizará el estado del usuario a <b>'+ estado +'</b> del colaborador "'+nombre+'"')
+        $('#mbody').html('Se <b>'+ estado +' la evaluación</b> del colaborador "'+nombre+'" para el período <b>'+$("#id_anio  option:selected").text()+'</b>');
+        //$('#btnGuardar').attr('onclick',"CambiarEstado('"+url+"','"+tdid+"')")
+        $("#btnGuardar").attr("OnClick","EvaluacionActivar('"+url+"','"+periodo+"','"+colaborador+"','"+estado2+"')")
+        $('#myModal').modal();
+    }
+function EvaluacionActivar(url, periodo, colaborador, estado2){
+        $("#myModalLoader").modal();
+        var request = $.ajax({
+          method: "POST",
+          url: url,
+          data: {csrfmiddlewaretoken: '{{ csrf_token }}', periodo: periodo, colaborador: colaborador, estado: estado2}
+        })
+        request.done(function(msg) {
+            $("#myModalLoader").modal('hide');
+            historialRefresh($("#id_anio").val());
+            alert(msg);
+          });
+        request.fail(function(jqXHR, textStatus) {
+            $("#myModalLoader").modal('hide');
+            alert( "Activar evaluación falló: " + textStatus);
+          });
     }
 </script>
 {% endblock %}

@@ -23,10 +23,16 @@ def getTotalCriterios(empresa_id, puesto_id):
 @register.filter(name='evaluacionDisponible')
 def getevaluacionDisponible(empresa_id, usuario_id):
 	objColaborador = colaboradores.objects.get(usuario__pk=usuario_id)
-	return 1 if evaluaciones.objects.filter(empresa__pk=empresa_id,puesto=objColaborador.puesto,estado=True,periodo__estado=True).count()>0 else 0
+	resp = 1 if evaluaciones.objects.filter(empresa__pk=empresa_id,puesto=objColaborador.puesto,estado=True).count()>0 else 0
+	return resp
 
 @register.filter(name='evaluacionColaboradores')
 def getevaluacionColaboradores(empresa_id, usuario_id):
-	return evaluacion_colaborador.objects.filter(empresa__pk=empresa_id, colaborador__supervisor__usuario__pk=usuario_id, estado=True,periodo__estado=True).distinct('colaborador').count()
+	return evaluacion_colaborador.objects.filter(empresa__pk=empresa_id, colaborador__supervisor__usuario__pk=usuario_id, estado=True).distinct('colaborador').count()
+
+@register.filter(name='evaluacionActiva')
+def getevaluacionActiva(colaborador, periodo):
+	empresa_id = colaboradores.objects.get(pk=colaborador).empresa.pk
+	return 1 if evaluacion_activa.objects.get(empresa__pk=empresa_id, colaborador__pk=colaborador, periodo__pk=periodo).estado == True else 0
 #cambio
 

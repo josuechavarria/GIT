@@ -74,7 +74,7 @@
                     <th>COLABORADOR</th>
                     <th>ESTADO</th>
                     <th>NOTA ACTUAL</th>
-                    <th>ACCIONES</th>
+                    {% if 'evaluaciones.especiales_es_supervisor' in perms %}<th>ACCIONES</th>{%endif%}
                   </tr>
                 </thead>
                 <tbody>
@@ -134,5 +134,6 @@ function historialDetalleRefresh(id, colaborador){
           $("#id_modal_detalle").html("");
         });
     }
+
 </script>
 {% endblock %}

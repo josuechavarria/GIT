@@ -1407,6 +1407,19 @@ class BorrarPeriodo(SuccessMessageMixin, DeleteView):
 			messages.add_message(request,messages.WARNING,'info, Existen Empresas que dependen de este Periodo, el estado paso a inactivo.')
 			self.object.estado = False
 			self.object.save()
+			objEvalColaborador = evaluacion_colaborador.objects.filter(
+				periodo = self.object.pk
+			)
+			for x in objEvalColaborador:
+				x.estado = False
+				x.save()
+
+			objEvaluacion = evaluaciones.objects.filter(
+				periodo = self.object.pk
+			)
+			for x in objEvaluacion:
+				x.estado = False
+				x.save()
 			return HttpResponseRedirect(error_url)
 
 class activar_periodo(View):
@@ -1422,7 +1435,19 @@ class activar_periodo(View):
 			print(obj.estado)
 			obj.estado = True
 			obj.save()
-			print(obj.estado)		 
+			objEvalColaborador = evaluacion_colaborador.objects.filter(
+				periodo = obj.pk
+			)
+			for x in objEvalColaborador:
+				x.estado = True
+				x.save()
+
+			objEvaluacion = evaluaciones.objects.filter(
+				periodo = obj.pk
+			)
+			for x in objEvaluacion:
+				x.estado = True
+				x.save()	 
 		return HttpResponse(success_url)
 
 class activar_criterio(View):
@@ -1448,8 +1473,8 @@ class ColaboradorMisEvaluaciones(View):
 		ctx = {'empresa': objEmpresa}
 		try:
 			objColaborador = colaboradores.objects.get(usuario__pk=id)
-			objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, periodo__estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-			objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador__usuario=objColaborador.usuario, estado=True)
+			objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+			objEvalColaborador = evaluacion_colaborador.objects.filter(estado=True, colaborador__usuario=objColaborador.usuario)
 			objPeriodo = objEvaluaciones[0].periodo
 			ctx = {'empresa': objEmpresa,
 			'criterios' : objEvaluaciones,
@@ -1466,8 +1491,8 @@ class ColaboradorMisEvaluaciones(View):
 		error = False
 		objEmpresa = empresas.objects.get(pk=pk)
 		objColaborador = colaboradores.objects.get(usuario__pk=id)
-		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, periodo__estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objEvaluacionesNota = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, periodo__estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objEvaluacionesNota = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
 		objPeriodo = objEvaluaciones[0].periodo
 		print(request.POST)
 		try:
@@ -1523,7 +1548,7 @@ class ColaboradorMisEvaluaciones(View):
 			messages.add_message(request,messages.SUCCESS,"Evaluación guardada exitosamente.")
 		else:
 			messages.add_message(request,messages.ERROR,"La Evaluación no se ha guardado.")
-		objEvalColaborador = evaluacion_colaborador.objects.filter(periodo__estado=True, colaborador=objColaborador, estado=True)
+		objEvalColaborador = evaluacion_colaborador.objects.filter(empresa=objEmpresa ,colaborador=objColaborador, estado=True)
 		ctx = {'empresa': objEmpresa,
 		'criterios' : objEvaluaciones,
 		'colaborador' : objColaborador,
@@ -1572,7 +1597,7 @@ class SupervisorEvaluacionesList(View):
 		template_name = "evaluaciones/supervisorEvaluacionesList.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 		data=[]
-		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
+		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True).count()
 		evalu = evaluacion_colaborador.objects\
 		.filter(empresa__pk=pk, colaborador__supervisor__usuario=request.user, estado=True)\
 		.values('empresa__pk','evaluacion__puesto__pk','colaborador__usuario','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
@@ -1662,7 +1687,7 @@ class EvaluacionesHistorialSupervisor(View):
 		totalCriterios = evaluaciones.objects.filter(empresa__pk=pk,estado=True,periodo__estado=True).count()
 		evalu = evaluacion_colaborador.objects\
 		.filter(empresa__pk=pk, colaborador__supervisor__usuario=request.user, periodo__pk=request.POST['id_periodo'])\
-		.values('empresa__pk','evaluacion__puesto__pk','colaborador__pk','colaborador__usuario','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
+		.values('empresa__pk','evaluacion__puesto__pk','periodo__pk','colaborador__pk','colaborador__usuario','colaborador__codigo','colaborador__primer_nombre','colaborador__primer_apellido').annotate(SumaNotas=Sum('nota'), TotalNotas=Count('evaluacion'))
 
 		html_message = loader.render_to_string(
 			'evaluaciones/evaluacionesHistorialRefresh.html',
@@ -1670,9 +1695,43 @@ class EvaluacionesHistorialSupervisor(View):
 					'empresa': objEmpresa,
 					'evaluaciones': evalu,
 					'totalCriterios' : totalCriterios
-				}
+				}, request=request
 			)
 		return HttpResponse(html_message)
+
+class EvaluacionActiva(View):
+	def get(self,request,pk=None):
+		pass
+
+	def post(self,request,pk=None):
+		print(request.POST)
+		objEvalActiva, created = evaluacion_activa.objects.update_or_create(
+				empresa = empresas.objects.get(pk=pk),
+				periodo = periodos.objects.get(pk=request.POST['periodo']),
+				colaborador = colaboradores.objects.get(pk=request.POST['colaborador']),
+				defaults = {'estado' : True if request.POST['estado'] == '1' else False}
+			)
+		objEvalColaborador = evaluacion_colaborador.objects.filter(
+				empresa = empresas.objects.get(pk=pk),
+				periodo = periodos.objects.get(pk=request.POST['periodo']),
+				colaborador = colaboradores.objects.get(pk=request.POST['colaborador']),
+				puesto = colaboradores.objects.get(pk=request.POST['colaborador']).puesto
+			)
+		for x in objEvalColaborador:
+			x.estado = True if request.POST['estado'] == '1' else False
+			x.save()
+
+		objEvaluacion = evaluaciones.objects.filter(
+				empresa = empresas.objects.get(pk=pk),
+				periodo = periodos.objects.get(pk=request.POST['periodo']),
+				puesto = colaboradores.objects.get(pk=request.POST['colaborador']).puesto
+			)
+		for z in objEvaluacion:
+			z.estado = True if request.POST['estado'] == '1' else False
+			z.save()
+
+		mensaje = "Evaluación %sactivada satisfactoriamente"%("des" if request.POST['estado'] == '0' else "")
+		return HttpResponse(mensaje)
 
 class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	model = evaluaciones

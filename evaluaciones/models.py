@@ -229,4 +229,9 @@ class notificaciones(models.Model):
 	fecha = models.DateTimeField(default=now)
 	estado = models.BooleanField(default=True)
 
+class evaluacion_activa(models.Model):
+	empresa = models.ForeignKey(empresas)
+	periodo = models.ForeignKey(periodos)
+	colaborador = models.ForeignKey(colaboradores)
+	estado = models.BooleanField(default=False)
 ## Para la carga de archivos
