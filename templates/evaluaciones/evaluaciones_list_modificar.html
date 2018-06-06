@@ -70,6 +70,27 @@
                 <i class="fa fa-check"></i>Error¡¡¡ la suma de la columna "Ponderación" no es igual a 100.00 </strong>
         </div>
 
+        <div class="col-md-6">
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    <i class="fa fa-text-width"></i>
+                    <h3 class="box-title">Text Emphasis</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <p class="lead">Lead to emphasize importance</p>
+                    <p class="text-green">Text green to emphasize success</p>
+                    <p class="text-aqua">Text aqua to emphasize info</p>
+                    <p class="text-light-blue">Text light blue to emphasize info (2)</p>
+                    <p class="text-red">Text red to emphasize danger</p>
+                    <p class="text-yellow">Text yellow to emphasize warning</p>
+                    <p class="text-muted">Text muted to emphasize general</p>
+                </div>
+                <!-- /.box-body -->
+            </div>
+            <!-- /.box -->
+        </div>
+
         <div class="box">            
             <div class="box-header">
               <h3 class="box-title">Listado de evaluaciones | {{empresa.nombre}}</h3>
@@ -83,7 +104,7 @@
                 </a>
                 <a class="btn btn-app" id="modificar_" href="{%  url 'evaluaciones:listar_evaluaciones' pk=empresa.pk %}" hidden>
                     <i class="fa fa-list"></i> Listar Criterios
-                </a>
+                </a>          
                 <table id="evaluaciones" name="evaluaciones" class="table table-bordered table-striped">
                     <thead>
                         <tr>
@@ -92,9 +113,6 @@
                             <th>Descripcion</th>
                             <th>Puesto</th>
                             <th>Empresa</th>                            
-                            <th>Periodo (Año) </th>
-                            <th>Periodo (Mes-Inicial) </th>
-                            <th>Periodo (Mes-Final) </th>
                             <th>Ponderación</th>
                             <th>Porcentaje Meta</th>
                             <th>Opciones</th>
@@ -109,18 +127,21 @@
                         <th>Descripcion</th>
                         <th>Puesto</th>
                         <th>Empresa</th>                        
-                        <th>Periodo (Año) </th>
-                        <th>Periodo (Mes-Inicial) </th>
-                        <th>Periodo (Mes-Final) </th>
                         <th>Ponderación</th>
                         <th>Porcentaje Meta</th> 
                         <th>Opciones</th>
                         </tr>
                     </tfoot>
                 </table>
-            </div><!-- /.box-body -->
+            </div><!-- /.box-body -->             
         </div><!-- /.box -->
-    </div>
+         {% if periodo %} {% for p in periodo %}
+        <div class="box-body">
+            <h3 class="box-title">Los periodos son: {{ p.periodo__fecha_inico }}</h3>
+        </div>
+         {% endfor %} {% endif %}
+        <!-- /.box-header -->        
+    </div>    
     <input type="hidden" name="GuardarNuevo" id="SaveNew" disabled="disabled" />
     <div class="box-footer">
         <div class="col-md-3 col-md-offset-6">
@@ -156,10 +177,7 @@
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Criterio</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Empresa</th>
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Descripcion</th>
-                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Tipo Objetivo</th>
-                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Periodo</th>
-                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Fecha de Inicio</th>
-                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending">Fecha Fin</th>                                    
+                                    <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Tipo Objetivo</th>                                                                                                         
                                     <th class="sorting" tabindex="0" aria-controls="example2" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending">Opciones</th>
                                 </tr>
                             </thead>
@@ -171,10 +189,7 @@
                                     <th rowspan="1" colspan="1">Criterio</th>
                                     <th rowspan="1" colspan="1">Empresa</th>
                                     <th rowspan="1" colspan="1">Descripcion</th>
-                                    <th rowspan="1" colspan="1">Tipo Objetivo</th>
-                                    <th rowspan="1" colspan="1">Periodo</th>
-                                    <th rowspan="1" colspan="1">Fecha Inicio</th>
-                                    <th rowspan="1" colspan="1">Fecha Fin</th>                                   
+                                    <th rowspan="1" colspan="1">Tipo Objetivo</th>                                                                                                     
                                     <th rowspan="1" colspan="1">Opciones</th>
                                 </tr>
                             </tfoot>
@@ -243,7 +258,8 @@
                           { "data": "criterio__nombre" },
                           { "data": "criterio__descripcion" },
                           { "data": "puesto__nombre" },
-                          { "data": "empresa__nombre" },                                                    
+                          { "data": "empresa__nombre" },
+                          /*                                                    
                           { "data": "periodo__fecha_inico",
                             render: function (d) {
                                   return moment(d).format("YYYY");
@@ -257,6 +273,7 @@
                            render: function (d) {
                                   return monthNames[moment(d).format("M")-1];
                               }  },
+                              */
                           { "data": "ponderacion",
                             render: function (data, type, ssrow, meta) { 
                                     return '<input type="text" id="p' + ssrow.criterio_id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  value="'+ data + '"onclick="oculta('+ssrow.criterio_id+')"/>'                                    
@@ -293,16 +310,7 @@
                           {
                               "targets": [2],
                               "visible": false,                             
-                          },
-                          {
-                              "targets": [7],  
-                              "visible": false,                           
-                          },
-                        
-                              {
-                                  "targets": [6],
-                                  "visible": false,
-                              },
+                          },                        
                           
                       ],
                         "ajax": {
@@ -322,13 +330,14 @@
                             { "data": "nombre" },
                             { "data": "empresa__nombre" },
                             { "data": "descripcion" },
-                            { "data": "objetivo__nombre" },  
+                            { "data": "objetivo__nombre" },
+                            /*  
                             {
                                 "data": "periodo__fecha_inico",
                                 render: function (d) {
                                     return moment(d).format("YYYY");
                                 }
-                            },
+                            },                            
                             {
                                 "data": "periodo__fecha_inico",
                                 render: function (d) {
@@ -340,7 +349,7 @@
                                 render: function (d) {
                                     return monthNames[moment(d).format("M") - 1];
                                 }
-                            },                     
+                            }, */
                             { "data": "opciones",
                                "render": function (data, type, ssrow, meta) {                                   
                                     return ' <p class="seleccionado_" id="icon_' + ssrow.id + '" hidden><i class="fa fa-check-circle"  ></i></p >';
@@ -416,21 +425,20 @@
                   var puesto_id = document.getElementById('id_puesto').value                  
                   error_alert.hidden = true
                   datos.each(function (value, index) {
-                      a = value                      
-                      fecha = new Date(a.periodo__fecha_inico)
+                      a = value     
+                      console.log(a)                 
+                      /*fecha = new Date(a.periodo__fecha_inico)
                       fecha2 = new Date(a.periodo__fecha_fin)
                       anio = fecha.getFullYear();
                       month1 = monthNames[fecha.getMonth()]; 
                       month2 = monthNames[fecha2.getMonth()];                       
+                      */
                       tabla1.row.add([
                                      a.id, 
                                      a.nombre,
                                      a.descripcion, 
                                      puesto_id,
-                                     a.empresa__nombre,                                     
-                                     anio, 
-                                     month1,
-                                     month2,
+                                     a.empresa__nombre,                                                                          
                                      '<input type="text" id="p' + a.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00" required  />', '<input type="text"  id="m' + a.id + '" pattern="[0-9]+(\.[0-9][0-9]?)?" tittle="Debe ser un valor de 5 digitos con dos valores decimales, ej: 100.00"  required />', ' <p class="seleccionado_" id="icon_' + a.id + '" hidden><i class="fa fa-check-circle"  ></i></p >']).draw().node();
 
 
@@ -452,26 +460,25 @@
               var datos = tabla1.rows('.selectedout').data();              
               datos.each(function (value, index) {                  
                   a = value                  
-                  fecha = new Date(a.periodo__fecha_inico)
+                  /*fecha = new Date(a.periodo__fecha_inico)
                   fecha2 = new Date(a.periodo__fecha_fin)
                   anio = fecha.getFullYear();
                   month1 = monthNames[fecha.getMonth()];
                   month2 = monthNames[fecha2.getMonth()]; 
+                  */
                   console.log(a)
+                  console.log(a[0])
                   //tabla2.row.add([a[0], a[1], a[2],a[3], ' <p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check-circle"  ></i></p >']).draw().node();
 
-                  /* tabla2.rows.add([{
+                  tabla2.rows.add([{
                       "id": a[0],
                       "nombre": a[1],
                       "empresa__nombre": a[4],
                       "descripcion": a[2],
-                      "objetivo__nombre": a[4],
-                      "periodo__fecha_inico":  a[5],
-                      "periodo__fecha_fin" : a[7],
+                      "objetivo__nombre": a[4],                     
                       "opciones": '<p class="seleccionado_" id="icon_' + a[0] + '" hidden><i class="fa fa-check - circle"></i></p >'
-                  }]).draw();
-                  */
-                      tabla2.row.add([
+                  }]).draw();                  
+                     /* tabla2.row.add([
                       a[0],
                       a.nombre,
                       a.descripcion,
@@ -481,6 +488,7 @@
                       month1,
                       month2,
                       '<p class="seleccionado_" id="icon_' + a.id + '" hidden><i class="fa fa-check - circle"></i></p >']).draw().node();
+                      */
               });
               var datos_llenos = tabla2.rows().data();
               datos_llenos.each(function (value, index) {
