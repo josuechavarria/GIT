@@ -1704,6 +1704,7 @@ class ListarEvaluaciones_modificar(ListView):
 	def get_context_data(self, **kwargs):		
 		context = super().get_context_data(**kwargs)
 		periodo = periodos.objects.filter(empresa_id =self.kwargs['pk']).order_by('-id')[:1]
+		print(periodo)
 		evaluaciones_hechas = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )
 		puestos_ = puestos.objects.filter(empresa_id = self.kwargs['pk'])			
 		puestos_finales = puestos_.filter(id__in =  evaluaciones_hechas.values_list('puesto_id' ))
