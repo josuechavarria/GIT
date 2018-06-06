@@ -17,6 +17,7 @@
         -o-transform: rotate(-90deg);
         transform: rotate(-90deg);
     }
+
 </style>
 {% endblock %}
 {% block content %}
@@ -99,7 +100,7 @@
           </div><!-- /.row -->
           {% endif %}
           <!-- Table row -->
-          <div class="row">
+          <div class="row section-to-print">
             <div class="col-xs-12 table-responsive">
               <table class="table table-striped">
                 <thead align="center">
@@ -154,11 +155,10 @@
               </table>
             </div><!-- /.col -->
           </div><!-- /.row -->
-
           <!-- this row will not appear when printing -->
           <div class="row no-print">
             <div class="col-xs-12">
-              <a {% if not colaborador %}disabled{%else%}href="invoice-print.html" target="_blank" class="btn btn-default"{% endif %}><i class="fa fa-print"></i> Imprimir</a>
+              <a {% if not colaborador %}disabled{%else%}href="#" OnClick="window.print();" class="btn btn-default"{% endif %}><i class="fa fa-print"></i> Imprimir</a>
               <button class="btn btn-success pull-right" {% if not colaborador %}disabled{% endif %}><i class="fa fa-send"></i> Enviar Evaluación</button>
               <button class="btn btn-primary pull-right" style="margin-right: 5px;" disabled><i class="fa fa-download"></i> Generar excel</button>
             </div>
