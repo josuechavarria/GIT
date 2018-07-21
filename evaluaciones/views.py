@@ -33,6 +33,47 @@ from decimal import *
 from django.db.models import Q,Count, Sum, Avg
 from django.db import transaction
 
+def error_404(request):
+	bandera = False		
+	if perfil.objects.filter(usuario_id =request.user.id).exists():
+		#print('hay algo')
+		p = perfil.objects.get(usuario_id=request.user.id)
+		#print(p)
+		request.session['picture'] = p.foto.url
+		bandera =True
+	else: 			
+		pass
+
+	template_name = "evaluaciones/index_empresa.html"
+
+	ctx = {'empresa': '',
+		    'bandera': bandera}
+	if colaboradores.objects.filter(usuario=request.user).exists():
+		request.session['puesto'] = colaboradores.objects.get(usuario=request.user).puesto.nombre
+	else:
+		request.session['puesto'] = 'Super Admin'
+	return render(request,'evaluaciones/404.html', ctx)
+ 
+def error_500(request):
+	bandera = False		
+	if perfil.objects.filter(usuario_id =request.user.id).exists():
+		#print('hay algo')
+		p = perfil.objects.get(usuario_id=request.user.id)
+		#print(p)
+		request.session['picture'] = p.foto.url
+		bandera =True
+	else: 			
+		pass
+
+	template_name = "evaluaciones/index_empresa.html"
+
+	ctx = {'empresa': '',
+		    'bandera': bandera}
+	if colaboradores.objects.filter(usuario=request.user).exists():
+		request.session['puesto'] = colaboradores.objects.get(usuario=request.user).puesto.nombre
+	else:
+		request.session['puesto'] = 'Super Admin'
+	return render(request,'evaluaciones/500.html', ctx)
 
 def home(request):
 	numbers = [1, 2, 3, 4, 5]
@@ -62,7 +103,7 @@ class RolesView(View):
 		return render(request, template_name, ctx)
 
 	def post(self, request, pk=None):
-		print(request.POST)
+		#print(request.POST)
 		group = Group.objects.get(pk=request.POST['group'])
 		permission = Permission.objects.get(pk=request.POST['permission'])
 		if request.POST['accion'] == 'agregar':
@@ -93,7 +134,7 @@ class RolesActualizarView(View):
 		return HttpResponse(0)
 
 	def post(self, request, pk=None, id=None):
-		print(request.POST)
+		#print(request.POST)
 		objGroup = Group.objects.get(pk=pk)
 
 		if not Group.objects.filter(name__upper=request.POST['perfil'].strip().upper()+'|'+str(id)).exists() or objGroup.name.upper() == request.POST['perfil'].strip().upper()+'|'+str(id):
@@ -110,7 +151,7 @@ class RolesEliminarView(View):
 		return HttpResponse(0)
 
 	def post(self, request, pk=None, id=None):
-		print(request.POST)
+		#print(request.POST)
 		objGroup = Group.objects.get(pk=pk)
 
 		try:
@@ -370,7 +411,7 @@ class CrearUsuarioView(View):
 			else:
 				messages.add_message(request,messages.ERROR,"Error, ya existe un usuario con el correo <%s>"%(request.POST['email']))
 			ctx = {'form': formulario}
-			print (formulario.errors)
+			#print (formulario.errors)
 			#ctx['message'] = message
 
 		storage = messages.get_messages(request)
@@ -496,13 +537,13 @@ class IndexEmpresaView(View):
 	def get(self, request, pk=None):
 		bandera = False		
 		if perfil.objects.filter(usuario_id =request.user.id).exists():
-			print('hay algo')
+			#print('hay algo')
 			p = perfil.objects.get(usuario_id=request.user.id)
-			print(p)
+			#print(p)
 			request.session['picture'] = p.foto.url
 			bandera =True
 		else: 			
-			print('no hay nada')
+			pass
 
 		template_name = "evaluaciones/index_empresa.html"
 
@@ -514,8 +555,6 @@ class IndexEmpresaView(View):
 			request.session['puesto'] = 'Super Admin'
 		return render(request, template_name, ctx)
 
-# Vistas para la creación
-
 
 class CrearEmpresa(SuccessMessageMixin, CreateView):
 	model = empresas
@@ -526,14 +565,13 @@ class CrearEmpresa(SuccessMessageMixin, CreateView):
 	error_message = "La empresa no se pudo crear, inténtelo nuevamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_empresa')
 		else:
 			url = reverse_lazy('evaluaciones:listar_empresa')
 		return url
 
-# Vistas para la actualización
 
 class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 	model = empresas
@@ -543,7 +581,7 @@ class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 	error_message = "La empresa no se pudo actualizar, inténtelo nuevamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_empresa')
 		else:
@@ -555,7 +593,7 @@ class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 
 class ListarEmpresas(ListView):	
 	def get_queryset(self):
-		print('usuario')
+		#print('usuario')
 		return empresas.objects.raw("SELECT e.*,count(c.id) colaboradores FROM evaluaciones_empresas e left outer join evaluaciones_colaboradores c on c.empresa_id = e.id group by e.id ")
 	
 	def get_context_data(self, **kwargs):
@@ -572,7 +610,7 @@ class CrearPuesto(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 	form_invalid_message = 'Error al crear el puesto por favor revise los datos'
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_puesto',
 							   args=[self.kwargs['pk']])
@@ -586,7 +624,6 @@ class CrearPuesto(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
-# Vistas para la actualización
 
 class ActualizarPuesto(SuccessMessageMixin, FormInvalidMessageMixin, UpdateView):
 	model = puestos
@@ -596,7 +633,7 @@ class ActualizarPuesto(SuccessMessageMixin, FormInvalidMessageMixin, UpdateView)
 	form_invalid_message = 'Error al Actualizar el puesto  por favor revise los datos'
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_puesto',
 							   args=[self.kwargs['id']])
@@ -628,7 +665,7 @@ class BorrarPuesto(SuccessMessageMixin, DeleteView):
 
 	def get_success_url(self):
 		empresa_id = self.kwargs['id']
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "Confirm" in self.request.POST:
 			url = reverse('evaluaciones:listar_puesto',
 						  kwargs={'pk': empresa_id})
@@ -657,7 +694,7 @@ class BorrarPuesto(SuccessMessageMixin, DeleteView):
 			return HttpResponseRedirect(success_url)
 		except models.ProtectedError:  
 			puesto = puestos.objects.get(id = self.object.pk)				
-			print(puesto.pk)
+			#print(puesto.pk)
 			messages.add_message(request,messages.WARNING,'info, Existen Colaboradores que dependen de este Puesto, el estado paso a inactivo.')
 			self.object.estado = False
 			self.object.save()
@@ -669,7 +706,7 @@ class CrearDepartamento(SuccessMessageMixin,CreateView):
 	template_name = "evaluaciones/crearDepartamento.html"
 	success_message = "Departamento creado satisfactoriamente."
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_departamento', args=[self.kwargs['pk']])
 		else:
@@ -681,8 +718,6 @@ class CrearDepartamento(SuccessMessageMixin,CreateView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
-# Vistas para la actualización
-
 
 class ActualizarDepartamento(SuccessMessageMixin, UpdateView):
 	model = departamentos
@@ -692,7 +727,7 @@ class ActualizarDepartamento(SuccessMessageMixin, UpdateView):
 	error_message = "El Departamento no se pudo actualizar, inténtelo nuevamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_departamento', args=[
 							   self.kwargs['id']])
@@ -727,7 +762,7 @@ class BorrarDepartamento(SuccessMessageMixin, DeleteView):
 
 	def get_success_url(self):
 		empresa_id = self.kwargs['id']
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "Confirm" in self.request.POST:
 			url = reverse('evaluaciones:listar_departamento',
 						  kwargs={'pk': empresa_id})
@@ -766,7 +801,7 @@ class CrearSucursal(SuccessMessageMixin, CreateView):
 	success_message = "Sucursal creado satisfactoriamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_sucursal',
 							   args=[self.kwargs['pk']])
@@ -780,8 +815,6 @@ class CrearSucursal(SuccessMessageMixin, CreateView):
 		context['empresa'] = empresas.objects.get(pk=self.kwargs['pk'])
 		return context
 
-# Vistas para la actualización
-
 
 class ActualizarSucursal(SuccessMessageMixin, UpdateView):
 	model = sucursales
@@ -791,7 +824,7 @@ class ActualizarSucursal(SuccessMessageMixin, UpdateView):
 	error_message = "La Sucursal no se pudo actualizar, inténtelo nuevamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_sucursal',
 							   args=[self.kwargs['id']])
@@ -820,7 +853,7 @@ class BorrarSucursal(SuccessMessageMixin, DeleteView):
 	model = sucursales
 	def get_success_url(self):
 		empresa_id = self.kwargs['id']
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "Confirm" in self.request.POST:
 			url = reverse('evaluaciones:listar_sucursal',
 						  kwargs={'pk': empresa_id})
@@ -854,7 +887,7 @@ class BorrarSucursal(SuccessMessageMixin, DeleteView):
 			return HttpResponseRedirect(success_url)
 		except models.ProtectedError:  			
 			sucursal = sucursales.objects.get(id = self.object.pk)				
-			print(sucursal.pk)
+			#print(sucursal.pk)
 			messages.add_message(request,
 			messages.WARNING,'info, Existen Colaboradores que dependen de esta Sucursal, el estado paso a inactivo.')
 			# messages.add_message(request, messages.INFO,'info, Tendra que ser por acá')
@@ -915,7 +948,6 @@ class LogoutView(View):
 		logout(request)		
 		return HttpResponseRedirect('/accounts/login/')
 
-# Criterios
 
 class Perfil_(View):
 	def get(self, request,pk,id):		
@@ -946,26 +978,26 @@ class Perfil_(View):
 	def post(self, request,id=None,pk=None):		
 		if 'Actualizar' in request.POST and perfil.objects.filter(usuario_id =id).exists():
 			perfil_ = perfil.objects.get(usuario_id =id)		
-			print('Actualizar')
+			#print('Actualizar')
 			formulario = PerfilForm(request.POST,request.FILES, instance = perfil_)			
-			print(request.FILES['foto'])
+			#print(request.FILES['foto'])
 			colaborador = colaboradores.objects.get(usuario_id = id)
 			empresa_pk = colaborador.empresa.pk
 			usuario_id = id	
 			url = reverse_lazy('evaluaciones:perfil_' , kwargs ={'pk' : pk, 'id' : id })		
 			if formulario.is_valid():
 				form = formulario.save(commit=False)
-				print('VALIDO')						
+				#print('VALIDO')						
 				perfil_.save()
 				request.session['picture'] = perfil_.foto.url
 				messages.add_message(request, messages.SUCCESS,
 			                     "Datos Actualizados con Exito!")
 			else:
-				print('ERRONEO')
+				#print('ERRONEO')
 				messages.add_message(request, messages.ERROR,
 			                     "Formulario contiene errores!!")
 		else:
-			print('otro')
+			#print('otro')
 			formulario = PerfilForm(request.POST,request.FILES)
 			colaborador = colaboradores.objects.get(usuario_id = request.user.id)			
 			empresa_pk = colaborador.empresa.pk
@@ -973,7 +1005,7 @@ class Perfil_(View):
 			usuario_id = request.user.id	
 			url = reverse_lazy('evaluaciones:perfil_' , kwargs ={'pk' : pk, 'id' : id })		
 			if formulario.is_valid():
-				print('Valido')				
+				#print('Valido')				
 				form = formulario.save(commit=False)
 				form.colaborador_id = colaborador.pk
 				form.empresa = empresa
@@ -995,7 +1027,7 @@ class CrearCriterio(SuccessMessageMixin, CreateView):
 
 	def post(self,request,pk=None):
 		empresa_id = request.POST['empresa']
-		print(empresa_id)
+		#print(empresa_id)
 		formulario = CriteriosForm(request.POST)
 		success_url = reverse('evaluaciones:crear_criterio',
 						  kwargs={'pk': empresa_id})				
@@ -1010,7 +1042,7 @@ class CrearCriterio(SuccessMessageMixin, CreateView):
 		return HttpResponseRedirect(success_url)
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_criterio',
 							   args=[self.kwargs['pk']])
@@ -1033,7 +1065,7 @@ class ActualizarCriterios(SuccessMessageMixin, UpdateView):
 	error_message = "El Criterio no se pudo actualizar, inténtelo nuevamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:						
 			url = reverse_lazy('evaluaciones:crear_criterio',
 							  args=[self.kwargs['id']])
@@ -1066,7 +1098,7 @@ class BorrarCriterios(SuccessMessageMixin, DeleteView):
 
 	def get_success_url(self):
 		empresa_id = self.kwargs['id']
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "Confirm" in self.request.POST:
 			url = reverse('evaluaciones:listar_criterios',
 						  kwargs={'pk': empresa_id})
@@ -1107,7 +1139,7 @@ class CrearPeriodos(SuccessMessageMixin, CreateView):
 		return context        
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_periodo',
 							   args=[self.kwargs['pk']])
@@ -1135,7 +1167,7 @@ class CrearObjetivos(SuccessMessageMixin, CreateView):
 	success_message = "Objetivo creado satisfactoriamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_objetivos',
 							   args=[self.kwargs['pk']])
@@ -1170,7 +1202,7 @@ class ActualizarObjetivos(SuccessMessageMixin, UpdateView):
 	error_message = "El objetivo no se pudo actualizar, inténtelo nuevamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_objetivos',
 							   args=[self.kwargs['id']])
@@ -1197,7 +1229,7 @@ class BorrarObjetivos(SuccessMessageMixin, DeleteView):
 
 	def get_success_url(self):
 		empresa_id = self.kwargs['id']
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "Confirm" in self.request.POST:
 			url = reverse('evaluaciones:listar_objetivos',
 						  kwargs={'pk': empresa_id})
@@ -1222,7 +1254,7 @@ class BorrarObjetivos(SuccessMessageMixin, DeleteView):
 			return HttpResponseRedirect(success_url)
 		except models.ProtectedError:  
 			cri = criterios.objects.get(objetivo_id = self.object.pk)				
-			print(cri.pk)
+			#print(cri.pk)
 			messages.add_message(request,messages.WARNING,'info, Existen Criterios que dependen de este Objetivo, el estado paso a inactivo.')
 			self.object.estado = False
 			self.object.save()
@@ -1244,7 +1276,7 @@ def simple_upload(request):
 
 class activar_objetivo(View):
 	def post(self,request,pk=None):
-		print(request.POST['empresa_id'])
+		#print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
 		messages.add_message(request,messages.SUCCESS,'info,Objetivo activado')
 		success_url = reverse('evaluaciones:listar_objetivos',
@@ -1252,15 +1284,15 @@ class activar_objetivo(View):
 		objetivo_ = request.POST['pk']
 		obj = objetivos.objects.get(pk = objetivo_)
 		if obj:
-			print(obj.estado)
+			#print(obj.estado)
 			obj.estado = True
 			obj.save()
-			print(obj.estado)		 
+			#print(obj.estado)		 
 		return HttpResponse(success_url)
 
 class activar_empresa(View):
 	def post(self, request, pk=None):
-		print(request.POST)
+		#print(request.POST)
 		empresa_id = request.POST['pk']		
 		obj = empresas.objects.get(pk=empresa_id)	   
 		if request.POST['bandera'] == '1':
@@ -1277,54 +1309,54 @@ class activar_empresa(View):
 
 class activar_departamento(View):
 	def post(self,request,pk=None):
-		print(request.POST['empresa_id'])
+		#print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
 		messages.add_message(request,messages.SUCCESS,'Departamento activado')
 		success_url = reverse('evaluaciones:listar_departamento',
 						  kwargs={'pk': empresa_id})
 		departamento_ = request.POST['pk']
-		print(departamento_)
+		#print(departamento_)
 		depa = departamentos.objects.get(pk = departamento_)
 		if depa:
-			print(depa.estado)
+			#print(depa.estado)
 			depa.estado = True
 			depa.save()
-			print(depa.estado)		 
+			#print(depa.estado)		 
 		return HttpResponse(success_url)
 
 class activar_puesto(View):
 	def post(self,request,pk=None):
-		print(request.POST['empresa_id'])
+		#print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
 		messages.add_message(request,messages.SUCCESS,'Puesto activado')
 		success_url = reverse('evaluaciones:listar_puesto',
 						  kwargs={'pk': empresa_id})
 		puest = request.POST['pk']
-		print(puest)
+		#print(puest)
 		puesto = puestos.objects.get(pk = puest)
 		if puesto:
-			print(puesto.estado)
+			#print(puesto.estado)
 			puesto.estado = True
 			puesto.save()
-			print(puesto.estado)		 
+			#print(puesto.estado)		 
 		return HttpResponse(success_url)
 
 
 class activar_sucursal(View):
 	def post(self,request,pk=None):
-		print(request.POST['empresa_id'])
+		#print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
 		messages.add_message(request,messages.SUCCESS,'Sucursal activada')
 		success_url = reverse('evaluaciones:listar_sucursal',
 						  kwargs={'pk': empresa_id})
 		sucu = request.POST['pk']
-		print(sucu)
+		#print(sucu)
 		sucursal = sucursales.objects.get(pk = sucu)
 		if sucursal:
-			print(sucursal.estado)
+			#print(sucursal.estado)
 			sucursal.estado = True
 			sucursal.save()
-			print(sucursal.estado)		 
+			#print(sucursal.estado)		 
 		return HttpResponse(success_url)
 
 class CrearPerfil(SuccessMessageMixin, CreateView):
@@ -1334,7 +1366,7 @@ class CrearPerfil(SuccessMessageMixin, CreateView):
 	success_message = "Criterio creado satisfactoriamente."
 
 	def get_success_url(self, **kwargs):
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_perfil',
 							   args=[self.kwargs['pk']])				
@@ -1375,7 +1407,7 @@ class BorrarPeriodo(SuccessMessageMixin, DeleteView):
 
 	def get_success_url(self):
 		empresa_id = self.kwargs['id']
-		print(self.request.POST)
+		#print(self.request.POST)
 		if "Confirm" in self.request.POST:
 			url = reverse('evaluaciones:listar_periodos',
 						  kwargs={'pk': empresa_id})
@@ -1424,7 +1456,7 @@ class BorrarPeriodo(SuccessMessageMixin, DeleteView):
 
 class activar_periodo(View):
 	def post(self,request,pk=None):
-		print(request.POST['empresa_id'])
+		#print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
 		messages.add_message(request,messages.SUCCESS,'info,Periodo activado')
 		success_url = reverse('evaluaciones:listar_periodos',
@@ -1432,7 +1464,7 @@ class activar_periodo(View):
 		periodo_ = request.POST['pk']
 		obj = periodos.objects.get(pk = periodo_)
 		if obj:
-			print(obj.estado)
+			#print(obj.estado)
 			obj.estado = True
 			obj.save()
 			objEvalColaborador = evaluacion_colaborador.objects.filter(
@@ -1452,7 +1484,7 @@ class activar_periodo(View):
 
 class activar_criterio(View):
 	def post(self,request,pk=None):
-		print(request.POST['empresa_id'])
+		#print(request.POST['empresa_id'])
 		empresa_id = request.POST['empresa_id']
 		messages.add_message(request,messages.SUCCESS,'info,Criterio activado')
 		success_url = reverse('evaluaciones:listar_criterios',
@@ -1460,10 +1492,10 @@ class activar_criterio(View):
 		criterio_ = request.POST['pk']
 		obj = criterios.objects.get(pk = criterio_)
 		if obj:
-			print(obj.estado)
+			#print(obj.estado)
 			obj.estado = True
 			obj.save()
-			print(obj.estado)		 
+			#print(obj.estado)		 
 		return HttpResponse(success_url)
 
 class ColaboradorMisEvaluaciones(View):
@@ -1494,7 +1526,7 @@ class ColaboradorMisEvaluaciones(View):
 		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
 		objEvaluacionesNota = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
 		objPeriodo = objEvaluaciones[0].periodo
-		print(request.POST)
+		#print(request.POST)
 		try:
 			sid = transaction.savepoint()
 			for x in objEvaluacionesNota:
@@ -1704,7 +1736,7 @@ class EvaluacionActiva(View):
 		pass
 
 	def post(self,request,pk=None):
-		print(request.POST)
+		#print(request.POST)
 		objEvalActiva, created = evaluacion_activa.objects.update_or_create(
 				empresa = empresas.objects.get(pk=pk),
 				periodo = periodos.objects.get(pk=request.POST['periodo']),
@@ -1755,11 +1787,11 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 		criterios_ =  criterios.objects.filter(empresa_id =self.kwargs['pk'], periodo_id = periodo).order_by('id')		
 		criterios_usados = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )		
 		evaluaciones_hechas = evaluaciones.objects.filter(empresa_id = self.kwargs['pk'], periodo_id = periodo )
-		print(evaluaciones_hechas)		
+		#print(evaluaciones_hechas)		
 		criterios_finales = criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' ))
 		puestos_ = puestos.objects.filter(empresa_id = self.kwargs['pk'])			
 		puestos_finales = puestos_.exclude(id__in =  evaluaciones_hechas.values_list('puesto_id' ))
-		print(puestos_finales)
+		#print(puestos_finales)
 		context['criterios'] = criterios_finales
 		context['periodos'] = periodo	
 		context['puestos'] = puestos_finales
@@ -1767,7 +1799,7 @@ class CrearEvaluacion(SuccessMessageMixin, FormInvalidMessageMixin, CreateView):
 
 class guardar_evaluacion(View):
 	def post(self,request,pk=None):	
-		print(request.POST)	
+		#print(request.POST)	
 		empresa_id = request.POST['empresa_id']
 		periodo_id = request.POST['periodo_id']
 		puesto_id = request.POST['puesto_id']
@@ -1783,13 +1815,13 @@ class guardar_evaluacion(View):
 				periodo_id = periodo_id,
 				puesto_id = puesto_id)
 			evaluacion_.save()
-			print(objeto, ponderacion[contador],meta[contador])			
+			#print(objeto, ponderacion[contador],meta[contador])			
 			contador= contador+1
 		if contador>0 :
 			messages.add_message(request,messages.SUCCESS,'Info,Evaluación Creada con exito')
 		else:
 			messages.add_message(request,messages.ERROR,'Error,no se pudo crear la evaluación')
-		print(empresa_id,periodo_id,puesto_id)			
+		#print(empresa_id,periodo_id,puesto_id)			
 		
 		success_url = reverse('evaluaciones:listar_criterios',
 						  kwargs={'pk': empresa_id})
@@ -1812,7 +1844,7 @@ class borrar_evaluaciones(View):
 		periodo_id = request.POST['periodo_id']
 		puesto_id = request.POST['puesto_id']
 		elementos = request.POST.getlist('ids[]')					
-		print(empresa_id,periodo_id,puesto_id)
+		#print(empresa_id,periodo_id,puesto_id)
 		if	evaluaciones.objects.filter(empresa__pk=empresa_id, puesto__pk = puesto_id).delete():
 			messages.add_message(request,messages.SUCCESS, 'Exito. Evaluaciones Borradas')
 		else:
@@ -1846,15 +1878,15 @@ def actualizar_tabla(request):
 		return HttpResponse(json.dumps(evaluaciones_, cls=DjangoJSONEncoder), content_type="application/json")
 
 def actualizar_tablacriterios(request):
-		print('actualizando tabla criterios')
+		#print('actualizando tabla criterios')
 		empresa_id = request.POST['empresa_id']
 		puesto_id = request.POST['puesto_id']	
 		periodo_id = request.POST['periodo_id']			
 		if puesto_id == '':
-			print('puesto_id vacio' + periodo_id)
+			#print('puesto_id vacio' + periodo_id)
 			criterios_finales = []
 		else: 
-			print('al parecer hay algo')
+			#print('al parecer hay algo')
 			criterios_ =  criterios.objects.filter(empresa_id =empresa_id, periodo_id = periodo_id).order_by('id')		
 			criterios_usados = evaluaciones.objects.filter(empresa_id = empresa_id, periodo_id = periodo_id, puesto_id = puesto_id)
 			criterios_finales = list(criterios_.exclude(id__in = criterios_usados.values_list('criterio_id' )).values(
@@ -1879,7 +1911,7 @@ class ListarEvaluaciones_modificar(ListView):
 
 class modificar_evaluacion(View):
 	def post(self,request,pk=None):	
-		print(request.POST)	
+		#print(request.POST)	
 		empresa_id = request.POST['empresa_id']
 		periodo_id = request.POST['periodo_id']
 		puesto_id = request.POST['puesto_id']
@@ -1914,7 +1946,7 @@ class modificar_evaluacion(View):
 			messages.add_message(request,messages.SUCCESS,'Exito,Evaluación Actualizada con exito')
 		else:
 			messages.add_message(request,messages.ERROR,'Error,no se pudo modificar la evaluación')
-		print(empresa_id,periodo_id,puesto_id)			
+		#print(empresa_id,periodo_id,puesto_id)			
 		
 		success_url = reverse('evaluaciones:listar_criterios',
 						  kwargs={'pk': empresa_id})

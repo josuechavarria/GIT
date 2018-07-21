@@ -17,6 +17,8 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.conf import settings
 from evaluaciones.views import LoginView
+from evaluaciones import views as evaluaciones_views
+from django.conf.urls import handler404, handler500
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -27,3 +29,6 @@ urlpatterns = [
 from django.conf import settings
 from django.conf.urls.static import static
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+handler404 = evaluaciones_views.error_404
+handler500 = evaluaciones_views.error_500
