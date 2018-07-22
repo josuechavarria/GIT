@@ -171,23 +171,30 @@
 
 {% block script %}
 <script type="text/javascript">
-$("#id_empresa").val("{{empresa.pk}}");
-$("#id_empresa").attr('disabled','disabled');
-
+    $("#id_empresa").val("{{empresa.pk}}");
+    $("#id_empresa").attr('disabled','disabled');
+    {%for x in promedioColaboradoresProm%}
+        var promedio = parseFloat({{x.promedioNotas}}/{{totalSubordinados}}).toFixed(2)
+        $("#id_porcentaje_{{CriterioPromedio.id}}_{{colaborador.pk}}").attr("readonly","true")
+        $("#id_porcentaje_{{CriterioPromedio.id}}_{{colaborador.pk}}").attr("style","background-color: rgb(235, 235, 228);")
+        $("#id_porcentaje_{{CriterioPromedio.id}}_{{colaborador.pk}}").val(promedio)
+        CalcularNota({{CriterioPromedio.id}},{{colaborador.pk}},'{{CriterioPromedio.porcentaje_meta}}','{{CriterioPromedio.ponderacion}}',promedio)
+        RecalcularTotal()
+    {%endfor%}
 function CalcularNota(id1, id2, pm, pon, p){
-  var porcentaje_meta = pm
-  var porcentaje_final = 0.0
-  var ponderacion = pon
-  var nota = 0.0
-  if((p/porcentaje_meta)<1){
-    porcentaje_final = (p/porcentaje_meta)*100
-  }else{
-    porcentaje_final = 100
-  }
-  nota = ponderacion*porcentaje_final/100
-  nota = parseFloat(Math.round(nota*100)/100).toFixed(2)
-  $("#id_nota_"+id1+"_"+id2).html(nota)
-  RecalcularTotal()
+    var porcentaje_meta = pm
+    var porcentaje_final = 0.0
+    var ponderacion = pon
+    var nota = 0.0
+    if((p/porcentaje_meta)<1){
+      porcentaje_final = (p/porcentaje_meta)*100
+    }else{
+      porcentaje_final = 100
+    }
+    nota = ponderacion*porcentaje_final/100
+    nota = parseFloat(Math.round(nota*100)/100).toFixed(2)
+    $("#id_nota_"+id1+"_"+id2).html(nota)
+    RecalcularTotal()
   //alert(ponderacion)
 }
 

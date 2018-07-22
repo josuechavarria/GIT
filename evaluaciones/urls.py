@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from . import views
 
 urlpatterns = [
-    url(r'^$', permission_required('evaluaciones.evaluaciones_enterprise')(views.principal), name='principal'),
+    url(r'^$', login_required(views.principal), name='principal'),
     #url(r'^accounts/login/$', views.LoginView.as_view(), name='login'), 
     url(r'^logout/$', views.LogoutView.as_view(), name='logout'),    
     url(r'^empresas/(?P<pk>\d+)/$', login_required(views.IndexEmpresaView.as_view()), name='principal_empresa'),

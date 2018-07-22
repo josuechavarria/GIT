@@ -83,6 +83,21 @@ def home(request):
 
 
 def principal(request):
+	if request.user.is_superuser:
+		return render(request, 'evaluaciones/principal.html')
+	elif colaboradores.objects.filter(usuario=request.user).count() > 0:
+		objEmpresa = colaboradores.objects.get(usuario=request.user).empresa
+		if objEmpresa.estado is True:
+			objColaborador = colaboradores.objects.get(usuario=request.user)
+			if objColaborador.password_caducado is False:
+				return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
+			else:
+				logout(request)
+				return HttpResponseRedirect(reverse('evaluaciones:expired_password', args=[objColaborador.pk,objColaborador.empresa.pk]))
+		else:
+			messages.error(request, 'Empresa inactiva, comuníquese con el administrador.')
+	else:
+		return HttpResponseRedirect(reverse('evaluaciones:principal'))
 	return render(request, 'evaluaciones/principal.html')
 
 
@@ -1501,20 +1516,43 @@ class activar_criterio(View):
 class ColaboradorMisEvaluaciones(View):
 	def get(self,request,pk=None, id=None):
 		template_name = "evaluaciones/misEvaluaciones.html"
+		objEvalColaboradorProm = ""
+		objCriterioPromedio = ""
+		totalSubordinados = 1
 		objEmpresa = empresas.objects.get(pk=pk)
 		ctx = {'empresa': objEmpresa}
-		try:
-			objColaborador = colaboradores.objects.get(usuario__pk=id)
-			objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-			objEvalColaborador = evaluacion_colaborador.objects.filter(estado=True, colaborador__usuario=objColaborador.usuario)
-			objPeriodo = objEvaluaciones[0].periodo
-			ctx = {'empresa': objEmpresa,
-			'criterios' : objEvaluaciones,
-			'colaborador' : objColaborador,
-			'periodo' : objPeriodo,
-			'evaluacionColaborador' : objEvalColaborador}
-		except:
-			pass
+		#try:
+		objColaborador = colaboradores.objects.get(usuario__pk=id)
+		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+		objEvalColaborador = evaluacion_colaborador.objects.filter(estado=True, colaborador__usuario=objColaborador.usuario)
+		objPeriodo = objEvaluaciones[0].periodo
+		
+		if request.user.has_perm('evaluaciones.especiales_es_supervisor'):
+			objCriterioPromedio = evaluaciones.objects.get(empresa__pk=pk, 
+				criterio__estado=True, 
+				estado=True, 
+				puesto=objColaborador.puesto, 
+				criterio__nombre__upper = 'NOTA PROMEDIO COLABORADORES')
+			objEvalColaboradorProm = evaluacion_colaborador.objects.filter(empresa__pk=pk, 
+				estado=True,
+				evaluacion__criterio__estado=True, 
+				colaborador__supervisor__usuario=request.user).values('colaborador__supervisor').annotate(promedioNotas=Sum('nota'))
+
+			totalSubordinados = evaluacion_colaborador.objects.filter(
+				empresa__pk=pk, 
+				estado=True,
+				evaluacion__criterio__estado=True, 
+				colaborador__supervisor__usuario=request.user).distinct('colaborador__pk').count()
+		ctx = {'empresa': objEmpresa,
+		'criterios' : objEvaluaciones,
+		'colaborador' : objColaborador,
+		'periodo' : objPeriodo,
+		'evaluacionColaborador' : objEvalColaborador,
+		'promedioColaboradoresProm' : objEvalColaboradorProm,
+		'totalSubordinados' : totalSubordinados,
+		'CriterioPromedio' : objCriterioPromedio}
+		#except:
+		#	pass
 		return render(request, template_name, ctx)
 
 	@transaction.atomic
@@ -1643,7 +1681,7 @@ class SupervisorEvaluacionesList(View):
 
 class EvaluacionesHistorial(View):
 	def get(self,request,pk=None):
-		template_name = "evaluaciones/EvaluacionesHistorial.html"
+		template_name = "evaluaciones/evaluacionesHistorial.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 		data=[]
 		objPeriodos = periodos.objects.filter(empresa=objEmpresa, estado=False)
@@ -1699,7 +1737,7 @@ class EvaluacionesHistorialDetalle(View):
 
 class EvaluacionesHistorialSupervisor(View):
 	def get(self,request,pk=None):
-		template_name = "evaluaciones/EvaluacionesHistorialSupervisor.html"
+		template_name = "evaluaciones/evaluacionesHistorialSupervisor.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 		data=[]
 		objPeriodos = periodos.objects.filter(empresa=objEmpresa, estado=False)
