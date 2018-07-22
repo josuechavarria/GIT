@@ -1053,11 +1053,19 @@ class CrearCriterio(SuccessMessageMixin, CreateView):
 			new_rec.save()
 			messages.add_message(request,messages.SUCCESS,'Criterio Creado Exitosamente.')			
 		else:
-			messages.add_message(request,messages.ERROR,'Criterio Erroneo.')			
-		return HttpResponseRedirect(success_url)
+			messages.add_message(request,messages.ERROR,'Criterio Erroneo.')
+
+		if "GuardarNuevo" in self.request.POST:
+			url = reverse_lazy('evaluaciones:crear_criterio',
+							   args=[empresa_id])
+		else:
+			url = reverse_lazy('evaluaciones:listar_criterios',
+							   args=[empresa_id])
+		
+		return HttpResponseRedirect(url)
 
 	def get_success_url(self, **kwargs):
-		#print(self.request.POST)
+		print(self.request.POST)
 		if "GuardarNuevo" in self.request.POST:
 			url = reverse_lazy('evaluaciones:crear_criterio',
 							   args=[self.kwargs['pk']])
@@ -1521,43 +1529,46 @@ class ColaboradorMisEvaluaciones(View):
 		totalSubordinados = 1
 		objEmpresa = empresas.objects.get(pk=pk)
 		ctx = {'empresa': objEmpresa}
-		#try:
-		objColaborador = colaboradores.objects.get(usuario__pk=id)
-		objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
-		objEvalColaborador = evaluacion_colaborador.objects.filter(estado=True, colaborador__usuario=objColaborador.usuario)
-		objPeriodo = objEvaluaciones[0].periodo
-		
-		if request.user.has_perm('evaluaciones.especiales_es_supervisor'):
-			objCriterioPromedio = evaluaciones.objects.get(empresa__pk=pk, 
-				criterio__estado=True, 
-				estado=True, 
-				puesto=objColaborador.puesto, 
-				criterio__nombre__upper = 'NOTA PROMEDIO COLABORADORES')
-			objEvalColaboradorProm = evaluacion_colaborador.objects.filter(empresa__pk=pk, 
-				estado=True,
-				evaluacion__criterio__estado=True, 
-				colaborador__supervisor__usuario=request.user).values('colaborador__supervisor').annotate(promedioNotas=Sum('nota'))
-
-			totalSubordinados = evaluacion_colaborador.objects.filter(
-				empresa__pk=pk, 
-				estado=True,
-				evaluacion__criterio__estado=True, 
-				colaborador__supervisor__usuario=request.user).distinct('colaborador__pk').count()
-		ctx = {'empresa': objEmpresa,
-		'criterios' : objEvaluaciones,
-		'colaborador' : objColaborador,
-		'periodo' : objPeriodo,
-		'evaluacionColaborador' : objEvalColaborador,
-		'promedioColaboradoresProm' : objEvalColaboradorProm,
-		'totalSubordinados' : totalSubordinados,
-		'CriterioPromedio' : objCriterioPromedio}
-		#except:
-		#	pass
+		try:
+			objColaborador = colaboradores.objects.get(usuario__pk=id)
+			objEvaluaciones = evaluaciones.objects.filter(empresa__pk=pk, criterio__estado=True, estado=True, puesto=objColaborador.puesto).order_by('criterio__objetivo__nombre', 'criterio__nombre')
+			objEvalColaborador = evaluacion_colaborador.objects.filter(estado=True, colaborador__usuario=objColaborador.usuario)
+			objPeriodo = objEvaluaciones[0].periodo
+			
+			if request.user.has_perm('evaluaciones.especiales_es_supervisor')  and request.user.pk == int(id):
+				objCriterioPromedio = evaluaciones.objects.get(empresa__pk=pk, 
+					criterio__estado=True, 
+					estado=True, 
+					puesto=objColaborador.puesto, 
+					criterio__nombre__upper = 'NOTA PROMEDIO COLABORADORES')
+				objEvalColaboradorProm = evaluacion_colaborador.objects.filter(empresa__pk=pk, 
+					estado=True,
+					evaluacion__criterio__estado=True, 
+					colaborador__supervisor__usuario=request.user).values('colaborador__supervisor').annotate(promedioNotas=Sum('nota'))
+				print(objEvalColaboradorProm)
+				totalSubordinados = evaluacion_colaborador.objects.filter(
+					empresa__pk=pk, 
+					estado=True,
+					evaluacion__criterio__estado=True, 
+					colaborador__supervisor__usuario=request.user).distinct('colaborador__pk').count()
+			ctx = {'empresa': objEmpresa,
+			'criterios' : objEvaluaciones,
+			'colaborador' : objColaborador,
+			'periodo' : objPeriodo,
+			'evaluacionColaborador' : objEvalColaborador,
+			'promedioColaboradoresProm' : objEvalColaboradorProm,
+			'totalSubordinados' : totalSubordinados,
+			'CriterioPromedio' : objCriterioPromedio}
+		except:
+			pass
 		return render(request, template_name, ctx)
 
 	@transaction.atomic
 	def post(self,request,pk=None, id=None):
 		template_name = "evaluaciones/misEvaluaciones.html"
+		objEvalColaboradorProm = ""
+		objCriterioPromedio = ""
+		totalSubordinados = 1
 		error = False
 		objEmpresa = empresas.objects.get(pk=pk)
 		objColaborador = colaboradores.objects.get(usuario__pk=id)
@@ -1599,6 +1610,24 @@ class ColaboradorMisEvaluaciones(View):
 					else:
 						objEvalColaborador.fecha_colaborador = timezone.now()
 					objEvalColaborador.save()
+
+			if request.user.has_perm('evaluaciones.especiales_es_supervisor') and request.user.pk == int(id):
+				objCriterioPromedio = evaluaciones.objects.get(empresa__pk=pk, 
+					criterio__estado=True, 
+					estado=True, 
+					puesto=objColaborador.puesto, 
+					criterio__nombre__upper = 'NOTA PROMEDIO COLABORADORES')
+				objEvalColaboradorProm = evaluacion_colaborador.objects.filter(empresa__pk=pk, 
+					estado=True,
+					evaluacion__criterio__estado=True, 
+					colaborador__supervisor__usuario=request.user).values('colaborador__supervisor').annotate(promedioNotas=Sum('nota'))
+
+				totalSubordinados = evaluacion_colaborador.objects.filter(
+					empresa__pk=pk, 
+					estado=True,
+					evaluacion__criterio__estado=True, 
+					colaborador__supervisor__usuario=request.user).distinct('colaborador__pk').count()
+
 			if request.user.has_perm('evaluaciones.especiales_es_supervisor') and request.user.pk != id:
 				pass
 			else:
@@ -1623,7 +1652,10 @@ class ColaboradorMisEvaluaciones(View):
 		'criterios' : objEvaluaciones,
 		'colaborador' : objColaborador,
 		'periodo' : objPeriodo,
-		'evaluacionColaborador' : objEvalColaborador}
+		'evaluacionColaborador' : objEvalColaborador,
+		'promedioColaboradoresProm' : objEvalColaboradorProm,
+		'totalSubordinados' : totalSubordinados,
+		'CriterioPromedio' : objCriterioPromedio}
 		return render(request, template_name, ctx)
 
 def EnviarNotificaciones(empresa=None, usuario=None, puesto=None, texto=None, url=None):

@@ -166,7 +166,7 @@ class criterios(models.Model):
 	empresa = models.ForeignKey(empresas,on_delete=models.PROTECT)
 	periodo = models.ForeignKey(periodos,on_delete=models.PROTECT)
 	nombre = models.CharField(max_length=120, unique=True)
-	descripcion = models.TextField()
+	descripcion = models.TextField(null=True, blank=True, default=None)
 	objetivo = models.ForeignKey(objetivos,on_delete=models.PROTECT)
 	estado = models.BooleanField(default=True)
 
