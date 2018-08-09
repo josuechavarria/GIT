@@ -350,14 +350,13 @@ class PerfilChangePasswordView(View):
 		}
 		return HttpResponse(mensaje)
 
-
 class CrearUsuarioView(View):	
 	def get(self, request, pk=None):
 		form = usuariosForm()
 		form.fields["puesto"].queryset = puestos.objects.filter(empresa__pk=pk, estado=True)
 		form.fields["departamento"].queryset = departamentos.objects.filter(empresa__pk=pk, estado=True)
 		form.fields["sucursal"].queryset = sucursales.objects.filter(empresa__pk=pk, estado=True)
-		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, grupo__name__upper='SUPERVISOR', usuario__is_active=True)
+		form.fields["supervisor"].queryset = colaboradores.objects.filter(empresa__pk=pk, usuario__is_active=True)
 		template_name = "evaluaciones/crearUsuario.html"
 		objEmpresa = empresas.objects.get(pk=pk)
 
@@ -375,14 +374,15 @@ class CrearUsuarioView(View):
 		'permitir': permitir
 		}
 		return render(request, template_name, ctx)
-   
+
+	@transaction.atomic
 	def post(self, request, pk=None):
 		ctx={}
 		template_name = "evaluaciones/crearUsuario.html"
 		formulario = usuariosForm(request.POST)
 		objEmpresa = empresas.objects.get(pk=pk)
 		password = User.objects.make_random_password(length=8, allowed_chars='0123456789qwertyuiopasdfghjklzxcvbnm%$')
-		objUser = User(username=request.POST['email'], email=request.POST['email']
+		objUser = User(username=request.POST['usuario'], email=request.POST['email']
 			, first_name=request.POST['primer_nombre'], last_name=request.POST['primer_apellido'])
 		objUser.set_password(password)
 
@@ -394,39 +394,45 @@ class CrearUsuarioView(View):
 			permitir = False
 		#fin validar licencias
 		
-		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 0 and permitir is True:
-			form = formulario.save(commit = False)
-			form.usuario_creador = request.user
-			form.usuario_modificador = request.user
-			objUser.save()
-			objUser.groups.add(Group.objects.get(pk=request.POST['grupo']))
-			form.usuario = objUser
-			form.save()
-			subject = 'Bienvenido al sistema de evaluación y desempeño'
-			url = reverse_lazy('login')
-			html_message = loader.render_to_string(
-			'evaluaciones/email_Bienvenida.html',
-				{
-					'empresa': empresas.objects.get(pk=pk).nombre,
-					'name':  request.POST['primer_nombre'],
-					'usuario' : objUser.username,
-					'password' : password,
-					'action_url' : settings.SITE_URL + str(url)
-				}
-			)
-			messagemail = 'Sus datos de acceso son: usuario-> ' + objUser.username + ' password-> ' + password
-			if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objUser.email], fail_silently=False, html_message=html_message):
-				messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Pero no se pudo enviar el correo al colaborador.')
-			else:
-				messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Se envio un correo con sus datos de acceso a %s'%(objUser.email))
-			ctx['form'] = usuariosForm()
+		if formulario.is_valid() and permitir is True and len(User.objects.filter(username=request.POST['usuario']))==0:
+			try:
+				sid = transaction.savepoint()
+				form = formulario.save(commit = False)
+				form.usuario_creador = request.user
+				form.usuario_modificador = request.user
+				objUser.save()
+				objUser.groups.add(Group.objects.get(pk=request.POST['grupo']))
+				form.usuario = objUser
+				form.save()
+				subject = 'Bienvenido al sistema de evaluación y desempeño'
+				url = reverse_lazy('login')
+				html_message = loader.render_to_string(
+				'evaluaciones/email_Bienvenida.html',
+					{
+						'empresa': empresas.objects.get(pk=pk).nombre,
+						'name':  request.POST['primer_nombre'],
+						'usuario' : objUser.username,
+						'password' : password,
+						'action_url' : settings.SITE_URL + str(url)
+					}
+				)
+				transaction.savepoint_commit(sid)
+				messagemail = 'Sus datos de acceso son: usuario-> ' + objUser.username + ' password-> ' + password
+				if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objUser.email], fail_silently=False, html_message=html_message):
+					messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Pero no se pudo enviar el correo al colaborador.')
+				else:
+					messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Se envio un correo con sus datos de acceso a %s'%(objUser.email))
+				ctx['form'] = usuariosForm()
+			except:
+				print ("error hola")
+				transaction.savepoint_rollback(sid)
 		else:
-			if len(User.objects.filter(username=request.POST['email'])) == 0:
-				messages.add_message(request,messages.ERROR,"Formulario contiene errores!!")
+			if len(User.objects.filter(username=request.POST['usuario'])) > 0:
+				messages.add_message(request,messages.ERROR,"Error, ya existe un usuario con el nombre <%s>"%(request.POST['usuario']))
 			else:
-				messages.add_message(request,messages.ERROR,"Error, ya existe un usuario con el correo <%s>"%(request.POST['email']))
+				messages.add_message(request,messages.ERROR,"Formulario contiene errores, por favor validar")
 			ctx = {'form': formulario}
-			#print (formulario.errors)
+			print (formulario.errors)
 			#ctx['message'] = message
 
 		storage = messages.get_messages(request)
@@ -442,7 +448,6 @@ class CrearUsuarioView(View):
 		if "GuardarNuevo" in request.POST:
 			return render(request, template_name, ctx)
 		else:
-			messages.add_message(request,messages.SUCCESS,"Exito")
 			url = reverse_lazy('evaluaciones:listar_usuario', args=[pk,])
 		return HttpResponseRedirect(url)
 
@@ -482,11 +487,10 @@ class ActualizarUsuarioView(View):
 		formulario = usuariosForm(request.POST, instance=objColaborador)
 		error = False
 		objUser = objColaborador.usuario		
-		if formulario.is_valid() and len(User.objects.filter(username=request.POST['email'])) == 1 and objUser.email ==request.POST['email']:
+		if formulario.is_valid():
 			form = formulario.save(commit = False)
 			form.usuario_modificador = request.user
 			form.fecha_modificacion = timezone.now()
-			objUser.username = request.POST['email']
 			objUser.email = request.POST['email']
 			objUser.first_name = request.POST['primer_nombre']
 			objUser.last_name = request.POST['primer_apellido']
@@ -508,10 +512,7 @@ class ActualizarUsuarioView(View):
 			ctx['form'] = usuariosForm()
 			messages.add_message(request,messages.SUCCESS,"Usuario actualizado exitosamente.")
 		else:
-			if len(User.objects.filter(username=request.POST['email'])) == 0:
-				messages.add_message(request,messages.ERROR,"Formulario contiene errores!!")
-			else:
-				messages.add_message(request,messages.ERROR,"Error, ya existe un usuario con el correo <%s>"%(request.POST['email']))
+			messages.add_message(request,messages.ERROR,"Formulario contiene errores!!")
 			ctx = {'form': formulario}
 			error = True
 		ctx['empresa'] = empresas.objects.get(pk=id)

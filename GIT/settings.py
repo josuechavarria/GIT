@@ -167,8 +167,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'josuechavarria89@gmail.com' #hancoir@gmail.com
-EMAIL_HOST_PASSWORD = '31829kmx' #******
+EMAIL_HOST_USER = 'smartalentsolutions@gmail.com'
+EMAIL_HOST_PASSWORD = 'y3T21n.48$0H12c'
 
 # Update database configuration with $DATABASE_URL.
 import dj_database_url  
