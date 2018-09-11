@@ -100,6 +100,7 @@ class colaboradores(models.Model):
 	fecha_modificacion = models.DateField(default=now)
 	fecha_ult_mod_password = models.DateField(default=now)
 	estado = models.BooleanField(default=True)
+	licencia = models.BooleanField(default=True) #establece si el usuario consumira una licencia
 
 	def _get_full_name(self):
 		"Returns the person's full name."

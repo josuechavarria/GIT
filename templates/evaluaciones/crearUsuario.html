@@ -16,7 +16,7 @@
 {% block content %}
 <div class="row">
     <!-- left column -->
-    <div class="col-md-10">
+    <div class="col-md-11">
         <!-- general form elements -->
         {% if messages %}
             {% for message in messages %}
@@ -143,6 +143,10 @@
                         <label class="col-sm-2 control-label" for="id_{{form.password_caducado.name}}">{{form.password_caducado.label}} </label>
                         <div class="col-sm-4">
                             <input type="checkbox" id="id_password_caducado" name="password_caducado" />
+                        </div>
+                        <label class="col-sm-2 control-label" for="id_{{form.licencia.name}}">Usuario con licencia</label>
+                        <div class="col-sm-4">
+                            {{form.licencia}}
                         </div>
                     </div>
                 </div>

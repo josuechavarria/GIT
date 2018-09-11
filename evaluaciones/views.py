@@ -361,7 +361,7 @@ class CrearUsuarioView(View):
 		objEmpresa = empresas.objects.get(pk=pk)
 
 		#validar licencias
-		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True, licencia=True).count()
 		licencias = objEmpresa.licencias
 		permitir = True
 		if usuarios_activos >= licencias:
@@ -387,7 +387,7 @@ class CrearUsuarioView(View):
 		objUser.set_password(password)
 
 		#validar licencias
-		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True, licencia=True).count()
 		licencias = objEmpresa.licencias
 		permitir = True
 		if usuarios_activos >= licencias:
@@ -418,10 +418,13 @@ class CrearUsuarioView(View):
 				)
 				transaction.savepoint_commit(sid)
 				messagemail = 'Sus datos de acceso son: usuario-> ' + objUser.username + ' password-> ' + password
-				if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objUser.email], fail_silently=False, html_message=html_message):
-					messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Pero no se pudo enviar el correo al colaborador.')
+				if form.licencia==True:
+					if not send_mail(subject, '', settings.EMAIL_HOST_USER, [objUser.email], fail_silently=False, html_message=html_message):
+						messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Pero no se pudo enviar el correo al colaborador.')
+					else:
+						messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Se envio un correo con sus datos de acceso a %s'%(objUser.email))
 				else:
-					messages.add_message(request,messages.SUCCESS,'Usuario Creado Exitosamente. Se envio un correo con sus datos de acceso a %s'%(objUser.email))
+					messages.add_message(request,messages.SUCCESS,'Usuario sin licencia Creado Exitosamente.')
 				ctx['form'] = usuariosForm()
 			except:
 				print ("error hola")
@@ -484,10 +487,20 @@ class ActualizarUsuarioView(View):
 		ctx={}
 		template_name = "evaluaciones/ActualizaUsuario.html"
 		objColaborador = colaboradores.objects.get(pk=pk)
+		objEmpresa = empresas.objects.get(pk=id)
 		formulario = usuariosForm(request.POST, instance=objColaborador)
 		error = False
-		objUser = objColaborador.usuario		
-		if formulario.is_valid():
+		objUser = objColaborador.usuario	
+
+		#validar licencias
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True, licencia=True).count()
+		licencias = objEmpresa.licencias
+		permitir = True
+		print(request.POST)
+		if usuarios_activos >= licencias and objColaborador.licencia==False and 'licencia' in request.POST:
+			permitir = False	
+
+		if formulario.is_valid() and permitir==True:
 			form = formulario.save(commit = False)
 			form.usuario_modificador = request.user
 			form.fecha_modificacion = timezone.now()
@@ -515,16 +528,23 @@ class ActualizarUsuarioView(View):
 			messages.add_message(request,messages.ERROR,"Formulario contiene errores!!")
 			ctx = {'form': formulario}
 			error = True
+
+		if permitir==False:
+			messages.add_message(request,messages.WARNING,"Lo sentimos, no tiene licencias disponibles.")
+
 		ctx['empresa'] = empresas.objects.get(pk=id)
 		ctx['grupos'] = group_empresas.objects.filter(empresa__pk = id)
 		ctx['perfil'] = int(request.POST['grupo'])
 		ctx['email'] = request.POST['email']
-		if "GuardarNuevo" in request.POST or error == True:
-			url = reverse_lazy('evaluaciones:crear_usuario', args=[id,])
-			return HttpResponseRedirect(url)
+
+		if error == True:
+			url = reverse_lazy('evaluaciones:actualiza_usuario', args=[pk,id,])
 		else:
-			url = reverse_lazy('evaluaciones:listar_usuario', args=[id,])
-			return HttpResponseRedirect(url)
+			if "GuardarNuevo" in request.POST:
+				url = reverse_lazy('evaluaciones:crear_usuario', args=[id,])
+			else:
+				url = reverse_lazy('evaluaciones:listar_usuario', args=[id,])
+		return HttpResponseRedirect(url)
 
 class EstadoUsuarioView(View):	
 	def get(self, request, pk=None, id=None):
@@ -533,11 +553,12 @@ class EstadoUsuarioView(View):
 	def post(self, request, pk=None, id=None):
 		objEmpresa = empresas.objects.get(pk=id)
 		objUser = User.objects.get(pk=pk)
+		objColaborador = colaboradores.objects.get(empresa=objEmpresa, usuario=objUser)
 		#validar licencias
-		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True).count()
+		usuarios_activos = colaboradores.objects.filter(empresa=objEmpresa, usuario__is_active=True, licencia=True).count()
 		licencias = objEmpresa.licencias
 		permitir = True
-		if usuarios_activos >= licencias and objUser.is_active == False:
+		if usuarios_activos >= licencias and objUser.is_active == False and objColaborador.licencia == True:
 			permitir = False
 		#fin validar licencias
 		if permitir:
@@ -610,7 +631,11 @@ class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 class ListarEmpresas(ListView):	
 	def get_queryset(self):
 		#print('usuario')
-		return empresas.objects.raw("SELECT e.*,count(c.id) colaboradores FROM evaluaciones_empresas e left outer join evaluaciones_colaboradores c on c.empresa_id = e.id group by e.id ")
+		return empresas.objects.raw("""SELECT e.*,count(c.id) colaboradores 
+			FROM evaluaciones_empresas e 
+			left join evaluaciones_colaboradores c on c.empresa_id = e.id 
+			left join auth_user d on c.usuario_id = d.id
+			where d.is_active=True and c.licencia=True group by e.id""")
 	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -940,7 +965,11 @@ class LoginView(View):
 						if objEmpresa.estado is True:
 							objColaborador = colaboradores.objects.get(usuario=user)
 							if objColaborador.password_caducado is False:
-								return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
+								if objColaborador.licencia == True:
+									return HttpResponseRedirect(reverse('evaluaciones:principal_empresa', args=[objColaborador.empresa.pk]))
+								else:
+									messages.error(request, 'El usuario no tiene licencia activa')
+									logout(request)
 							else:
 								logout(request)
 								return HttpResponseRedirect(reverse('evaluaciones:expired_password', args=[objColaborador.pk,objColaborador.empresa.pk]))

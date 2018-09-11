@@ -62,7 +62,7 @@
                             <td>
                                 <a href="{% url 'evaluaciones:crear_usuario' empresa.pk%}" class="text-green" data-toggle="tooltip" data-placement="top" title="Agregar usuario"><i class="fa fa-plus">&nbsp;&nbsp;</i></a>
                                 <a {% if not object.usuario.is_active %}hidden{% endif %} id="edit_{{object.usuario.pk}}{{object.pk}}" href="{% url 'evaluaciones:actualiza_usuario' pk=object.pk id=empresa.pk %}" class="text-purple" data-toggle="tooltip" data-placement="top" title="Editar usuario"><i id="cicon_{{object.usuario.pk}}{{object.pk}}" class="fa fa-edit">&nbsp;&nbsp;</i></a>
-                                <a {% if not object.usuario.is_active %}hidden{% endif %} href="#" onclick = "AbrirModal2('{% url 'evaluaciones:notificacion_password' pk=object.pk id=empresa.pk %}','{{object.usuario.email}}')" class="text-blue" data-toggle="tooltip" data-placement="top" title="Reestablecer contraseña"><i class="fa fa-key">&nbsp;&nbsp;</i></a> 
+                                <a {% if not object.usuario.is_active or not object.licencia %}hidden{% endif %} href="#" onclick = "AbrirModal2('{% url 'evaluaciones:notificacion_password' pk=object.pk id=empresa.pk %}','{{object.usuario.email}}')" class="text-blue" data-toggle="tooltip" data-placement="top" title="Reestablecer contraseña"><i class="fa fa-key">&nbsp;&nbsp;</i></a> 
                             </td>
                         </tr>
                     {% empty %}

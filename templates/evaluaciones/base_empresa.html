@@ -268,7 +268,8 @@
             {% if 'evaluaciones.evaluaciones_mis_evaluaciones' in perms and not request.user.is_superuser %}
             <li class="treeview">
               <a href="#">
-                <i class="fa fa-list"></i> <span>Mis Evaluaciones <small class="label pull-right bg-green">{{empresa.pk|evaluacionDisponible:request.user.pk}}</small></span> 
+                <i class="fa fa-list"></i> <span>Mis Evaluaciones</span> 
+                <small class="label pull-right bg-green">{{empresa.pk|evaluacionDisponible:request.user.pk}}</small>
               </a>
               <ul class="treeview-menu">
                 {% if empresa.pk|evaluacionDisponible:request.user.pk == 1 %}
@@ -281,7 +282,8 @@
             {% if 'evaluaciones.especiales_es_supervisor' in perms and not request.user.is_superuser %}
             <li class="treeview">
               <a href="#">
-                <i class="fa fa-users"></i> <span>Colaboradores <small class="label pull-right bg-blue">{{empresa.pk|evaluacionColaboradores:request.user.pk}}</small></span> 
+                <i class="fa fa-users"></i> <span>Colaboradores</span> 
+                <small class="label pull-right bg-blue">{{empresa.pk|evaluacionColaboradores:request.user.pk}}</small>
               </a>
               
               <ul class="treeview-menu">
