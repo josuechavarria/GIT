@@ -631,11 +631,11 @@ class ActualizarEmpresa(SuccessMessageMixin, UpdateView):
 class ListarEmpresas(ListView):	
 	def get_queryset(self):
 		#print('usuario')
-		return empresas.objects.raw("""SELECT e.*,count(c.id) colaboradores 
+		return empresas.objects.raw("""SELECT e.*,count(d.id) colaboradores 
 			FROM evaluaciones_empresas e 
-			left join evaluaciones_colaboradores c on c.empresa_id = e.id 
-			left join auth_user d on c.usuario_id = d.id
-			where d.is_active=True and c.licencia=True group by e.id""")
+			left join evaluaciones_colaboradores c on c.empresa_id = e.id and c.licencia=True 
+			left join auth_user d on c.usuario_id = d.id and d.is_active=True 
+			group by e.id""")
 	
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
